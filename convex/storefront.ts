@@ -16,14 +16,15 @@ export const STOREFRONT = String.raw`<!doctype html>
 body { margin:0; background:var(--paper); color:var(--ink); font:400 17px/1.45 var(--body); padding-bottom:110px; }
 h1,h2 { font-family:var(--display); margin:0; letter-spacing:-.02em; }
 p { margin:0; }
-button,input { font:inherit; color:inherit; }
+button,input,textarea { font:inherit; color:inherit; }
+button { min-height:44px; }
 :focus-visible { outline:3px solid var(--coral); outline-offset:2px; }
 .wrap { max-width:560px; margin:0 auto; padding:0 18px; }
 header { background:var(--ink); color:var(--paper); padding:28px 0 26px; border-radius:0 0 28px 28px; }
 header h1 { font-size:clamp(2rem,9vw,2.8rem); font-weight:800; line-height:1; }
 header p { color:#CFC6E6; margin-top:8px; font-size:.95rem; }
-.tabs { display:flex; gap:8px; margin:18px 0 6px; }
-.tabs button { flex:1; border:1.5px solid var(--line); background:#fff; border-radius:999px; padding:10px; font-weight:700; cursor:pointer; }
+.tabs { display:flex; gap:8px; margin:18px 0 6px; overflow-x:auto; padding:4px; }
+.tabs button { flex:1 0 auto; white-space:nowrap; border:1.5px solid var(--line); background:#fff; border-radius:999px; padding:10px; font-weight:700; cursor:pointer; }
 .tabs button.on { background:var(--ink); border-color:var(--ink); color:var(--paper); }
 .item { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid #EEE8F7; }
 .item .name { font-weight:700; }
@@ -31,7 +32,7 @@ header p { color:#CFC6E6; margin-top:8px; font-size:.95rem; }
 .item .price { color:var(--plum); font-weight:700; font-size:.95rem; }
 .item.off { opacity:.45; }
 .step { margin-left:auto; display:flex; align-items:center; gap:10px; }
-.step button { width:40px; height:40px; border-radius:50%; border:1.5px solid var(--line); background:#fff; font-size:1.3rem; font-weight:700; cursor:pointer; line-height:1; }
+.step button { width:44px; height:44px; border-radius:50%; border:1.5px solid var(--line); background:#fff; font-size:1.3rem; font-weight:700; cursor:pointer; line-height:1; }
 .step button.add { background:var(--violet); border-color:var(--violet); color:#fff; }
 .step span { min-width:1.2ch; text-align:center; font-weight:800; }
 .bar { position:fixed; left:0; right:0; bottom:0; padding:12px 18px calc(12px + env(safe-area-inset-bottom)); background:rgba(250,247,242,.94); backdrop-filter:blur(8px); border-top:1px solid var(--line); }
@@ -64,6 +65,17 @@ header p { color:#CFC6E6; margin-top:8px; font-size:.95rem; }
 .send { display:flex; gap:8px; }
 .send input { flex:1; border:1.5px solid var(--line); border-radius:14px; padding:13px 14px; background:#fff; }
 .send button { background:var(--violet); color:#fff; border:0; border-radius:14px; padding:0 18px; font-weight:700; cursor:pointer; }
+.fields { display:grid; gap:12px; margin-top:18px; }
+.fields label,.search { display:grid; gap:6px; font-size:.85rem; font-weight:700; color:var(--muted); }
+.fields input,.fields textarea,.search input { width:100%; min-width:0; border:1.5px solid var(--line); border-radius:14px; padding:13px 14px; background:#fff; }
+.fields textarea { min-height:110px; resize:vertical; }
+.fields fieldset { border:0; padding:0; margin:0; min-width:0; }
+.fields legend { font-size:.85rem; font-weight:700; color:var(--muted); margin-bottom:6px; }
+.stars { display:flex; gap:8px; }
+.stars button { width:44px; border:1.5px solid var(--line); border-radius:14px; background:#fff; color:var(--muted); font-size:1.5rem; cursor:pointer; }
+.stars button.on { background:var(--plum); border-color:var(--plum); color:var(--paper); }
+.search { margin-top:18px; }
+.menu-count { color:var(--muted); font-size:.85rem; margin-top:8px; }
 .empty { color:var(--muted); padding:24px 0; }
 footer { text-align:center; color:var(--muted); font-size:.8rem; padding:28px 0 0; }
 footer a { color:var(--plum); font-weight:700; }
@@ -73,14 +85,46 @@ footer a { color:var(--plum); font-weight:700; }
 <body>
 <header><div class="wrap"><h1 id="shopName">Loading</h1><p id="shopHours"></p></div></header>
 <div class="wrap">
-  <div class="tabs" role="tablist"><button id="tabMenu" class="on">Menu</button><button id="tabChat">Ask the octopus</button></div>
-  <section id="menuView">
+  <div class="tabs" role="tablist" aria-label="Shop">
+    <button id="tabMenu" class="on" role="tab" aria-controls="menuView" aria-selected="true">Menu</button>
+    <button id="tabChat" role="tab" aria-controls="chatView" aria-selected="false" tabindex="-1">Ask the octopus</button>
+    <button id="tabBook" role="tab" aria-controls="bookView" aria-selected="false" tabindex="-1">Book</button>
+    <button id="tabReview" role="tab" aria-controls="reviewView" aria-selected="false" tabindex="-1">Review</button>
+  </div>
+  <section id="menuView" role="tabpanel" aria-labelledby="tabMenu">
     <div id="status"></div>
+    <label class="search">Search the menu<input id="menuSearch" type="search" placeholder="Search the menu"></label>
+    <p class="menu-count" id="menuCount" hidden></p>
     <div id="menu"></div>
   </section>
-  <section id="chatView" hidden>
+  <section id="chatView" role="tabpanel" aria-labelledby="tabChat" hidden>
     <div class="thread" id="thread"></div>
     <form class="send" id="chatForm"><input id="chatInput" placeholder="Do you have oat milk?" aria-label="Message the shop"><button>Send</button></form>
+  </section>
+  <section id="bookView" role="tabpanel" aria-labelledby="tabBook" hidden>
+    <form class="status fields" id="bookForm">
+      <label>Your name<input id="bookName" autocomplete="given-name" required maxlength="40"></label>
+      <label>What for<input id="bookService" placeholder="Pickup, haircut, table for two" required></label>
+      <label>When<input id="bookWhen" placeholder="Tomorrow 5 PM" required></label>
+      <p class="err" id="bookErr" role="alert"></p>
+      <button class="primary" id="bookSubmit">Book it</button>
+    </form>
+    <div id="bookResult" role="status"><p class="status" id="bookConfirmation" hidden></p></div>
+  </section>
+  <section id="reviewView" role="tabpanel" aria-labelledby="tabReview" hidden>
+    <form class="status fields" id="reviewForm">
+      <fieldset><legend>Your rating</legend><div class="stars" id="stars">
+        <button type="button" class="on" data-rating="1" aria-label="1 star" aria-pressed="false">&#9733;</button>
+        <button type="button" class="on" data-rating="2" aria-label="2 stars" aria-pressed="false">&#9733;</button>
+        <button type="button" class="on" data-rating="3" aria-label="3 stars" aria-pressed="false">&#9733;</button>
+        <button type="button" class="on" data-rating="4" aria-label="4 stars" aria-pressed="false">&#9733;</button>
+        <button type="button" class="on" data-rating="5" aria-label="5 stars" aria-pressed="true">&#9733;</button>
+      </div></fieldset>
+      <label>What did you think?<textarea id="reviewText"></textarea></label>
+      <p class="err" id="reviewErr" role="alert"></p>
+      <button class="primary" id="reviewSubmit">Send review</button>
+    </form>
+    <div id="reviewResult" role="status"><p class="status" id="reviewConfirmation" hidden></p></div>
   </section>
   <footer>Run by <a id="home" href="/">Octopus</a>. Eight arms, one shop, zero staff.</footer>
 </div>
@@ -116,12 +160,16 @@ async function call(path, body) {
 }
 
 function drawMenu() {
-  $('menu').innerHTML = items.length ? items.map((i) => {
+  const query = $('menuSearch').value.trim().toLowerCase();
+  const matches = items.filter((i) => i.name.toLowerCase().includes(query));
+  $('menuCount').hidden = items.length <= 12;
+  $('menuCount').textContent = items.length + ' items';
+  $('menu').innerHTML = matches.length ? matches.map((i) => {
     const n = cart[i.name] || 0;
     const stepper = !i.available ? '<span class="price">Sold out</span>'
       : '<div class="step">' + (n ? '<button data-n="' + esc(i.name) + '" data-d="-1" aria-label="Remove one ' + esc(i.name) + '">−</button><span>' + n + '</span>' : '') + '<button class="add" data-n="' + esc(i.name) + '" data-d="1" aria-label="Add ' + esc(i.name) + '">+</button></div>';
     return '<div class="item' + (i.available ? '' : ' off') + '"><div><div class="name">' + esc(i.name) + '</div>' + (i.description ? '<div class="desc">' + esc(i.description) + '</div>' : '') + '<div class="price">' + money(i.priceCents) + (i.available && i.stock !== null && i.stock <= 3 ? ' · only ' + i.stock + ' left' : '') + '</div></div>' + (i.available ? stepper : '<div class="step">' + stepper + '</div>') + '</div>';
-  }).join('') : '<p class="empty">The menu is being set up. Ask the octopus what is available.</p>';
+  }).join('') : '<p class="empty" role="status">' + (query ? 'Nothing matches' : 'The menu is being set up. Ask the octopus what is available.') + '</p>';
   const lines = items.filter((i) => cart[i.name]);
   const count = lines.reduce((t, i) => t + cart[i.name], 0);
   const total = lines.reduce((t, i) => t + cart[i.name] * i.priceCents, 0);
@@ -139,6 +187,7 @@ function drawStatus(o) {
   $('status').innerHTML = '<div class="status"><h2>' + head + '</h2><p>' + esc(o.lines.join(', ')) + (o.requestedTime ? ', ' + esc(o.requestedTime) : '') + ' <b>' + money(o.totalCents) + '</b></p>'
     + '<div class="track">' + names.map((n, k) => '<div class="' + (k <= stage ? 'on' : '') + (k === stage ? ' now' : '') + '">' + n + '</div>').join('') + '</div>'
     + '<span class="pill' + (o.paid ? ' ok' : '') + '">' + (o.paid ? 'Paid' : 'Not paid yet') + '</span>'
+    + (o.paid && o.status === 'ready' ? '<p>Show this screen when you pick up.</p>' : '')
     + (!o.paid && o.paymentLink ? '<a class="primary" target="_blank" rel="noopener" href="' + esc(o.paymentLink) + '">Pay ' + money(o.totalCents) + '</a>' : '')
     + (stage === 2 || o.status === 'cancelled' ? '<button class="ghost" id="again">Start a new order</button>' : '') + '</div>';
   const again = $('again');
@@ -161,6 +210,7 @@ async function refresh() {
   } catch (err) { $('shopName').textContent = 'Shop not found'; }
 }
 
+$('menuSearch').addEventListener('input', drawMenu);
 $('menu').addEventListener('click', (e) => {
   const b = e.target.closest('button[data-n]');
   if (!b) return;
@@ -202,13 +252,68 @@ $('chatForm').addEventListener('submit', async (e) => {
   catch (err) { messages = messages.concat([{ role: 'agent', text: err.message }]); }
   drawThread(false);
 });
-function show(chat) {
-  $('menuView').hidden = chat; $('chatView').hidden = !chat; $('bar').hidden = chat;
-  $('tabMenu').classList.toggle('on', !chat); $('tabChat').classList.toggle('on', chat);
-  if (chat) call('/public/chat', { shopId: shopId, session: session }).then((d) => { messages = d.messages; drawThread(false); }).catch(() => drawThread(false));
+$('bookName').value = localStorage.getItem('octopusName') || '';
+$('bookForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = $('bookName').value.trim(), service = $('bookService').value.trim(), when = $('bookWhen').value.trim();
+  $('bookErr').textContent = ''; $('bookConfirmation').hidden = true; $('bookSubmit').disabled = true;
+  try {
+    await call('/public/book', { shopId: shopId, session: session, name: name, service: service, when: when });
+    $('bookForm').reset();
+    $('bookConfirmation').textContent = 'Booked: ' + service + ', ' + when + '. We will remind you.';
+    $('bookConfirmation').hidden = false;
+  } catch (err) { $('bookErr').textContent = err.message; }
+  $('bookSubmit').disabled = false;
+});
+
+let rating = 5;
+function drawRating() {
+  $('stars').querySelectorAll('button').forEach((b) => {
+    b.classList.toggle('on', Number(b.dataset.rating) <= rating);
+    b.setAttribute('aria-pressed', String(Number(b.dataset.rating) === rating));
+  });
 }
-$('tabMenu').onclick = () => show(false);
-$('tabChat').onclick = () => show(true);
+$('stars').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-rating]');
+  if (!b) return;
+  rating = Number(b.dataset.rating); drawRating();
+});
+$('reviewForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('reviewErr').textContent = ''; $('reviewConfirmation').hidden = true; $('reviewSubmit').disabled = true;
+  try {
+    await call('/public/review', { shopId: shopId, session: session, rating: rating, text: $('reviewText').value.trim() });
+    $('reviewForm').reset(); rating = 5; drawRating();
+    $('reviewConfirmation').textContent = 'Thank you. The shop will see this.';
+    $('reviewConfirmation').hidden = false;
+  } catch (err) { $('reviewErr').textContent = err.message; }
+  $('reviewSubmit').disabled = false;
+});
+
+const tabs = ['Menu', 'Chat', 'Book', 'Review'];
+function show(tab) {
+  tabs.forEach((name) => {
+    const selected = name === tab;
+    $(name.toLowerCase() + 'View').hidden = !selected;
+    $('tab' + name).classList.toggle('on', selected);
+    $('tab' + name).setAttribute('aria-selected', String(selected));
+    $('tab' + name).tabIndex = selected ? 0 : -1;
+  });
+  $('bar').hidden = tab !== 'Menu';
+  if (tab === 'Chat') call('/public/chat', { shopId: shopId, session: session }).then((d) => { messages = d.messages; drawThread(false); }).catch(() => drawThread(false));
+}
+tabs.forEach((name, index) => {
+  $('tab' + name).onclick = () => show(name);
+  $('tab' + name).onkeydown = (e) => {
+    let next;
+    if (e.key === 'ArrowRight') next = (index + 1) % tabs.length;
+    else if (e.key === 'ArrowLeft') next = (index + tabs.length - 1) % tabs.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = tabs.length - 1;
+    else return;
+    e.preventDefault(); show(tabs[next]); $('tab' + tabs[next]).focus();
+  };
+});
 
 drawMenu();
 refresh();

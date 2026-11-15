@@ -1,73 +1,78 @@
 import SwiftUI
 
+/// The business dashboard: the mascot on top, one tile per business function below.
 struct ArmsView: View {
-    let shopId: String
+    let shop: Shop
 
-    @State private var counts: [Double] = []
-    @State private var pulsing: Set<Int> = []
-    @State private var errorMessage: String?
+    @StateObject private var dashboard: DashboardStore
+    @StateObject private var store: SuiteStore
+    @State private var selected: TileKind?
 
-    private static let arms = [
-        "Takes orders by text",
-        "Answers customer questions",
-        "Sends the pay link",
-        "Remembers every regular",
-        "Reads your menu from a photo",
-        "Pings you when an order lands",
-        "Tells customers when the order is ready",
-        "Sends you the day's total at closing",
-    ]
+    private static let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible())]
+    private static let heroShare = 0.4
+    private static let nameHeight: CGFloat = 56
+
+    init(shop: Shop) {
+        self.shop = shop
+        _dashboard = StateObject(wrappedValue: DashboardStore(shopId: shop.id))
+        _store = StateObject(wrappedValue: SuiteStore(shopId: shop.id))
+    }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 12) {
-                    OctopusMascotView(height: 180)
-                    ForEach(Array(Self.arms.enumerated()), id: \.offset) { index, title in
-                        ArmRow(
-                            number: index + 1, title: title, value: value(at: index),
-                            isPulsing: pulsing.contains(index))
-                    }
-                    if let errorMessage {
-                        Text(errorMessage)
-                            .font(Theme.caption)
-                            .foregroundStyle(Theme.coral)
-                    }
-                    Text("Eight arms. One shop. Zero staff.")
-                        .font(Theme.headline)
-                        .foregroundStyle(Theme.purple)
-                        .padding(.vertical, 16)
-                }
-                .padding(16)
-            }
-            .screenBackground()
-            .navigationTitle("Arms")
-            .task {
-                do {
-                    for try await latest in ConvexService.shared.armCounts(shopId: shopId).values {
-                        receive(latest)
-                    }
-                } catch {
-                    errorMessage = error.plainMessage
+        GeometryReader { screen in
+            let heroHeight = screen.size.height * Self.heroShare
+            ZStack(alignment: .top) {
+                hero(height: heroHeight)
+                ScrollView {
+                    tiles
+                        .frame(minHeight: screen.size.height - heroHeight, alignment: .top)
+                        .background(
+                            Theme.background,
+                            in: UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28))
+                        .padding(.top, heroHeight)
                 }
             }
         }
-    }
-
-    /// Rows whose counter changed pulse briefly. The first load does not pulse.
-    private func receive(_ latest: [Double]) {
-        let changed = Set(latest.indices.filter { $0 < counts.count && counts[$0] != latest[$0] })
-        counts = latest
-        guard !changed.isEmpty else { return }
-        pulsing.formUnion(changed)
-        Task {
-            try? await Task.sleep(for: .seconds(0.8))
-            pulsing.subtract(changed)
+        .background(Theme.ink.ignoresSafeArea())
+        .sheet(item: $selected) { kind in
+            TileDetailView(kind: kind, dashboard: dashboard.dashboard, store: store)
         }
     }
 
-    private func value(at index: Int) -> String {
-        if index == Self.arms.count - 1 { return "Soon" }
-        return String(Int(index < counts.count ? counts[index] : 0))
+    private func hero(height: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            OctopusMascotView(height: max(height - Self.nameHeight, 0))
+            Text(shop.name)
+                .font(Theme.largeTitle)
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .padding(.horizontal, 16)
+                .frame(height: Self.nameHeight)
+        }
+    }
+
+    private var tiles: some View {
+        VStack(spacing: 12) {
+            if let message = store.errorMessage ?? dashboard.errorMessage {
+                Text(message)
+                    .font(Theme.caption)
+                    .foregroundStyle(Theme.coral)
+            }
+            LazyVGrid(columns: Self.columns, spacing: 12) {
+                ForEach(TileKind.allCases) { kind in
+                    let stat = kind.stat(dashboard: dashboard.dashboard, store: store)
+                    Button { selected = kind } label: {
+                        ArmTile(kind: kind, value: stat.value, caption: stat.caption)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            Text("Eight arms. One shop. Zero staff.")
+                .font(Theme.headline)
+                .foregroundStyle(Theme.purple)
+                .padding(.vertical, 16)
+        }
+        .padding(16)
     }
 }

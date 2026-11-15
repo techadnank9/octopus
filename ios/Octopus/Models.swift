@@ -104,3 +104,60 @@ struct Customer: Decodable, Equatable {
     @ConvexFloat var spentCents: Double
     let usual: String?
 }
+
+struct Suite: Decodable, Equatable {
+    let sales: [Sale]
+    let tax: TaxSummary
+    @ConvexFloat var receipts: Double
+    @ConvexFloat var unpaid: Double
+    let bookings: [Booking]
+    let reviews: [Review]
+    let reorder: [ReorderLine]
+    let audience: Audience
+}
+
+struct Sale: Decodable, Equatable, Identifiable {
+    let id: String
+    @ConvexFloat var at: Double
+    let customer: String
+    let items: String
+    @ConvexFloat var totalCents: Double
+    let paid: Bool
+}
+
+struct TaxSummary: Decodable, Equatable {
+    /// Percent, for example 8.5.
+    @ConvexFloat var rate: Double
+    @ConvexFloat var grossCents: Double
+    @ConvexFloat var taxCents: Double
+    @ConvexFloat var netCents: Double
+}
+
+struct Booking: Decodable, Equatable, Identifiable {
+    let id: String
+    let customer: String
+    let service: String
+    let when: String
+    let status: String
+    let reminded: Bool
+
+    var isBooked: Bool { status == "booked" }
+}
+
+struct Review: Decodable, Equatable, Identifiable {
+    let id: String
+    let customer: String
+    @ConvexFloat var rating: Double
+    let text: String
+    let reply: String?
+}
+
+struct ReorderLine: Decodable, Equatable {
+    let name: String
+    @ConvexFloat var left: Double
+}
+
+struct Audience: Decodable, Equatable {
+    @ConvexFloat var all: Double
+    @ConvexFloat var quiet: Double
+}

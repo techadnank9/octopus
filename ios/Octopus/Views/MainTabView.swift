@@ -17,7 +17,7 @@ struct MainTabView: View {
                 .tabItem { Label("Menu", systemImage: "camera.fill") }
             NumberView(shop: shop)
                 .tabItem { Label("Number", systemImage: "qrcode") }
-            ArmsView(shopId: shop.id)
+            ArmsView(shop: shop)
                 .tabItem { Label("Arms", systemImage: "sparkles") }
             ChatView(shopId: shop.id)
                 .tabItem { Label("Octopus", systemImage: "bubble.left.and.text.bubble.right") }

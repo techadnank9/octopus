@@ -103,6 +103,21 @@ struct ConvexService {
         client.subscribe(to: "dashboard:get", with: ["shopId": shopId], yielding: Dashboard.self)
     }
 
+    func suite(shopId: String) -> AnyPublisher<Suite, ClientError> {
+        client.subscribe(to: "dashboard:suite", with: ["shopId": shopId], yielding: Suite.self)
+    }
+
+    /// Runs one dashboard action and returns a sentence saying what happened.
+    func runDashboard(
+        shopId: String, action: String, id: String?, text: String?, rate: Double?
+    ) async throws -> String {
+        var args: [String: ConvexEncodable?] = ["shopId": shopId, "action": action]
+        if let id { args["id"] = id }
+        if let text { args["text"] = text }
+        if let rate { args["rate"] = rate }
+        return try await client.action("dashboard:run", with: args)
+    }
+
     // MARK: Arms
 
     func armCounts(shopId: String) -> AnyPublisher<[Double], ClientError> {
