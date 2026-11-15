@@ -26,6 +26,11 @@ struct ConvexService {
         let _: String = try await client.mutation("shops:create", with: args)
     }
 
+    /// Links this device to a shop that was set up on the web. Returns the shop id.
+    func claimShop(ownerId: String, code: String) async throws -> String {
+        try await client.mutation("onboard:claim", with: ["ownerId": ownerId, "code": code])
+    }
+
     // MARK: Items
 
     func items(shopId: String) -> AnyPublisher<[Item], ClientError> {

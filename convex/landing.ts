@@ -131,7 +131,7 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
       <div class="panel"><h3>Your text line</h3><p class="hint">Customers scan this and text. Post it anywhere.</p><img class="qr" id="qr" alt="QR code for your text line"><p id="lineText" style="text-align:center;font-weight:700"></p></div>
       <div class="panel"><h3>Try it as a customer</h3><p class="hint">This is what your customers get when they text.</p><div class="thread" id="custThread"></div><form class="send" id="custForm"><input id="custInput" placeholder="two coffees for 3 PM" aria-label="Message as a customer"><button>Send</button></form></div>
       <div class="panel wide"><h3>Orders</h3><p class="hint">They land here, and on your phone, the moment a customer confirms.</p><div id="orders"></div></div>
-      <div class="panel dark"><h3>Tell your octopus</h3><p class="hint">You message, it does the work.</p><div class="chips" id="chips"></div><div class="thread" id="ownerThread"></div><form class="send" id="ownerForm"><input id="ownerInput" placeholder="Banana bread is sold out" aria-label="Message your octopus"><button>Send</button></form></div>
+      <div class="panel dark"><h3>Tell your octopus</h3><p class="hint">You message, it does the work.</p><p class="hint" id="ownerLine"></p><div class="chips" id="chips"></div><div class="thread" id="ownerThread"></div><form class="send" id="ownerForm"><input id="ownerInput" placeholder="Banana bread is sold out" aria-label="Message your octopus"><button>Send</button></form></div>
       <div class="panel wide"><h3>What your octopus did today</h3><p class="hint">Eight arms, counted live.</p><div id="arms"></div></div>
       <div class="panel"><h3>Take it with you</h3><p class="hint">Open the Octopus iPhone app and enter this code to run the same shop from your pocket.</p><p class="code" id="claim"></p></div>
     </div>
@@ -208,6 +208,8 @@ async function refresh() {
     const m = /^sms:([^&?]+)[&?]body=(.*)$/.exec(s.shop.channelLink);
     $('lineText').textContent = m ? 'Text ' + decodeURIComponent(m[2]) + ' to ' + m[1] : s.shop.channelLink;
   } else { $('lineText').textContent = 'Your text line is being set up'; }
+  const om = s.shop.ownerLink && /^sms:([^&?]+)[&?]body=(.*)$/.exec(s.shop.ownerLink);
+  $('ownerLine').textContent = om ? 'Or from your phone: text ' + decodeURIComponent(om[2]) + ' to ' + om[1] : '';
   $('claim').textContent = s.shop.claimCode || 'Already on your phone';
   const ids = s.orders.map((o) => o.id);
   const fresh = seenOrders ? ids.filter((id) => seenOrders.indexOf(id) < 0) : [];

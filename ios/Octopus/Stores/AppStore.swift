@@ -53,4 +53,8 @@ final class AppStore: ObservableObject {
             name: name.trimmingCharacters(in: .whitespacesAndNewlines),
             hours: trimmedHours.isEmpty ? nil : trimmedHours)
     }
+
+    func claimShop(code: String) async throws {
+        _ = try await ConvexService.shared.claimShop(ownerId: ownerId, code: code)
+    }
 }

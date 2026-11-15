@@ -4,30 +4,56 @@ import type { Id } from "./_generated/dataModel";
 import { v } from "convex/values";
 import { brain, remember } from "./memory";
 
-type Draft = { name: string; hours: string | null; about: string | null; items: { name: string; price: number; description: string | null }[] };
+type Draft = { name: string; hours: string | null; about: string | null; unpriced: string[]; items: { name: string; price: number; description: string | null }[] };
 
 const PROMPT = `You set up a small shop from what its owner gave you: text from their website, or their own description.
-Reply with JSON only: {"name": string, "hours": string|null, "about": string|null, "items": [{"name": string, "price": number, "description": string|null}]}.
+Reply with JSON only: {"name": string, "hours": string|null, "about": string|null, "items": [{"name": string, "price": number, "description": string|null}], "unpriced": [string]}.
 name is the business name. about is one plain sentence on what they sell. price is a number in the main currency unit.
-Only include items or services that have a clear price in the text. Never invent items, prices or hours. At most 25 items.`;
+items holds only things that have a clear price in the text. unpriced lists up to 15 things they clearly sell where no price is given. Never invent items, prices or hours. At most 25 items.`;
 
-/** Firecrawl renders the page and returns clean markdown, which reads menus far better than raw HTML. */
-async function scrapeWithFirecrawl(target: string) {
+type Scrape = { markdown: string; links: string[] };
+
+/** Firecrawl renders a page and returns clean markdown plus its links, which reads menus far better than raw HTML. */
+async function scrape(target: string): Promise<Scrape | null> {
   const key = process.env.FIRECRAWL_API_KEY;
   if (!key) return null;
   const res = await fetch("https://api.firecrawl.dev/v2/scrape", {
     method: "POST",
     headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
-    body: JSON.stringify({ url: target, formats: ["markdown"], onlyMainContent: true }),
+    body: JSON.stringify({ url: target, formats: ["markdown", "links"], onlyMainContent: true }),
   });
   if (!res.ok) return null;
-  const body = (await res.json()) as { data?: { markdown?: string } };
-  return body.data?.markdown?.slice(0, 14000) || null;
+  const body = (await res.json()) as { data?: { markdown?: string; links?: string[] } };
+  return body.data?.markdown ? { markdown: body.data.markdown, links: body.data.links ?? [] } : null;
+}
+
+const WORTH_READING = /menu|pric|order|shop|product|service|book|catering|about|hours|visit/i;
+
+/** Reads the home page, then up to three more pages on the same site that look like menus, prices or hours. */
+async function scrapeSite(target: string) {
+  const home = await scrape(target);
+  if (!home) return null;
+  const host = new URL(target).host;
+  const more = [...new Set(home.links)]
+    .filter((link) => {
+      try {
+        const url = new URL(link);
+        return url.host === host && url.href.replace(/\/$/, "") !== target.replace(/\/$/, "") && WORTH_READING.test(url.pathname);
+      } catch {
+        return false;
+      }
+    })
+    .slice(0, 3);
+  const pages = await Promise.all(more.map((link) => scrape(link)));
+  return [home, ...pages]
+    .filter((page): page is Scrape => page !== null)
+    .map((page) => page.markdown.slice(0, 9000))
+    .join("\n\n---\n\n");
 }
 
 async function readWebsite(url: string) {
   const target = /^https?:\/\//i.test(url) ? url : `https://${url}`;
-  const scraped = await scrapeWithFirecrawl(target);
+  const scraped = await scrapeSite(target);
   if (scraped) return scraped;
   const res = await fetch(target, { headers: { "user-agent": "OctopusSetup/1.0" } });
   if (!res.ok) throw new Error(`Could not open that website (${res.status})`);
@@ -96,6 +122,9 @@ export const fromWeb = internalAction({
     const claimCode = Math.random().toString(36).slice(2, 8).toUpperCase();
     const shopId = await ctx.runMutation(internal.onboard.createShop, { name, hours: draft.hours ?? undefined, claimCode, items });
     if (draft.about) await remember(brain.shopNotes(shopId), `About the shop: ${draft.about}`);
+    if (draft.unpriced?.length) {
+      await remember(brain.shopNotes(shopId), `The shop also sells these, but the price is not set yet, so ask the owner before taking an order for them: ${draft.unpriced.slice(0, 15).join(", ")}`);
+    }
     return { shopId, claimCode };
   },
 });
@@ -112,7 +141,7 @@ export const state = internalQuery({
       ctx.runQuery(api.events.countsToday, { shopId }),
     ]);
     return {
-      shop: { name: shop.name, hours: shop.hours ?? null, channelLink: shop.channelLink ?? null, claimCode: shop.ownerId.startsWith("web:") ? shop.ownerId.slice(4) : null },
+      shop: { name: shop.name, hours: shop.hours ?? null, channelLink: shop.channelLink ?? null, claimCode: shop.ownerId.startsWith("web:") ? shop.ownerId.slice(4) : null, ownerLink: process.env.OWNER_CHANNEL_LINK ?? null },
       items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, available: i.available })),
       orders: orders.slice(0, 8).map((o) => ({
         id: o._id,
