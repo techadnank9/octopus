@@ -106,7 +106,7 @@ let session = localStorage.getItem('octopusSession');
 if (!session) { session = Math.random().toString(36).slice(2, 12); localStorage.setItem('octopusSession', session); }
 const orderKey = 'octopusOrder:' + shopId;
 let items = [], cart = {}, orderId = localStorage.getItem(orderKey), messages = [];
-if (window.OCTOPUS_API) $('home').href = './..';
+$('home').href = window.OCTOPUS_ROOT || '/';
 
 async function call(path, body) {
   const res = await fetch(API + path, body ? { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) } : undefined);

@@ -49,6 +49,7 @@ export function addSiteRoutes(http: HttpRouter) {
   });
 
   http.route({ path: "/shop", method: "GET", handler: html(STOREFRONT) });
+  http.route({ path: "/dashboard", method: "GET", handler: html(LANDING) });
 
   for (const path of ["/onboard", "/public/chat", "/public/owner", "/public/order", "/public/placeOrder", "/public/item"]) {
     http.route({ path, method: "OPTIONS", handler: preflight });
