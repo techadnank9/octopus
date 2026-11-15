@@ -28,6 +28,13 @@ header p { color:#CFC6E6; margin-top:8px; font-size:.95rem; }
 .tabs button.on { background:var(--ink); border-color:var(--ink); color:var(--paper); }
 .item { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid #EEE8F7; }
 .item .name { font-weight:700; }
+.item-info { flex:1; min-width:0; overflow-wrap:anywhere; }
+.item-heading { display:flex; align-items:center; gap:8px; }
+.favourite { flex-shrink:0; width:44px; height:44px; display:grid; place-items:center; border:1.5px solid var(--line); border-radius:50%; background:#fff; color:var(--plum); cursor:pointer; }
+.favourite svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2; }
+.favourite[aria-pressed="true"] svg { fill:currentColor; }
+.favourites-filter { margin-top:12px; padding:8px 16px; border:1.5px solid var(--line); border-radius:999px; background:#fff; font-weight:700; cursor:pointer; }
+.favourites-filter[aria-pressed="true"] { background:var(--ink); border-color:var(--ink); color:var(--paper); }
 .item .desc { color:var(--muted); font-size:.85rem; }
 .item .price { color:var(--plum); font-weight:700; font-size:.95rem; }
 .item.off { opacity:.45; }
@@ -94,6 +101,7 @@ footer a { color:var(--plum); font-weight:700; }
   <section id="menuView" role="tabpanel" aria-labelledby="tabMenu">
     <div id="status"></div>
     <label class="search">Search the menu<input id="menuSearch" type="search" placeholder="Search the menu"></label>
+    <button type="button" class="favourites-filter" id="favouritesFilter" aria-pressed="false" aria-controls="menu">Favourites</button>
     <p class="menu-count" id="menuCount" hidden></p>
     <div id="menu"></div>
   </section>
@@ -149,6 +157,12 @@ const shopId = new URLSearchParams(location.search).get('id');
 let session = localStorage.getItem('octopusSession');
 if (!session) { session = Math.random().toString(36).slice(2, 12); localStorage.setItem('octopusSession', session); }
 const orderKey = 'octopusOrder:' + shopId;
+const favouritesKey = 'octopusFavourites:' + shopId;
+let favourites = new Set(), favouritesOnly = false;
+try {
+  const saved = JSON.parse(localStorage.getItem(favouritesKey) || '[]');
+  if (Array.isArray(saved)) favourites = new Set(saved.filter((name) => typeof name === 'string'));
+} catch {}
 let items = [], cart = {}, orderId = localStorage.getItem(orderKey), messages = [];
 $('home').href = window.OCTOPUS_ROOT || '/';
 
@@ -161,15 +175,16 @@ async function call(path, body) {
 
 function drawMenu() {
   const query = $('menuSearch').value.trim().toLowerCase();
-  const matches = items.filter((i) => i.name.toLowerCase().includes(query));
+  const matches = items.filter((i) => i.name.toLowerCase().includes(query) && (!favouritesOnly || favourites.has(i.name)));
   $('menuCount').hidden = items.length <= 12;
   $('menuCount').textContent = items.length + ' items';
   $('menu').innerHTML = matches.length ? matches.map((i) => {
     const n = cart[i.name] || 0;
     const stepper = !i.available ? '<span class="price">Sold out</span>'
       : '<div class="step">' + (n ? '<button data-n="' + esc(i.name) + '" data-d="-1" aria-label="Remove one ' + esc(i.name) + '">−</button><span>' + n + '</span>' : '') + '<button class="add" data-n="' + esc(i.name) + '" data-d="1" aria-label="Add ' + esc(i.name) + '">+</button></div>';
-    return '<div class="item' + (i.available ? '' : ' off') + '"><div><div class="name">' + esc(i.name) + '</div>' + (i.description ? '<div class="desc">' + esc(i.description) + '</div>' : '') + '<div class="price">' + money(i.priceCents) + (i.available && i.stock !== null && i.stock <= 3 ? ' · only ' + i.stock + ' left' : '') + '</div></div>' + (i.available ? stepper : '<div class="step">' + stepper + '</div>') + '</div>';
-  }).join('') : '<p class="empty" role="status">' + (query ? 'Nothing matches' : 'The menu is being set up. Ask the octopus what is available.') + '</p>';
+    const heart = '<button type="button" class="favourite" data-favourite="' + esc(i.name) + '" aria-label="Favourite ' + esc(i.name) + '" aria-pressed="' + favourites.has(i.name) + '"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>';
+    return '<div class="item' + (i.available ? '' : ' off') + '"><div class="item-info"><div class="item-heading"><div class="name">' + esc(i.name) + '</div>' + heart + '</div>' + (i.description ? '<div class="desc">' + esc(i.description) + '</div>' : '') + '<div class="price">' + money(i.priceCents) + (i.available && i.stock !== null && i.stock <= 3 ? ' · only ' + i.stock + ' left' : '') + '</div></div>' + (i.available ? stepper : '<div class="step">' + stepper + '</div>') + '</div>';
+  }).join('') : '<p class="empty" role="status">' + (query ? 'Nothing matches' : favouritesOnly ? 'No favourites yet. Tap a heart on the menu to save an item.' : 'The menu is being set up. Ask the octopus what is available.') + '</p>';
   const lines = items.filter((i) => cart[i.name]);
   const count = lines.reduce((t, i) => t + cart[i.name], 0);
   const total = lines.reduce((t, i) => t + cart[i.name] * i.priceCents, 0);
@@ -211,7 +226,22 @@ async function refresh() {
 }
 
 $('menuSearch').addEventListener('input', drawMenu);
+$('favouritesFilter').onclick = () => {
+  favouritesOnly = !favouritesOnly;
+  $('favouritesFilter').setAttribute('aria-pressed', String(favouritesOnly));
+  drawMenu();
+};
 $('menu').addEventListener('click', (e) => {
+  const heart = e.target.closest('button[data-favourite]');
+  if (heart) {
+    const name = heart.dataset.favourite;
+    if (favourites.has(name)) favourites.delete(name); else favourites.add(name);
+    try { localStorage.setItem(favouritesKey, JSON.stringify(Array.from(favourites))); } catch {}
+    drawMenu();
+    const next = Array.from($('menu').querySelectorAll('[data-favourite]')).find((b) => b.dataset.favourite === name);
+    (next || $('favouritesFilter')).focus();
+    return;
+  }
   const b = e.target.closest('button[data-n]');
   if (!b) return;
   const n = (cart[b.dataset.n] || 0) + Number(b.dataset.d);
