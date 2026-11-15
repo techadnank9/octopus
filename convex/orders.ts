@@ -84,14 +84,19 @@ export const setStatus = mutation({
 
 export const markPaidDemo = mutation({
   args: { orderId: v.id("orders") },
-  handler: (ctx, { orderId }) => ctx.db.patch(orderId, { paymentStatus: "paid" }),
+  handler: async (ctx, { orderId }) => {
+    await ctx.db.patch(orderId, { paymentStatus: "paid" });
+    await ctx.scheduler.runAfter(0, internal.notify.receipt, { orderId });
+  },
 });
 
 export const markPaidByWebhook = internalMutation({
   args: { orderId: v.string() },
   handler: async (ctx, { orderId }) => {
     const id = ctx.db.normalizeId("orders", orderId);
-    if (id && (await ctx.db.get(id))) await ctx.db.patch(id, { paymentStatus: "paid" });
+    if (!id || !(await ctx.db.get(id))) return;
+    await ctx.db.patch(id, { paymentStatus: "paid" });
+    await ctx.scheduler.runAfter(0, internal.notify.receipt, { orderId: id });
   },
 });
 

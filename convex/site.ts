@@ -51,7 +51,7 @@ export function addSiteRoutes(http: HttpRouter) {
   http.route({ path: "/shop", method: "GET", handler: html(STOREFRONT) });
   http.route({ path: "/dashboard", method: "GET", handler: html(LANDING) });
 
-  for (const path of ["/onboard", "/public/chat", "/public/owner", "/public/order", "/public/placeOrder", "/public/item"]) {
+  for (const path of ["/onboard", "/public/chat", "/public/owner", "/public/order", "/public/placeOrder", "/public/item", "/public/do", "/public/book", "/public/review"]) {
     http.route({ path, method: "OPTIONS", handler: preflight });
   }
 
@@ -74,6 +74,57 @@ export function addSiteRoutes(http: HttpRouter) {
       }
       return { ok: true };
     }),
+  });
+
+  http.route({
+    path: "/public/do",
+    method: "POST",
+    handler: page(async (ctx, body) => {
+      const shopId = shopOf(body);
+      const id = String(body.id ?? "");
+      switch (body.action) {
+        case "announce":
+          return ctx.runAction(internal.suite.broadcast, { shopId, group: "all", text: String(body.text ?? "") });
+        case "winback":
+          return ctx.runAction(internal.suite.broadcast, { shopId, group: "quiet" });
+        case "chaseUnpaid":
+          return ctx.runAction(internal.suite.broadcast, { shopId, group: "unpaid" });
+        case "askReviews":
+          return ctx.runAction(internal.suite.broadcast, { shopId, group: "happy" });
+        case "remind":
+          return ctx.runAction(internal.suite.remind, { bookingId: id as Id<"bookings"> });
+        case "cancelBooking":
+          return ctx.runMutation(internal.suite.cancelBooking, { bookingId: id as Id<"bookings"> });
+        case "replyReview":
+          return ctx.runAction(internal.suite.replyToReview, { reviewId: id as Id<"reviews"> });
+        case "setTax":
+          return ctx.runMutation(internal.suite.setTaxRate, { shopId, rate: Number(body.rate) });
+        case "dailyTotal":
+          return ctx.runAction(internal.suite.sendDailyTotal, { shopId });
+        default:
+          throw new Error("Unknown action");
+      }
+    }),
+  });
+
+  http.route({
+    path: "/public/book",
+    method: "POST",
+    handler: page(async (ctx, body) => {
+      const shopId = shopOf(body);
+      const who = String(body.name ?? "").trim().slice(0, 40);
+      const booked = await ctx.runMutation(internal.suite.book, { shopId, channelId: webChannel(body), service: String(body.service ?? ""), when: String(body.when ?? "") });
+      if (who) await ctx.runMutation(internal.suite.nameCustomer, { shopId, channelId: webChannel(body), name: who });
+      return booked;
+    }),
+  });
+
+  http.route({
+    path: "/public/review",
+    method: "POST",
+    handler: page((ctx, body) =>
+      ctx.runMutation(internal.suite.leaveReview, { shopId: shopOf(body), channelId: webChannel(body), rating: Number(body.rating), text: String(body.text ?? "") }),
+    ),
   });
 
   http.route({

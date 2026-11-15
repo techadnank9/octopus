@@ -11,6 +11,7 @@ At the start of a conversation call get_customer_memory. If there is a usual ord
 Confirm the full order and total in one message before creating it. Only call create_order after the customer says yes.
 Right after create_order, call create_payment_link and tell the customer to pay with the link to confirm. Do not paste the link yourself; it is attached for you.
 Anything under "What you remember" is true: shop notes from the owner, and what this customer said or ordered before. Use it.
+If they want to book a time, use book_slot and confirm it. If they rate or review the shop, use leave_review and thank them.
 If asked something you cannot answer, say you will check with the owner. Do not guess.
 Never ask for card numbers or other sensitive details. Payment happens only through the link.`;
 
@@ -31,6 +32,8 @@ const TOOLS = [
     ["lines"],
   ),
   tool("create_payment_link", "Create the payment link for this customer's latest order."),
+  tool("book_slot", "Book a time for a service or a visit when the customer asks for one.", { service: { type: "string" }, when: { type: "string", description: "Day and time as the customer said it" } }, ["service", "when"]),
+  tool("leave_review", "Save the customer's rating and words when they give feedback.", { rating: { type: "number", description: "1 to 5" }, text: { type: "string" } }, ["rating", "text"]),
   tool("save_customer_memory", "Remember one fact about this customer.", { note: { type: "string" } }, ["note"]),
 ];
 
@@ -73,6 +76,10 @@ async function runTool(ctx: ActionCtx, t: Thread, name: string, args: Record<str
       state.link = url;
       return { created: true, total };
     }
+    case "book_slot":
+      return ctx.runMutation(internal.suite.book, { ...t, service: String(args.service ?? ""), when: String(args.when ?? "") });
+    case "leave_review":
+      return ctx.runMutation(internal.suite.leaveReview, { ...t, rating: Number(args.rating), text: String(args.text ?? "") });
     case "save_customer_memory":
       return ctx.runMutation(internal.agent.saveCustomerMemory, { ...t, note: String(args.note ?? "") });
     default:

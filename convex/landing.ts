@@ -116,6 +116,41 @@ body.dash #studio { padding-top:32px; }
 .cust { display:grid; grid-template-columns:minmax(0,1fr) 70px 90px minmax(0,1.4fr); gap:10px; padding:9px 0; border-bottom:1px solid #F0EBF8; font-size:.92rem; }
 .cust span:last-child { color:var(--muted); }
 @media (max-width:700px) { .stats { grid-template-columns:repeat(2,1fr); } .mrow { grid-template-columns:1fr 84px; } .cust { grid-template-columns:1fr 1fr; } }
+body.dash main { padding-top:0; }
+.dhero { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr); gap:24px; background:var(--ink); color:var(--paper); margin:0 calc(-1 * clamp(20px,5vw,72px)) 24px; padding:8px clamp(20px,5vw,72px) 28px; min-height:46vh; align-items:center; }
+.dhero h2 { font-size:clamp(2.2rem,5vw,4rem); font-weight:800; line-height:1; }
+.dhero .src { color:#9E93BF; font-size:.88rem; margin:8px 0 18px; }
+.dhero .stats { border-top-color:#4A3A75; }
+.dhero .stats span { color:#B9AEDA; }
+.dhero .links { display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:14px; font-size:.92rem; color:#CFC6E6; }
+.dhero .links a { background:var(--coral); color:var(--ink); font-weight:800; text-decoration:none; padding:10px 16px; border-radius:999px; }
+.dhero .links b { font-family:var(--display); letter-spacing:.06em; color:var(--coral); }
+.dstage { position:relative; min-height:38vh; }
+#octoDash { position:absolute; inset:-20px -40px; cursor:grab; }
+.tell { margin-bottom:20px; }
+.tell .thread { min-height:0; max-height:200px; }
+.toast { min-height:1.4em; font-weight:700; color:var(--plum); margin-bottom:8px; }
+.tiles { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.tile { background:#fff; border:1px solid var(--line); border-radius:24px; padding:20px; display:flex; flex-direction:column; min-width:0; }
+.tile.wide2 { grid-column:span 2; }
+.tile header { display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:start; margin-bottom:14px; }
+.tile .num { font:800 1.1rem var(--display); color:var(--paper); background:var(--ink); width:38px; height:38px; border-radius:50%; display:grid; place-items:center; }
+.tile h3 { font-size:1.25rem; font-weight:800; }
+.tile header p { color:var(--muted); font-size:.88rem; margin-top:2px; }
+.tile .live { font:800 1.5rem var(--display); color:var(--violet); text-align:right; letter-spacing:-.02em; }
+.tile .live small { display:block; font:500 .72rem var(--body); color:var(--muted); letter-spacing:0; }
+.tbody { max-height:340px; overflow:auto; }
+.tile.wide2 .tbody { max-height:460px; }
+.tbody .thread { min-height:120px; max-height:200px; }
+.tbody .send input { background:#fff; color:var(--ink); border-color:var(--line); }
+.tbody .qr { display:block; margin:8px auto; width:150px; height:150px; }
+.line3 { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:10px; align-items:center; padding:8px 0; border-bottom:1px solid #F0EBF8; font-size:.92rem; }
+.line3 small { color:var(--muted); display:block; }
+.line3 button { border:1.5px solid var(--line); background:#fff; border-radius:10px; padding:6px 10px; font-weight:700; font-size:.8rem; cursor:pointer; color:var(--ink); }
+.share { display:flex; gap:20px; align-items:center; margin-top:24px; padding:20px; border-top:2px solid var(--ink); }
+.share .qr { margin:0; width:130px; height:130px; flex:none; }
+.share p { max-width:40ch; color:var(--muted); }
+@media (max-width:860px) { .dhero { grid-template-columns:1fr; } .dstage { order:-1; min-height:220px; } .tiles { grid-template-columns:1fr; } .tile.wide2 { grid-column:auto; } }
 .arm { display:flex; gap:10px; align-items:center; padding:7px 0; border-bottom:1px solid #F0EBF8; font-size:.9rem; }
 .arm b { margin-left:auto; font:800 1.1rem var(--display); color:var(--violet); }
 .arm i { width:8px; height:8px; border-radius:50%; background:var(--line); }
@@ -153,21 +188,33 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
   </section>
 
   <section id="studio">
-    <div class="shophead"><h2 id="shopName"></h2><span id="source"></span></div>
-    <div class="stats" id="stats"></div>
-    <div id="alerts"></div>
-    <div class="grid">
-      <div class="panel wide"><h3>Orders</h3><p class="hint">They land here, and on your phone, the moment a customer confirms.</p><div id="orders"></div></div>
-      <div class="panel dark"><h3>Tell your octopus</h3><p class="hint">You message, it does the work.</p><p class="hint" id="ownerLine"></p><div class="chips" id="chips"></div><div class="thread" id="ownerThread"></div><form class="send" id="ownerForm"><input id="ownerInput" placeholder="Banana bread is sold out" aria-label="Message your octopus"><button>Send</button></form></div>
-      <div class="panel wide"><h3>Menu and stock</h3><p class="hint">Change a price, count what is left, or switch an item off. Counted items go down with every order and switch off at zero.</p><div id="menu"></div><form class="send" id="addForm"><input id="addName" placeholder="New item" aria-label="New item name"><input id="addPrice" placeholder="Price" inputmode="decimal" aria-label="New item price" style="max-width:110px"><button>Add</button></form></div>
-      <div class="panel"><h3>Selling today</h3><p class="hint">What is moving, most first.</p><div id="sellers"></div></div>
-      <div class="panel wide"><h3>Your customers</h3><p class="hint">Who ordered, how often, and their usual.</p><div id="customers"></div></div>
-      <div class="panel"><h3>Your customer app</h3><p class="hint">A storefront made for your shop: menu, cart, pay and live order status. Share the link or the code.</p><img class="qr" id="storeQr" alt="QR code for your customer app"><a id="storeLink" target="_blank" rel="noopener" style="text-align:center;font-weight:700;color:var(--violet)">Open your customer app</a></div>
-      <div class="panel"><h3>Your text line</h3><p class="hint">Customers scan this and text. Post it anywhere.</p><img class="qr" id="qr" alt="QR code for your text line"><p id="lineText" style="text-align:center;font-weight:700"></p></div>
-      <div class="panel"><h3>Try it as a customer</h3><p class="hint">This is what your customers get when they text.</p><div class="thread" id="custThread"></div><form class="send" id="custForm"><input id="custInput" placeholder="two coffees for 3 PM" aria-label="Message as a customer"><button>Send</button></form></div>
-      <div class="panel wide"><h3>What your octopus did today</h3><p class="hint">Eight arms, counted live.</p><div id="arms"></div></div>
-      <div class="panel"><h3>Take it with you</h3><p class="hint">Open the Octopus iPhone app and enter this code to run the same shop from your pocket.</p><p class="code" id="claim"></p></div>
+    <div class="dhero">
+      <div>
+        <h2 id="shopName"></h2>
+        <p id="source" class="src"></p>
+        <div class="stats" id="stats"></div>
+        <div class="links"><a id="storeLink" target="_blank" rel="noopener">Open your customer app</a><span>App code <b id="claim"></b></span></div>
+      </div>
+      <div class="dstage"><div id="octoDash" aria-label="3D octopus. Drag to turn it."></div></div>
     </div>
+    <div id="alerts"></div>
+    <div class="panel dark tell"><h3>Tell your octopus</h3><p class="hint">You message, it does the work. <span id="ownerLine"></span></p><div class="chips" id="chips"></div><div class="thread" id="ownerThread"></div><form class="send" id="ownerForm"><input id="ownerInput" placeholder="We have 12 samosas left" aria-label="Message your octopus"><button>Send</button></form></div>
+    <p class="toast" id="toast" role="status"></p>
+    <div class="tiles">
+      <article class="tile"><header><span class="num">1</span><div><h3>Customer service</h3><p>Answers questions about your menu and prices by text, at any hour.</p></div><b class="live" id="l1"></b></header><div class="tbody"><div class="thread" id="custThread"></div><form class="send" id="custForm"><input id="custInput" placeholder="Try it: do you have toor dal?" aria-label="Message as a customer"><button>Send</button></form></div></article>
+      <article class="tile"><header><span class="num">2</span><div><h3>Sales and orders</h3><p>Takes the order, confirms items and total.</p></div><b class="live" id="l2"></b></header><div class="tbody"><div id="orders"></div></div></article>
+      <article class="tile"><header><span class="num">3</span><div><h3>Payments</h3><p>Sends a pay link with every order and marks it paid.</p></div><b class="live" id="l3"></b></header><div class="tbody"><div id="payLines"></div><div class="acts"><button data-do="chaseUnpaid">Remind customers who have not paid</button></div></div></article>
+      <article class="tile"><header><span class="num">4</span><div><h3>Invoices and receipts</h3><p>Sends a receipt after payment and makes an invoice for any order.</p></div><b class="live" id="l4"></b></header><div class="tbody"><div id="invoices"></div></div></article>
+      <article class="tile"><header><span class="num">5</span><div><h3>Customer memory</h3><p>Remembers each customer's usual order and preferences.</p></div><b class="live" id="l5"></b></header><div class="tbody"><div id="customers"></div></div></article>
+      <article class="tile"><header><span class="num">6</span><div><h3>Order updates</h3><p>Texts "accepted" and "ready" so nobody has to ask.</p></div><b class="live" id="l6"></b></header><div class="tbody"><p class="hint">Sent the moment you tap Accept or Ready. Customers reach you here:</p><img class="qr" id="qr" alt="QR code for your text line"><p id="lineText" style="text-align:center;font-weight:700"></p></div></article>
+      <article class="tile"><header><span class="num">7</span><div><h3>Bookings and reminders</h3><p>Books time slots by text and reminds customers.</p></div><b class="live" id="l7"></b></header><div class="tbody"><div id="bookings"></div></div></article>
+      <article class="tile"><header><span class="num">8</span><div><h3>Marketing</h3><p>Announces specials and texts regulars who have gone quiet.</p></div><b class="live" id="l8"></b></header><div class="tbody"><form class="send" id="announceForm"><input id="announceText" placeholder="Fresh mangoes arrive Friday" aria-label="Announcement"><button>Send to all</button></form><div class="acts" style="margin-top:10px"><button data-do="winback" id="winback">Win back quiet regulars</button></div><p class="hint" style="margin-top:10px">Only people who texted or ordered first are ever messaged.</p></div></article>
+      <article class="tile"><header><span class="num">9</span><div><h3>Bookkeeping</h3><p>Logs every sale, sends you the daily total, exports for your accountant.</p></div><b class="live" id="l9"></b></header><div class="tbody"><div id="sellers"></div><div class="acts" style="margin-top:10px"><button data-do="dailyTotal">Send me today's total</button><button id="csv">Download sales (CSV)</button></div></div></article>
+      <article class="tile wide2"><header><span class="num">10</span><div><h3>Inventory and suppliers</h3><p>Counts stock, switches sold-out items off, tells you what to reorder.</p></div><b class="live" id="l10"></b></header><div class="tbody"><div id="reorder"></div><div id="menu"></div><form class="send" id="addForm"><input id="addName" placeholder="New item" aria-label="New item name"><input id="addPrice" placeholder="Price" inputmode="decimal" aria-label="New item price" style="max-width:110px"><button>Add</button></form></div></article>
+      <article class="tile"><header><span class="num">11</span><div><h3>Reviews and reputation</h3><p>Asks happy customers for a review and drafts your replies.</p></div><b class="live" id="l11"></b></header><div class="tbody"><div id="reviews"></div><div class="acts" style="margin-top:10px"><button data-do="askReviews">Ask recent customers for a review</button></div></div></article>
+      <article class="tile"><header><span class="num">12</span><div><h3>Taxes and compliance</h3><p>Keeps tidy records of sales and the tax inside them.</p></div><b class="live" id="l12"></b></header><div class="tbody"><form class="send" id="taxForm"><input id="taxRate" inputmode="decimal" placeholder="Tax rate %" aria-label="Tax rate in percent"><button>Save rate</button></form><div id="taxLines" style="margin-top:10px"></div></div></article>
+    </div>
+    <div class="share"><img class="qr" id="storeQr" alt="QR code for your customer app"><p>Customers scan this to open your shop's own app: menu, cart, pay and live order status.</p></div>
   </section>
 </main>
 <footer>Eight arms. One shop. Zero staff.</footer>
@@ -191,9 +238,10 @@ if (!session) { session = Math.random().toString(36).slice(2, 12); localStorage.
 let seenOrders = null;
 let octo = { pulse() {}, setMood() {} };
 
-if (!dashId) import('https://cdn.jsdelivr.net/gh/techadnank9/octopus@plan/plan/octo3d.js')
-  .then((m) => { octo = m.mountOctopus($('octo'), { glbUrl: 'https://cdn.jsdelivr.net/gh/techadnank9/octopus@plan/plan/assets/octopus.glb' }); })
-  .catch(() => { $('octo').innerHTML = '<img alt="Octopus" style="width:100%;height:100%;object-fit:contain" src="https://cdn.jsdelivr.net/gh/techadnank9/octopus@plan/plan/assets/octopus-concept.png">'; });
+const stage = dashId ? 'octoDash' : 'octo';
+import('https://cdn.jsdelivr.net/gh/techadnank9/octopus@plan/plan/octo3d.js')
+  .then((m) => { octo = m.mountOctopus($(stage), { glbUrl: 'https://cdn.jsdelivr.net/gh/techadnank9/octopus@plan/plan/assets/octopus.glb' }); })
+  .catch(() => { $(stage).innerHTML = '<img alt="Octopus" style="width:100%;height:100%;object-fit:contain" src="https://cdn.jsdelivr.net/gh/techadnank9/octopus@plan/plan/assets/octopus-concept.png">'; });
 
 async function post(path, body) {
   const res = await fetch(API + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
@@ -261,11 +309,33 @@ async function refresh() {
     $('lineText').textContent = m ? 'Text ' + decodeURIComponent(m[2]) + ' to ' + m[1] : s.shop.channelLink;
   } else { $('lineText').textContent = 'Your text line is being set up'; }
   const om = s.shop.ownerLink && /^sms:([^&?]+)[&?]body=(.*)$/.exec(s.shop.ownerLink);
-  $('ownerLine').textContent = om ? 'Or from your phone: text ' + decodeURIComponent(om[2]) + ' to ' + om[1] : '';
+  $('ownerLine').textContent = om ? 'From your phone: text ' + decodeURIComponent(om[2]) + ' to ' + om[1] : '';
   const storeUrl = new URL(STORE + encodeURIComponent(shopId), location.href).href;
   $('storeLink').href = storeUrl;
   if ($('storeQr').dataset.u !== storeUrl) { $('storeQr').dataset.u = storeUrl; $('storeQr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=380x380&data=' + encodeURIComponent(storeUrl); }
   $('claim').textContent = s.shop.claimCode || 'Already on your phone';
+  const u = s.suite, live = (id, value, label) => { $(id).innerHTML = value + '<small>' + label + '</small>'; };
+  sales = u.sales; taxInfo = u.tax;
+  live('l1', s.arms[1], 'answered today');
+  live('l2', d.today.orders, 'orders today');
+  live('l3', money(d.today.paidCents), 'collected');
+  live('l4', u.receipts, 'receipts sent');
+  live('l5', d.customers.length, 'customers known');
+  live('l6', s.arms[6], 'updates sent');
+  live('l7', u.bookings.filter((b) => b.status === 'booked').length, 'booked');
+  live('l8', u.audience.all, 'you can text');
+  live('l9', money(u.tax.grossCents), 'sales today');
+  live('l10', u.reorder.length, 'to reorder');
+  live('l11', u.reviews.length ? (u.reviews.reduce((t, r) => t + r.rating, 0) / u.reviews.length).toFixed(1) : '0', u.reviews.length + (u.reviews.length === 1 ? ' review' : ' reviews'));
+  live('l12', money(u.tax.taxCents), 'tax in sales');
+  $('payLines').innerHTML = [['Collected today', d.today.paidCents], ['Still unpaid', d.today.unpaidCents], ['Average order', d.today.averageCents]].map((r) => '<div class="row"><span>' + r[0] + '</span><b>' + money(r[1]) + '</b></div>').join('');
+  $('invoices').innerHTML = u.sales.length ? u.sales.map((o, k) => '<div class="line3"><span>' + esc(o.customer) + '<small>' + esc(o.items) + '</small></span><b>' + money(o.totalCents) + '</b><button data-inv="' + k + '">Invoice</button></div>').join('') : '<p class="empty">Receipts and invoices appear with your first sale.</p>';
+  $('bookings').innerHTML = u.bookings.length ? u.bookings.map((b) => '<div class="line3"><span>' + esc(b.customer) + '<small>' + esc(b.service) + ', ' + esc(b.when) + (b.status === 'cancelled' ? ' (cancelled)' : b.reminded ? ' (reminded)' : '') + '</small></span>' + (b.status === 'booked' ? '<button data-do="remind" data-id="' + b.id + '">Remind</button><button data-do="cancelBooking" data-id="' + b.id + '">Cancel</button>' : '<span></span><span></span>') + '</div>').join('') : '<p class="empty">No bookings yet. Customers can text "book me for 5 PM tomorrow".</p>';
+  $('winback').textContent = 'Win back quiet regulars (' + u.audience.quiet + ')';
+  $('reorder').innerHTML = u.reorder.length ? '<p class="hint">Reorder soon: ' + u.reorder.map((r) => esc(r.name) + ' (' + r.left + ' left)').join(', ') + '</p>' : '';
+  $('reviews').innerHTML = u.reviews.length ? u.reviews.map((r) => '<div class="line3"><span>' + '★'.repeat(r.rating) + ' ' + esc(r.customer) + '<small>' + esc(r.text) + (r.reply ? '<br>You replied: ' + esc(r.reply) : '') + '</small></span><span></span>' + (r.reply ? '<span></span>' : '<button data-do="replyReview" data-id="' + r.id + '">Draft and send reply</button>') + '</div>').join('') : '<p class="empty">No reviews yet. Ask after a good order.</p>';
+  if (document.activeElement !== $('taxRate')) $('taxRate').value = u.tax.rate || '';
+  $('taxLines').innerHTML = [['Sales today (incl. tax)', u.tax.grossCents], ['Tax inside at ' + u.tax.rate + '%', u.tax.taxCents], ['Net of tax', u.tax.netCents]].map((r) => '<div class="row"><span>' + r[0] + '</span><b>' + money(r[1]) + '</b></div>').join('');
   const ids = s.orders.map((o) => o.id);
   const fresh = seenOrders ? ids.filter((id) => seenOrders.indexOf(id) < 0) : [];
   if (fresh.length) { ding(); octo.setMood('happy'); octo.pulse(); }
@@ -277,9 +347,42 @@ async function refresh() {
     const pay = o.paid ? '' : '<button data-o="' + o.id + '" data-s="paid">Mark paid (demo)</button>';
     return '<div class="order' + (fresh.indexOf(o.id) >= 0 ? ' fresh' : '') + '"><div class="top"><span>' + esc(o.customer) + '</span><span class="pill' + (o.paid ? ' ok' : '') + '">' + (o.paid ? 'Paid' : 'Unpaid') + '</span></div><div class="what">' + esc(o.lines.join(', ')) + (o.requestedTime ? ', ' + esc(o.requestedTime) : '') + ' <b>' + money(o.totalCents) + '</b></div><div class="acts">' + acts + pay + '</div></div>';
   }).join('') : '<p class="empty">No orders yet. Text your line, or try the customer chat.</p>';
-  $('arms').innerHTML = ARMS.map((a, k) => '<div class="arm' + (s.arms[k] ? ' lit' : '') + '"><i></i><span>' + a + '</span><b>' + s.arms[k] + '</b></div>').join('');
 }
 
+let sales = [], taxInfo = { rate: 0 };
+const toast = (text) => { $('toast').textContent = text; setTimeout(() => { if ($('toast').textContent === text) $('toast').textContent = ''; }, 5000); };
+const DONE = { announce: 'Announcement sent to ', winback: 'Win-back text sent to ', chaseUnpaid: 'Payment reminder sent to ', askReviews: 'Review request sent to ' };
+async function act(action, extra, button) {
+  if (button) button.disabled = true;
+  try {
+    const out = await post('/public/do', Object.assign({ shopId: shopId, action: action }, extra || {}));
+    if (DONE[action]) toast(DONE[action] + out.sent + (out.sent === 1 ? ' customer.' : ' customers.'));
+    else if (action === 'dailyTotal') toast(out.text);
+    else if (action === 'replyReview') toast('Reply sent: ' + out.reply);
+    else toast('Done.');
+  } catch (err) { toast(err.message); }
+  if (button) button.disabled = false;
+  refresh();
+}
+$('studio').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-do]');
+  if (b) { act(b.dataset.do, b.dataset.id ? { id: b.dataset.id } : null, b); return; }
+  const inv = e.target.closest('button[data-inv]');
+  if (inv) invoice(sales[Number(inv.dataset.inv)]);
+});
+$('announceForm').addEventListener('submit', (e) => { e.preventDefault(); const t = $('announceText').value.trim(); if (t) { $('announceText').value = ''; act('announce', { text: t }); } });
+$('taxForm').addEventListener('submit', (e) => { e.preventDefault(); act('setTax', { rate: Number($('taxRate').value) }); });
+function invoice(o) {
+  const w = window.open('', '_blank');
+  const tax = Math.round(o.totalCents - o.totalCents / (1 + taxInfo.rate / 100));
+  w.document.write('<title>Invoice</title><body style="font:16px system-ui;max-width:560px;margin:40px auto;padding:0 20px"><h1 style="margin-bottom:0">' + esc($('shopName').textContent) + '</h1><p>Invoice ' + esc(o.id.slice(-6).toUpperCase()) + ' · ' + new Date(o.at).toLocaleDateString() + '</p><p>Billed to: <b>' + esc(o.customer) + '</b></p><hr>' + o.items.split('; ').map((l) => '<p>' + esc(l) + '</p>').join('') + '<hr><p>Tax included (' + taxInfo.rate + '%): ' + money(tax) + '</p><h2>Total ' + money(o.totalCents) + '</h2><p>' + (o.paid ? 'Paid. Thank you.' : 'Payment due.') + '</p><script>print()<\/script></body>');
+  w.document.close();
+}
+$('csv').onclick = () => {
+  const rows = [['time', 'customer', 'items', 'total', 'tax_included', 'paid']].concat(sales.map((o) => [new Date(o.at).toISOString(), o.customer, o.items, (o.totalCents / 100).toFixed(2), ((o.totalCents - o.totalCents / (1 + taxInfo.rate / 100)) / 100).toFixed(2), o.paid ? 'yes' : 'no']));
+  const csv = rows.map((r) => r.map((c) => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'sales-today.csv'; a.click();
+};
 const menuBusy = () => document.activeElement && document.activeElement.closest && document.activeElement.closest('#menu');
 async function item(body) {
   try { await post('/public/item', Object.assign({ shopId: shopId }, body)); } catch (err) { alert(err.message); }
@@ -324,7 +427,7 @@ function openStudio() {
     wired = true;
     wireChat('custForm', 'custInput', 'custThread', '/public/chat', { session: session });
     const tell = wireChat('ownerForm', 'ownerInput', 'ownerThread', '/public/owner', {});
-    ['Accept the newest order', 'How much did we make today?', 'What is running low?', 'Tell customers we close early today'].forEach((t) => {
+    ['Accept the newest order', 'How much did we make today?', 'We have 12 samosas left', 'Tell customers we close early today'].forEach((t) => {
       const c = document.createElement('button'); c.type = 'button'; c.textContent = t; c.onclick = () => tell(t); $('chips').append(c);
     });
     setInterval(refresh, 2500);

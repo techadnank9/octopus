@@ -16,6 +16,8 @@ export default defineSchema({
     channelLink: v.optional(v.string()),
     /** ISO 4217 code in lower case, such as "usd" or "eur". Dollars when absent. */
     currency: v.optional(v.string()),
+    /** Sales tax or VAT included in prices, in percent. */
+    taxRate: v.optional(v.number()),
     createdAt: v.number(),
   }).index("by_owner", ["ownerId"]),
 
@@ -58,6 +60,23 @@ export default defineSchema({
     text: v.string(),
     link: v.optional(v.string()),
   }).index("by_thread", ["shopId", "channelId"]),
+
+  bookings: defineTable({
+    shopId: v.id("shops"),
+    customerId: v.id("customers"),
+    service: v.string(),
+    when: v.string(),
+    status: v.union(v.literal("booked"), v.literal("cancelled")),
+    reminded: v.boolean(),
+  }).index("by_shop", ["shopId"]),
+
+  reviews: defineTable({
+    shopId: v.id("shops"),
+    customerId: v.id("customers"),
+    rating: v.number(),
+    text: v.string(),
+    reply: v.optional(v.string()),
+  }).index("by_shop", ["shopId"]),
 
   events: defineTable({
     shopId: v.id("shops"),

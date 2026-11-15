@@ -1,4 +1,4 @@
-import { internalAction, internalMutation, internalQuery, mutation } from "./_generated/server";
+import { internalAction, internalMutation, internalQuery, mutation, type QueryCtx } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { v } from "convex/values";
@@ -149,6 +149,8 @@ export const fromWeb = internalAction({
   },
 });
 
+const suiteOf = (ctx: QueryCtx, shopId: Id<"shops">) => ctx.runQuery(internal.suite.overview, { shopId });
+
 /** Everything the web page shows for one shop, in one read. */
 export const state = internalQuery({
   args: { shopId: v.id("shops") },
@@ -161,10 +163,12 @@ export const state = internalQuery({
       ctx.runQuery(api.events.countsToday, { shopId }),
       ctx.runQuery(internal.ownerTools.dashboard, { shopId }),
     ]);
+    const suite: Awaited<ReturnType<typeof suiteOf>> = await suiteOf(ctx, shopId);
     return {
       shop: { name: shop.name, currency: shop.currency ?? "usd", hours: shop.hours ?? null, channelLink: shop.channelLink ?? null, claimCode: shop.ownerId.startsWith("web:") ? shop.ownerId.slice(4) : null, ownerLink: process.env.OWNER_CHANNEL_LINK ?? null },
       items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, available: i.available, stock: i.stock ?? null })),
       dashboard,
+      suite,
       orders: orders.slice(0, 8).map((o) => ({
         id: o._id,
         customer: o.customerName,
