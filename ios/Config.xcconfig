@@ -1,0 +1,2 @@
+// Convex deployment URL. The /$()/ keeps xcconfig from reading // as a comment.
+CONVEX_URL = https:/$()/hushed-dove-252.convex.cloud

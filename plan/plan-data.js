@@ -80,14 +80,14 @@ export const SPONSORS = [
     arms: [] },
   { name: 'Revyl', req: true, role: 'Testing on a real build',
     use: 'Four plain-language flows, rerun after every merge: create shop, order arrives, accept and ready, counters move.',
-    fact: 'Needs a real build, not Expo Go: a simulator .app or an .apk. Free tier is 1,200 device minutes a month.',
+    fact: 'Builds the Xcode project itself and runs it on a cloud iPhone. Free tier is 1,200 device minutes a month.',
     arms: [] },
   { name: 'Candle', skip: true, role: 'Not used',
     use: 'A daily challenge for couples and friends. It has no job in a shop app, so adding it would be decoration.', fact: '', arms: [] },
 ];
 
 export const NODES = {
-  app:    { x: 40,  y: 70,  w: 220, h: 120, label: "Owner's app", sub: 'Expo, React Native', kind: 'ours',
+  app:    { x: 40,  y: 70,  w: 220, h: 120, label: "Owner's app", sub: 'native SwiftUI, iPhone', kind: 'ours',
             detail: 'Five screens: welcome, snap menu, shop number, orders, arms. Talks to Convex only. The Orders screen subscribes to a live query, so a new order appears without refresh. Sound and haptic fire when the list grows.' },
   cust:   { x: 40,  y: 410, w: 220, h: 120, label: 'Customer', sub: 'iMessage or other channel', kind: 'people',
             detail: 'No app to install. They scan the QR or tap the link, which opens their messages with the first text ready. We only ever message people who texted first.' },
@@ -131,7 +131,7 @@ export const ENDPOINTS = [
 ];
 
 export const TIMELINE = [
-  ['1:45', 'Scaffold and schema', 'Expo shell, five empty screens, Convex schema from this page, one seeded shop. Keiki access chased in parallel.', 'me'],
+  ['1:45', 'Scaffold and schema', 'SwiftUI shell with five screens, Convex schema from this page, one seeded shop. Keiki access chased in parallel.', 'me'],
   ['2:15', 'Six agents start', 'Orders screen, snap menu, agent endpoints, Whop link, memory, shop number and arms. One branch each.', 'capy'],
   ['3:00', 'Keiki cut-off', 'No working channel by now means the in-app customer chat ships instead, on the same endpoints.', 'gate'],
   ['3:30', 'Merge and test', 'Branches land one by one. Revyl reruns the four flows after each.', 'revyl'],
@@ -173,8 +173,8 @@ export const DECISIONS = [
     pick: 'Deep purple body with coral suckers, as on the octopus above, on off-white',
     alt: 'Coral body with purple accents' },
   { q: '3D octopus inside the phone app',
-    pick: 'Reuse this page\'s scene in the app through a web view on Welcome and Arms. Same code, works in Expo Go',
-    alt: 'Native 3D with react-three-fiber. Nicer, but known crashes on simulators and more setup' },
+    pick: 'Native: the same model as a USDZ file, shown with Apple\'s 3D view on Welcome and Arms',
+    alt: 'A looping video of this page\'s scene if the native view misbehaves' },
   { q: 'Capy needs a paid plan and Revyl needs a real build',
     pick: 'You sign up for both and connect the repo; I prepare the six task briefs, the setup file and the four test files',
     alt: 'I run the six slices as local parallel agents and you paste the same briefs into Capy for the record' },

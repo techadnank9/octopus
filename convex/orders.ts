@@ -85,7 +85,7 @@ export const createDemo = mutation({
     if (catalog.length === 0) throw new Error("Add a menu item first");
     const names = ["Priya", "Sam", "Jordan", "Alex"];
     const displayName = names[Math.floor(Math.random() * names.length)];
-    return placeOrder(ctx, {
+    await placeOrder(ctx, {
       shopId,
       channelId: `demo:${displayName.toLowerCase()}`,
       displayName,
