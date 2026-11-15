@@ -8,7 +8,7 @@ type Draft = { name: string; currency: string | null; hours: string | null; abou
 
 const PROMPT = `You set up a small shop from what its owner gave you: text from their website, or their own description.
 Reply with JSON only: {"name": string, "currency": string|null, "hours": string|null, "about": string|null, "items": [{"name": string, "price": number, "description": string|null}], "unpriced": [string]}.
-name is the business name. currency is the ISO 4217 code the prices are in, such as "usd" or "eur". about is one plain sentence on what they sell. price is a number in the main currency unit.
+name is the business name. currency is the ISO 4217 code the prices in the text are written in, such as "usd" or "eur" (a euro sign or EUR means "eur"); null when the text shows no prices. about is one plain sentence on what they sell. price is a number in the main currency unit.
 items holds only things that have a clear price in the text. unpriced lists up to 15 things they clearly sell where no price is given. Never invent items, prices or hours. At most 40 items.`;
 
 type Scrape = { markdown: string; links: string[] };
@@ -25,6 +25,21 @@ async function scrape(target: string): Promise<Scrape | null> {
   if (!res.ok) return null;
   const body = (await res.json()) as { data?: { markdown?: string; links?: string[] } };
   return body.data?.markdown ? { markdown: body.data.markdown, links: body.data.links ?? [] } : null;
+}
+
+/** Looks a business up by name and returns its own site, skipping social and directory pages. */
+async function findWebsite(name: string) {
+  const key = process.env.FIRECRAWL_API_KEY;
+  if (!key) return undefined;
+  const res = await fetch("https://api.firecrawl.dev/v2/search", {
+    method: "POST",
+    headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
+    body: JSON.stringify({ query: `${name} official website`, limit: 5 }),
+  });
+  if (!res.ok) return undefined;
+  const body = (await res.json()) as { data?: { web?: { url: string }[] } };
+  const skip = /instagram|facebook|yelp|tripadvisor|google|linkedin|tiktok|youtube|x\.com|twitter|wikipedia/i;
+  return body.data?.web?.map((hit) => hit.url).find((url) => !skip.test(new URL(url).host));
 }
 
 const WORTH_READING = /menu|pric|order|shop|product|service|book|catering|about|hours|visit/i;
@@ -108,11 +123,13 @@ export const createShop = internalMutation({
 
 /** Builds a shop from a website or a description: name, hours, priced catalog, text line and a code to open it in the app. */
 export const fromWeb = internalAction({
-  args: { website: v.optional(v.string()), description: v.optional(v.string()) },
-  handler: async (ctx, { website, description }): Promise<{ shopId: Id<"shops">; claimCode: string }> => {
-    const site = website?.trim();
-    const told = description?.trim().slice(0, 4000);
-    if (!site && !told) throw new Error("Give us a website or a few lines about your business");
+  args: { query: v.optional(v.string()), website: v.optional(v.string()), description: v.optional(v.string()) },
+  handler: async (ctx, { query, website, description }): Promise<{ shopId: Id<"shops">; claimCode: string; source: string | null }> => {
+    const typed = query?.trim().slice(0, 200);
+    const looksLikeSite = !!typed && /^\S+\.[a-z]{2,}(\/\S*)?$/i.test(typed);
+    const site = website?.trim() || (looksLikeSite ? typed : typed ? await findWebsite(typed) : undefined);
+    const told = description?.trim().slice(0, 4000) || (typed && !looksLikeSite ? `The business is called "${typed}".` : undefined);
+    if (!site && !told) throw new Error("Enter your website or your business name");
     if (!process.env.OPENAI_API_KEY) throw new Error("Setup is not available yet");
     const source = [site ? `Website ${site}:\n${await readWebsite(site)}` : "", told ? `Owner's description:\n${told}` : ""].join("\n\n");
     const draft = await draftShop(source);
@@ -128,7 +145,7 @@ export const fromWeb = internalAction({
     if (draft.unpriced?.length) {
       await remember(brain.shopNotes(shopId), `The shop also sells these, but the price is not set yet, so ask the owner before taking an order for them: ${draft.unpriced.slice(0, 15).join(", ")}`);
     }
-    return { shopId, claimCode };
+    return { shopId, claimCode, source: site ?? null };
   },
 });
 

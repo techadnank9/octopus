@@ -152,7 +152,7 @@ async function refresh() {
     const moneyChanged = currency !== s.shop.currency;
     currency = s.shop.currency || 'usd';
     $('shopName').textContent = s.shop.name;
-    $('shopHours').textContent = s.shop.hours ? 'Open ' + s.shop.hours : 'Order ahead by tapping, or ask the octopus';
+    $('shopHours').textContent = 'Order ahead by tapping, or ask the octopus';
     const changed = JSON.stringify(s.items) !== JSON.stringify(items);
     items = s.items;
     items.forEach((i) => { if (!i.available) delete cart[i.name]; });

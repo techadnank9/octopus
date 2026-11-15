@@ -102,15 +102,13 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
   <div>
     <p class="brand"><i></i>Octopus</p>
     <h1>Tell us about your shop. Your octopus runs it.</h1>
-    <p class="lede">Paste your website or describe what you sell. In about a minute you get a menu, a text line customers can order on, pay links, and an assistant you run by message.</p>
+    <p class="lede">Enter your website or your business name. In about a minute you get a menu, a text line customers can order on, pay links, and an assistant you run by message.</p>
     <form id="build">
-      <label>Your website<input id="website" type="text" inputmode="url" placeholder="mayascoffeecart.com" autocomplete="url"></label>
-      <p class="or">or</p>
-      <label>Describe your business<textarea id="description" placeholder="Maya's Coffee Cart, open 7 to 4. Flat white $4.50, iced latte $5, banana bread $3.50."></textarea></label>
+      <label>Your business<input id="query" type="text" placeholder="Enter website or name" autocomplete="off" autocapitalize="off"></label>
       <button class="go" id="go">Build my shop</button>
       <p class="err" id="err" role="alert"></p>
       <ol class="steps" id="steps" hidden>
-        <li>Reading what you gave us</li><li>Building your menu</li><li>Opening your text line</li><li>Waking your octopus</li>
+        <li>Finding and reading your site</li><li>Building your menu</li><li>Opening your text line</li><li>Waking your octopus</li>
       </ol>
     </form>
   </div>
@@ -125,7 +123,7 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
   </section>
 
   <section id="studio">
-    <div class="shophead"><h2 id="shopName"></h2><span id="shopHours"></span></div>
+    <div class="shophead"><h2 id="shopName"></h2><span id="source"></span></div>
     <div class="grid">
       <div class="panel"><h3>Your menu</h3><p class="hint">Read from what you gave us. Change it by telling your octopus.</p><div id="menu"></div></div>
       <div class="panel"><h3>Your text line</h3><p class="hint">Customers scan this and text. Post it anywhere.</p><img class="qr" id="qr" alt="QR code for your text line"><p id="lineText" style="text-align:center;font-weight:700"></p></div>
@@ -205,7 +203,7 @@ async function refresh() {
   const s = await res.json();
   currency = s.shop.currency || 'usd';
   $('shopName').textContent = s.shop.name;
-  $('shopHours').textContent = s.shop.hours ? 'Open ' + s.shop.hours : '';
+  $('source').textContent = localStorage.getItem('octopusSource') || '';
   $('menu').innerHTML = s.items.length ? s.items.map((i) => '<div class="row' + (i.available ? '' : ' off') + '"><span>' + esc(i.name) + '</span><b>' + money(i.priceCents) + '</b></div>').join('')
     : '<p class="empty">We found no priced items. Tell your octopus: "Add flat white for $4.50".</p>';
   if (s.shop.channelLink) {
@@ -258,17 +256,18 @@ function openStudio() {
 
 $('build').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const website = $('website').value.trim(), description = $('description').value.trim();
+  const query = $('query').value.trim();
   $('err').textContent = '';
-  if (!website && !description) { $('err').textContent = 'Add your website or a few lines about your business.'; return; }
+  if (!query) { $('err').textContent = 'Enter your website or your business name.'; return; }
   const steps = Array.from($('steps').children);
   $('go').disabled = true; $('go').textContent = 'Building'; $('steps').hidden = false;
   let at = 0; steps.forEach((li) => { li.className = ''; }); steps[0].className = 'on';
   const tick = setInterval(() => { if (at < steps.length - 1) { steps[at].className = 'done'; at += 1; steps[at].className = 'on'; } }, 2200);
   octo.setMood('busy');
   try {
-    const made = await post('/onboard', { website: website, description: description });
+    const made = await post('/onboard', { query: query });
     shopId = made.shopId; localStorage.setItem('octopusShop', shopId);
+    localStorage.setItem('octopusSource', made.source ? 'Read from ' + made.source.replace(/^https?:\/\//, '').replace(/\/$/, '') + '. Not your site? Enter the full address above.' : 'No website found. Tell your octopus what you sell.');
     seenOrders = null; wired = false;
     steps.forEach((li) => { li.className = 'done'; });
     openStudio();

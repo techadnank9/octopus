@@ -32,6 +32,7 @@ final class AppStore: ObservableObject {
         task = Task { [weak self] in
             do {
                 for try await shop in shops {
+                    Money.currencyCode = (shop?.currency ?? "usd").uppercased()
                     self?.phase = shop.map(Phase.ready) ?? .needsSetup
                 }
             } catch {
@@ -46,12 +47,11 @@ final class AppStore: ObservableObject {
         }
     }
 
-    func createShop(name: String, hours: String) async throws {
-        let trimmedHours = hours.trimmingCharacters(in: .whitespacesAndNewlines)
+    func createShop(name: String) async throws {
         try await ConvexService.shared.createShop(
             ownerId: ownerId,
             name: name.trimmingCharacters(in: .whitespacesAndNewlines),
-            hours: trimmedHours.isEmpty ? nil : trimmedHours)
+            hours: nil)
     }
 
     func claimShop(code: String) async throws {

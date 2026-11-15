@@ -85,11 +85,11 @@ export function addSiteRoutes(http: HttpRouter) {
     path: "/onboard",
     method: "POST",
     handler: page(async (ctx, body) => {
-      const { shopId, claimCode } = await ctx.runAction(internal.onboard.fromWeb, {
+      return ctx.runAction(internal.onboard.fromWeb, {
+        query: typeof body.query === "string" ? body.query : undefined,
         website: typeof body.website === "string" ? body.website : undefined,
         description: typeof body.description === "string" ? body.description : undefined,
       });
-      return { shopId, claimCode };
     }),
   });
 

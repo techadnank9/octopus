@@ -6,10 +6,11 @@ struct Shop: Decodable, Equatable {
     let name: String
     let hours: String?
     let channelLink: String?
+    let currency: String?
 
     enum CodingKeys: String, CodingKey {
         case id = "_id"
-        case name, hours, channelLink
+        case name, hours, channelLink, currency
     }
 }
 

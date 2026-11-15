@@ -4,7 +4,6 @@ struct WelcomeView: View {
     @ObservedObject var store: AppStore
 
     @State private var name = ""
-    @State private var hours = ""
     @State private var isSaving = false
     @State private var errorMessage: String?
 
@@ -34,7 +33,6 @@ struct WelcomeView: View {
                     .font(Theme.body)
                     .opacity(0.7)
                 field("Shop name", text: $name)
-                field("Opening hours (optional)", text: $hours)
                 if let errorMessage {
                     Text(errorMessage)
                         .font(Theme.caption)
@@ -86,7 +84,7 @@ struct WelcomeView: View {
         errorMessage = nil
         Task {
             do {
-                try await store.createShop(name: name, hours: hours)
+                try await store.createShop(name: name)
             } catch {
                 errorMessage = error.plainMessage
             }

@@ -1,8 +1,11 @@
 import Foundation
 
 enum Money {
+    /// ISO 4217 code of the open shop. Set when the shop loads.
+    static var currencyCode = "USD"
+
     static func string(cents: Double) -> String {
-        (cents / 100).formatted(.currency(code: "USD"))
+        (cents / 100).formatted(.currency(code: currencyCode))
     }
 
     /// Parses owner input such as "4.50" or "$4.50" into cents.
