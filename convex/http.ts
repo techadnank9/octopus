@@ -111,7 +111,7 @@ http.route({
 });
 
 /** Owner line: one route per tool, same secret. Only give this line to the shop owner. */
-for (const name of ["get_menu", "add_item", "update_item", "remove_item", "set_hours", "list_orders", "advance_order", "tell_customers", "today_summary"]) {
+for (const name of ["get_menu", "add_item", "update_item", "remove_item", "set_stock", "set_hours", "list_orders", "advance_order", "tell_customers", "today_summary"]) {
   http.route({
     path: `/owner/${name}`,
     method: "POST",

@@ -4,6 +4,7 @@ import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { cleanError } from "./agentLoop";
 import { OWNER_CHANNEL } from "./owner";
+import { brain, remember } from "./memory";
 import { LANDING } from "./landing";
 import { STOREFRONT } from "./storefront";
 
@@ -49,9 +50,30 @@ export function addSiteRoutes(http: HttpRouter) {
 
   http.route({ path: "/shop", method: "GET", handler: html(STOREFRONT) });
 
-  for (const path of ["/onboard", "/public/chat", "/public/owner", "/public/order", "/public/placeOrder"]) {
+  for (const path of ["/onboard", "/public/chat", "/public/owner", "/public/order", "/public/placeOrder", "/public/item"]) {
     http.route({ path, method: "OPTIONS", handler: preflight });
   }
+
+  http.route({
+    path: "/public/item",
+    method: "POST",
+    handler: page(async (ctx, body) => {
+      const shopId = shopOf(body);
+      const name = String(body.name ?? "");
+      if (body.remove === true) return ctx.runMutation(internal.ownerTools.removeItem, { shopId, name });
+      if (body.create === true) return ctx.runMutation(internal.ownerTools.addItem, { shopId, name, price: Number(body.price) });
+      if ("stock" in body) await ctx.runMutation(internal.ownerTools.setStock, { shopId, name, stock: typeof body.stock === "number" ? body.stock : null });
+      if (typeof body.price === "number" || typeof body.available === "boolean") {
+        await ctx.runMutation(internal.ownerTools.updateItem, {
+          shopId,
+          name,
+          price: typeof body.price === "number" ? body.price : undefined,
+          available: typeof body.available === "boolean" ? body.available : undefined,
+        });
+      }
+      return { ok: true };
+    }),
+  });
 
   http.route({
     path: "/public/store",
@@ -77,6 +99,8 @@ export function addSiteRoutes(http: HttpRouter) {
       });
       // The order stands even if the pay link cannot be made; the shop can still take payment at pickup.
       await ctx.runAction(internal.payments.createLink, { orderId }).catch(() => null);
+      const ordered = (body.lines as { name: string; qty: number }[]).map((l) => `${l.qty} x ${l.name}`).join(", ");
+      await remember(brain.customer(shopId, webChannel(body)), `${name} ordered ${ordered} in the customer app on ${new Date().toDateString()}.`);
       return { orderId };
     }),
   });

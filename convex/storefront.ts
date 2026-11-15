@@ -120,7 +120,7 @@ function drawMenu() {
     const n = cart[i.name] || 0;
     const stepper = !i.available ? '<span class="price">Sold out</span>'
       : '<div class="step">' + (n ? '<button data-n="' + esc(i.name) + '" data-d="-1" aria-label="Remove one ' + esc(i.name) + '">−</button><span>' + n + '</span>' : '') + '<button class="add" data-n="' + esc(i.name) + '" data-d="1" aria-label="Add ' + esc(i.name) + '">+</button></div>';
-    return '<div class="item' + (i.available ? '' : ' off') + '"><div><div class="name">' + esc(i.name) + '</div>' + (i.description ? '<div class="desc">' + esc(i.description) + '</div>' : '') + '<div class="price">' + money(i.priceCents) + '</div></div>' + (i.available ? stepper : '<div class="step">' + stepper + '</div>') + '</div>';
+    return '<div class="item' + (i.available ? '' : ' off') + '"><div><div class="name">' + esc(i.name) + '</div>' + (i.description ? '<div class="desc">' + esc(i.description) + '</div>' : '') + '<div class="price">' + money(i.priceCents) + (i.available && i.stock !== null && i.stock <= 3 ? ' · only ' + i.stock + ' left' : '') + '</div></div>' + (i.available ? stepper : '<div class="step">' + stepper + '</div>') + '</div>';
   }).join('') : '<p class="empty">The menu is being set up. Ask the octopus what is available.</p>';
   const lines = items.filter((i) => cart[i.name]);
   const count = lines.reduce((t, i) => t + cart[i.name], 0);
@@ -165,7 +165,9 @@ $('menu').addEventListener('click', (e) => {
   const b = e.target.closest('button[data-n]');
   if (!b) return;
   const n = (cart[b.dataset.n] || 0) + Number(b.dataset.d);
-  if (n > 0) cart[b.dataset.n] = Math.min(n, 20); else delete cart[b.dataset.n];
+  const it = items.find((i) => i.name === b.dataset.n);
+  const max = it && it.stock !== null ? it.stock : 20;
+  if (n > 0) cart[b.dataset.n] = Math.min(n, max); else delete cart[b.dataset.n];
   drawMenu();
 });
 $('checkout').onclick = () => { $('who').value = localStorage.getItem('octopusName') || ''; $('sheet').classList.add('on'); };

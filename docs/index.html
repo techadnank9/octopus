@@ -88,6 +88,25 @@ main { padding:0 clamp(20px,5vw,72px); }
 .acts button { border:1.5px solid var(--line); background:none; border-radius:12px; padding:8px 14px; font-weight:700; font-size:.85rem; cursor:pointer; }
 .acts button.main { background:var(--violet); border-color:var(--violet); color:#fff; }
 .acts .state { font-size:.85rem; font-weight:700; color:var(--plum); align-self:center; }
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border-top:2px solid var(--ink); margin-bottom:8px; }
+.stats div { padding:14px 16px 18px 0; }
+.stats b { display:block; font:800 clamp(1.6rem,3.4vw,2.4rem) var(--display); letter-spacing:-.03em; }
+.stats span { color:var(--muted); font-size:.88rem; }
+.alert { display:flex; gap:10px; align-items:center; background:#FFF1EF; border:1px solid #FFC9C2; color:#7A1D14; border-radius:14px; padding:10px 14px; margin-bottom:8px; font-size:.92rem; font-weight:500; }
+.alert i { width:8px; height:8px; border-radius:50%; background:var(--coral); flex:none; }
+#alerts { margin-bottom:20px; }
+.mrow { display:grid; grid-template-columns:minmax(0,1fr) 96px 150px 92px; gap:10px; align-items:center; padding:8px 0; border-bottom:1px solid #F0EBF8; font-size:.95rem; }
+.mrow.off .nm { color:var(--muted); text-decoration:line-through; }
+.mrow input { border:1.5px solid var(--line); border-radius:10px; padding:7px 9px; background:#fff; color:var(--ink); width:100%; }
+.stock { display:flex; align-items:center; gap:6px; }
+.stock button, .mrow .tog { border:1.5px solid var(--line); background:#fff; border-radius:10px; padding:6px 10px; font-weight:700; font-size:.82rem; cursor:pointer; color:var(--ink); }
+.stock b { min-width:2ch; text-align:center; }
+.stock b.low { color:#B3261A; }
+.mrow .tog.is { background:var(--ink); border-color:var(--ink); color:var(--paper); }
+#addForm input { background:#fff; color:var(--ink); border-color:var(--line); }
+.cust { display:grid; grid-template-columns:minmax(0,1fr) 70px 90px minmax(0,1.4fr); gap:10px; padding:9px 0; border-bottom:1px solid #F0EBF8; font-size:.92rem; }
+.cust span:last-child { color:var(--muted); }
+@media (max-width:700px) { .stats { grid-template-columns:repeat(2,1fr); } .mrow { grid-template-columns:1fr 84px; } .cust { grid-template-columns:1fr 1fr; } }
 .arm { display:flex; gap:10px; align-items:center; padding:7px 0; border-bottom:1px solid #F0EBF8; font-size:.9rem; }
 .arm b { margin-left:auto; font:800 1.1rem var(--display); color:var(--violet); }
 .arm i { width:8px; height:8px; border-radius:50%; background:var(--line); }
@@ -124,13 +143,17 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
 
   <section id="studio">
     <div class="shophead"><h2 id="shopName"></h2><span id="source"></span></div>
+    <div class="stats" id="stats"></div>
+    <div id="alerts"></div>
     <div class="grid">
-      <div class="panel"><h3>Your menu</h3><p class="hint">Read from what you gave us. Change it by telling your octopus.</p><div id="menu"></div></div>
-      <div class="panel"><h3>Your text line</h3><p class="hint">Customers scan this and text. Post it anywhere.</p><img class="qr" id="qr" alt="QR code for your text line"><p id="lineText" style="text-align:center;font-weight:700"></p></div>
-      <div class="panel"><h3>Your customer app</h3><p class="hint">A storefront made for your shop: menu, cart, pay and live order status. Share the link or the code.</p><img class="qr" id="storeQr" alt="QR code for your customer app"><a id="storeLink" target="_blank" rel="noopener" style="text-align:center;font-weight:700;color:var(--violet)">Open your customer app</a></div>
-      <div class="panel"><h3>Try it as a customer</h3><p class="hint">This is what your customers get when they text.</p><div class="thread" id="custThread"></div><form class="send" id="custForm"><input id="custInput" placeholder="two coffees for 3 PM" aria-label="Message as a customer"><button>Send</button></form></div>
       <div class="panel wide"><h3>Orders</h3><p class="hint">They land here, and on your phone, the moment a customer confirms.</p><div id="orders"></div></div>
       <div class="panel dark"><h3>Tell your octopus</h3><p class="hint">You message, it does the work.</p><p class="hint" id="ownerLine"></p><div class="chips" id="chips"></div><div class="thread" id="ownerThread"></div><form class="send" id="ownerForm"><input id="ownerInput" placeholder="Banana bread is sold out" aria-label="Message your octopus"><button>Send</button></form></div>
+      <div class="panel wide"><h3>Menu and stock</h3><p class="hint">Change a price, count what is left, or switch an item off. Counted items go down with every order and switch off at zero.</p><div id="menu"></div><form class="send" id="addForm"><input id="addName" placeholder="New item" aria-label="New item name"><input id="addPrice" placeholder="Price" inputmode="decimal" aria-label="New item price" style="max-width:110px"><button>Add</button></form></div>
+      <div class="panel"><h3>Selling today</h3><p class="hint">What is moving, most first.</p><div id="sellers"></div></div>
+      <div class="panel wide"><h3>Your customers</h3><p class="hint">Who ordered, how often, and their usual.</p><div id="customers"></div></div>
+      <div class="panel"><h3>Your customer app</h3><p class="hint">A storefront made for your shop: menu, cart, pay and live order status. Share the link or the code.</p><img class="qr" id="storeQr" alt="QR code for your customer app"><a id="storeLink" target="_blank" rel="noopener" style="text-align:center;font-weight:700;color:var(--violet)">Open your customer app</a></div>
+      <div class="panel"><h3>Your text line</h3><p class="hint">Customers scan this and text. Post it anywhere.</p><img class="qr" id="qr" alt="QR code for your text line"><p id="lineText" style="text-align:center;font-weight:700"></p></div>
+      <div class="panel"><h3>Try it as a customer</h3><p class="hint">This is what your customers get when they text.</p><div class="thread" id="custThread"></div><form class="send" id="custForm"><input id="custInput" placeholder="two coffees for 3 PM" aria-label="Message as a customer"><button>Send</button></form></div>
       <div class="panel wide"><h3>What your octopus did today</h3><p class="hint">Eight arms, counted live.</p><div id="arms"></div></div>
       <div class="panel"><h3>Take it with you</h3><p class="hint">Open the Octopus iPhone app and enter this code to run the same shop from your pocket.</p><p class="code" id="claim"></p></div>
     </div>
@@ -204,8 +227,18 @@ async function refresh() {
   currency = s.shop.currency || 'usd';
   $('shopName').textContent = s.shop.name;
   $('source').textContent = localStorage.getItem('octopusSource') || '';
-  $('menu').innerHTML = s.items.length ? s.items.map((i) => '<div class="row' + (i.available ? '' : ' off') + '"><span>' + esc(i.name) + '</span><b>' + money(i.priceCents) + '</b></div>').join('')
-    : '<p class="empty">We found no priced items. Tell your octopus: "Add flat white for $4.50".</p>';
+  if (!menuBusy()) $('menu').innerHTML = s.items.length ? s.items.map((i) => {
+    const n = esc(i.name);
+    const stock = i.stock === null ? '<button data-n="' + n + '" data-a="count">Count stock</button>'
+      : '<button data-n="' + n + '" data-a="dec" aria-label="One fewer ' + n + '">−</button><b class="' + (i.stock <= 3 ? 'low' : '') + '">' + i.stock + '</b><button data-n="' + n + '" data-a="inc" aria-label="One more ' + n + '">+</button><button data-n="' + n + '" data-a="uncount" aria-label="Stop counting ' + n + '">×</button>';
+    return '<div class="mrow' + (i.available ? '' : ' off') + '"><span class="nm">' + n + '</span><input data-n="' + n + '" data-a="price" inputmode="decimal" aria-label="Price of ' + n + '" value="' + (i.priceCents / 100).toFixed(2) + '"><div class="stock" data-s="' + (i.stock === null ? '' : i.stock) + '">' + stock + '</div><button class="tog' + (i.available ? ' is' : '') + '" data-n="' + n + '" data-a="toggle" data-on="' + (i.available ? 1 : 0) + '">' + (i.available ? 'On sale' : 'Off') + '</button></div>';
+  }).join('') : '<p class="empty">No items yet. Add one below, or tell your octopus: "Add flat white for 4.50".</p>';
+  const d = s.dashboard;
+  $('stats').innerHTML = [[d.today.orders, 'orders today'], [money(d.today.paidCents), 'collected'], [money(d.today.unpaidCents), 'still unpaid'], [money(d.today.averageCents), 'average order']]
+    .map((t) => '<div><b>' + t[0] + '</b><span>' + t[1] + '</span></div>').join('');
+  $('alerts').innerHTML = d.alerts.map((a) => '<div class="alert"><i></i>' + esc(a) + '</div>').join('');
+  $('sellers').innerHTML = d.topSellers.length ? d.topSellers.map((t) => '<div class="row"><span>' + esc(t.name) + '</span><b>' + t.qty + '</b></div>').join('') : '<p class="empty">Nothing sold yet today.</p>';
+  $('customers').innerHTML = d.customers.length ? d.customers.map((c) => '<div class="cust"><b>' + esc(c.name) + '</b><span>' + c.orders + (c.orders === 1 ? ' order' : ' orders') + '</span><span>' + money(c.spentCents) + '</span><span>' + esc(c.usual || '') + '</span></div>').join('') : '<p class="empty">Your first customer will show up here.</p>';
   if (s.shop.channelLink) {
     $('qr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=380x380&data=' + encodeURIComponent(s.shop.channelLink);
     const m = /^sms:([^&?]+)[&?]body=(.*)$/.exec(s.shop.channelLink);
@@ -231,6 +264,35 @@ async function refresh() {
   $('arms').innerHTML = ARMS.map((a, k) => '<div class="arm' + (s.arms[k] ? ' lit' : '') + '"><i></i><span>' + a + '</span><b>' + s.arms[k] + '</b></div>').join('');
 }
 
+const menuBusy = () => document.activeElement && document.activeElement.closest && document.activeElement.closest('#menu');
+async function item(body) {
+  try { await post('/public/item', Object.assign({ shopId: shopId }, body)); } catch (err) { alert(err.message); }
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  refresh();
+}
+$('menu').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-a]');
+  if (!b) return;
+  const name = b.dataset.n, a = b.dataset.a, now = Number(b.parentElement.dataset.s || 0);
+  if (a === 'toggle') item({ name: name, available: b.dataset.on !== '1' });
+  if (a === 'count') item({ name: name, stock: 10 });
+  if (a === 'uncount') item({ name: name, stock: null });
+  if (a === 'inc') item({ name: name, stock: now + 1 });
+  if (a === 'dec') item({ name: name, stock: Math.max(0, now - 1) });
+});
+$('menu').addEventListener('change', (e) => {
+  const f = e.target.closest('input[data-a="price"]');
+  const price = f ? Number(f.value) : NaN;
+  if (f && price >= 0) item({ name: f.dataset.n, price: price });
+});
+$('addForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const name = $('addName').value.trim(), price = Number($('addPrice').value);
+  if (!name || !(price >= 0) || $('addPrice').value.trim() === '') return;
+  $('addName').value = ''; $('addPrice').value = '';
+  item({ create: true, name: name, price: price });
+});
+
 $('orders').addEventListener('click', async (e) => {
   const b = e.target.closest('button[data-o]');
   if (!b) return;
@@ -246,7 +308,7 @@ function openStudio() {
     wired = true;
     wireChat('custForm', 'custInput', 'custThread', '/public/chat', { session: session });
     const tell = wireChat('ownerForm', 'ownerInput', 'ownerThread', '/public/owner', {});
-    ['Banana bread is sold out', 'Accept the newest order', 'How much did we make today?', 'We close at 2 PM today'].forEach((t) => {
+    ['Accept the newest order', 'How much did we make today?', 'What is running low?', 'Tell customers we close early today'].forEach((t) => {
       const c = document.createElement('button'); c.type = 'button'; c.textContent = t; c.onclick = () => tell(t); $('chips').append(c);
     });
     setInterval(refresh, 2500);

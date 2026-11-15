@@ -38,8 +38,18 @@ export async function placeOrder(
     if (!item) throw new Error(`"${wanted.name}" is not on the menu`);
     const qty = Math.floor(wanted.qty);
     if (qty < 1 || qty > 50) throw new Error(`Quantity for ${item.name} must be between 1 and 50`);
+    if (item.stock !== undefined && item.stock < qty) {
+      throw new Error(item.stock === 0 ? `${item.name} is sold out` : `Only ${item.stock} left of ${item.name}`);
+    }
     return { itemId: item._id, name: item.name, qty, priceCents: item.priceCents };
   });
+  // Counted items go down with every order and switch themselves off at zero.
+  for (const line of lines) {
+    const item = catalog.find((i) => i._id === line.itemId)!;
+    if (item.stock === undefined) continue;
+    const left = item.stock - line.qty;
+    await ctx.db.patch(item._id, { stock: left, available: left > 0 });
+  }
   const totalCents = lines.reduce((sum, l) => sum + l.qty * l.priceCents, 0);
   const customerId = await findOrCreateCustomer(ctx, args.shopId, args.channelId, args.displayName);
   const now = Date.now();

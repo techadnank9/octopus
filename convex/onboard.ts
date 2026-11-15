@@ -155,14 +155,16 @@ export const state = internalQuery({
   handler: async (ctx, { shopId }) => {
     const shop = await ctx.db.get(shopId);
     if (!shop) throw new Error("Shop not found");
-    const [items, orders, arms] = await Promise.all([
+    const [items, orders, arms, dashboard] = await Promise.all([
       ctx.runQuery(api.items.list, { shopId }),
       ctx.runQuery(api.orders.list, { shopId }),
       ctx.runQuery(api.events.countsToday, { shopId }),
+      ctx.runQuery(internal.ownerTools.dashboard, { shopId }),
     ]);
     return {
       shop: { name: shop.name, currency: shop.currency ?? "usd", hours: shop.hours ?? null, channelLink: shop.channelLink ?? null, claimCode: shop.ownerId.startsWith("web:") ? shop.ownerId.slice(4) : null, ownerLink: process.env.OWNER_CHANNEL_LINK ?? null },
-      items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, available: i.available })),
+      items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, available: i.available, stock: i.stock ?? null })),
+      dashboard,
       orders: orders.slice(0, 8).map((o) => ({
         id: o._id,
         customer: o.customerName,
@@ -202,7 +204,7 @@ export const store = internalQuery({
     const order = id ? await ctx.db.get(id) : null;
     return {
       shop: { name: shop.name, currency: shop.currency ?? "usd", hours: shop.hours ?? null },
-      items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, description: i.description ?? null, available: i.available })),
+      items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, description: i.description ?? null, available: i.available, stock: i.stock ?? null })),
       order:
         order && order.shopId === shopId
           ? {

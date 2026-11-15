@@ -25,6 +25,8 @@ export default defineSchema({
     priceCents: v.number(),
     description: v.optional(v.string()),
     available: v.boolean(),
+    /** Units left. Absent means the shop does not count this item. */
+    stock: v.optional(v.number()),
   }).index("by_shop", ["shopId"]),
 
   customers: defineTable({

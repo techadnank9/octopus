@@ -12,7 +12,7 @@ Act straight away when the request is clear. Ask one short question only when yo
 Prices are in the currency get_menu reports. Never invent menu items, orders or totals: read them with your tools.
 Anything under "What you remember" is what the owner told you before. Use it.
 When the owner mentions something customers should know (a special, closing early, an ingredient running out), call tell_customers.
-For "sold out" or "back in stock" use update_item with available. For accepting, readying or cancelling an order use advance_order; the customer is told automatically.`;
+For "sold out" or "back in stock" use update_item with available. When the owner gives a count ("we have 12 croissants") use set_stock. For accepting, readying or cancelling an order use advance_order; the customer is told automatically.`;
 
 const name = { type: "string", description: "Menu item name" };
 
@@ -21,6 +21,7 @@ export const OWNER_TOOLS = [
   tool("add_item", "Add a menu item.", { name, price: { type: "number" } }, ["name", "price"]),
   tool("update_item", "Change an item's price, name, or whether it is available.", { name, price: { type: "number" }, available: { type: "boolean" }, newName: { type: "string" } }, ["name"]),
   tool("remove_item", "Delete a menu item.", { name }, ["name"]),
+  tool("set_stock", "Set how many units of an item are left. It goes down with each order and switches off at zero. Use stock null to stop counting.", { name, stock: { type: ["number", "null"] } }, ["name", "stock"]),
   tool("set_hours", "Set the shop's opening hours.", { hours: { type: "string" } }, ["hours"]),
   tool("list_orders", "Today's orders with customer, items, total, status and payment."),
   tool(
@@ -52,6 +53,8 @@ export function runOwnerTool(ctx: ActionCtx, shopId: Id<"shops">, toolName: stri
         available: typeof args.available === "boolean" ? args.available : undefined,
         newName: typeof args.newName === "string" ? args.newName : undefined,
       });
+    case "set_stock":
+      return ctx.runMutation(internal.ownerTools.setStock, { shopId, name: String(args.name), stock: typeof args.stock === "number" ? args.stock : null });
     case "remove_item":
       return ctx.runMutation(internal.ownerTools.removeItem, { shopId, name: String(args.name) });
     case "set_hours":

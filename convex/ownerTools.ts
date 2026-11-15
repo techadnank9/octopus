@@ -26,7 +26,7 @@ export const menu = internalQuery({
   handler: async (ctx, { shopId }) => {
     const shop = await ctx.db.get(shopId);
     const items = await ctx.db.query("items").withIndex("by_shop", (q) => q.eq("shopId", shopId)).collect();
-    return { shopName: shop!.name, hours: shop!.hours ?? null, currency: shop!.currency ?? "usd", items: items.map((i) => ({ name: i.name, price: money(i.priceCents), available: i.available })) };
+    return { shopName: shop!.name, hours: shop!.hours ?? null, currency: shop!.currency ?? "usd", items: items.map((i) => ({ name: i.name, price: money(i.priceCents), available: i.available, stock: i.stock ?? null })) };
   },
 });
 
@@ -52,6 +52,20 @@ export const updateItem = internalMutation({
     });
     const updated = (await ctx.db.get(item._id))!;
     return { name: updated.name, price: money(updated.priceCents), available: updated.available };
+  },
+});
+
+export const setStock = internalMutation({
+  args: { shopId: v.id("shops"), name: v.string(), stock: v.union(v.number(), v.null()) },
+  handler: async (ctx, { shopId, name, stock }) => {
+    const item = await findItem(ctx, shopId, name);
+    if (stock === null) {
+      await ctx.db.patch(item._id, { stock: undefined });
+      return { name: item.name, counted: false };
+    }
+    const left = Math.max(0, Math.floor(stock));
+    await ctx.db.patch(item._id, { stock: left, available: left > 0 });
+    return { name: item.name, stock: left };
   },
 });
 
@@ -124,5 +138,49 @@ export const todaySummary = internalMutation({
     const sum = (paid: boolean) => orders.filter((o) => (o.paymentStatus === "paid") === paid).reduce((t, o) => t + o.totalCents, 0);
     await logArm(ctx, shopId, ARMS.dailyTotal);
     return { orders: orders.length, paidTotal: money(sum(true)), unpaidTotal: money(sum(false)), topItem: top ? `${top[0]} (${top[1]})` : null };
+  },
+});
+
+const LOW_STOCK = 3;
+
+/** The owner's dashboard in one read: today's money, what is running low, who the regulars are. */
+export const dashboard = internalQuery({
+  args: { shopId: v.id("shops") },
+  handler: async (ctx, { shopId }) => {
+    const shop = await ctx.db.get(shopId);
+    const cash = (cents: number) => new Intl.NumberFormat("en", { style: "currency", currency: (shop?.currency ?? "usd").toUpperCase() }).format(cents / 100);
+    const orders = (await todaysOrders(ctx, shopId)).filter((o) => o.status !== "cancelled");
+    const paid = orders.filter((o) => o.paymentStatus === "paid").reduce((t, o) => t + o.totalCents, 0);
+    const total = orders.reduce((t, o) => t + o.totalCents, 0);
+    const sold = new Map<string, number>();
+    for (const o of orders) for (const l of o.lines) sold.set(l.name, (sold.get(l.name) ?? 0) + l.qty);
+    const items = await ctx.db.query("items").withIndex("by_shop", (q) => q.eq("shopId", shopId)).collect();
+    const low = items.filter((i) => i.stock !== undefined && i.stock <= LOW_STOCK);
+    const waiting = orders.filter((o) => o.status === "new");
+    const customers = await ctx.db.query("customers").withIndex("by_shop_channel", (q) => q.eq("shopId", shopId)).collect();
+    const regulars = await Promise.all(
+      customers.map(async (c) => {
+        const theirs = await ctx.db.query("orders").withIndex("by_customer", (q) => q.eq("customerId", c._id)).collect();
+        const kept = theirs.filter((o) => o.status !== "cancelled");
+        const last = kept[kept.length - 1];
+        return {
+          name: c.displayName ?? c.channelId,
+          orders: kept.length,
+          spentCents: kept.reduce((t, o) => t + o.totalCents, 0),
+          usual: last ? last.lines.map((l) => `${l.qty} × ${l.name}`).join(", ") : null,
+          lastOrderAt: c.lastOrderAt ?? 0,
+        };
+      }),
+    );
+    return {
+      today: { orders: orders.length, paidCents: paid, unpaidCents: total - paid, averageCents: orders.length ? Math.round(total / orders.length) : 0 },
+      topSellers: [...sold.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, qty]) => ({ name, qty })),
+      alerts: [
+        ...waiting.map((o) => `An order for ${cash(o.totalCents)} is waiting to be accepted`),
+        ...low.map((i) => (i.stock === 0 ? `${i.name} is sold out` : `${i.name}: only ${i.stock} left`)),
+        ...(total - paid > 0 ? [`${cash(total - paid)} is still unpaid today`] : []),
+      ],
+      customers: regulars.filter((r) => r.orders > 0).sort((a, b) => b.lastOrderAt - a.lastOrderAt).slice(0, 8),
+    };
   },
 });

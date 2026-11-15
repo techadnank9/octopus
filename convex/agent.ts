@@ -7,7 +7,8 @@ import { placeOrder } from "./orders";
 export const resolveShop = internalQuery({
   args: { shopId: v.optional(v.string()) },
   handler: async (ctx, { shopId }) => {
-    const id = shopId ? ctx.db.normalizeId("shops", shopId) : null;
+    // The text lines serve one shop: the one named in DEMO_SHOP_ID, else the newest.
+    const id = ctx.db.normalizeId("shops", shopId ?? process.env.DEMO_SHOP_ID ?? "");
     const shop = id ? await ctx.db.get(id) : await ctx.db.query("shops").order("desc").first();
     if (!shop) throw new Error("No shop found");
     return shop._id;
