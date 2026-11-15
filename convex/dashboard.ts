@@ -25,6 +25,7 @@ type Suite = {
   reviews: { id: string; customer: string; rating: number; text: string; reply: string | null }[];
   reorder: { name: string; left: number }[];
   audience: { all: number; quiet: number };
+  features: { request: string; status: string; detail: string | null }[];
 };
 
 /** Bookings, reviews, books, tax and reorder list for the phone app. */

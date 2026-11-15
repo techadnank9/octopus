@@ -199,6 +199,7 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
     </div>
     <div id="alerts"></div>
     <div class="panel dark tell"><h3>Tell your octopus</h3><p class="hint">You message, it does the work. <span id="ownerLine"></span></p><div class="chips" id="chips"></div><div class="thread" id="ownerThread"></div><form class="send" id="ownerForm"><input id="ownerInput" placeholder="We have 12 samosas left" aria-label="Message your octopus"><button>Send</button></form></div>
+    <div id="features"></div>
     <p class="toast" id="toast" role="status"></p>
     <div class="tiles">
       <article class="tile"><header><span class="num">1</span><div><h3>Customer service</h3><p>Answers questions about your menu and prices by text, at any hour.</p></div><b class="live" id="l1"></b></header><div class="tbody"><div class="thread" id="custThread"></div><form class="send" id="custForm"><input id="custInput" placeholder="Try it: do you have toor dal?" aria-label="Message as a customer"><button>Send</button></form></div></article>
@@ -328,6 +329,8 @@ async function refresh() {
   live('l10', u.reorder.length, 'to reorder');
   live('l11', u.reviews.length ? (u.reviews.reduce((t, r) => t + r.rating, 0) / u.reviews.length).toFixed(1) : '0', u.reviews.length + (u.reviews.length === 1 ? ' review' : ' reviews'));
   live('l12', money(u.tax.taxCents), 'tax in sales');
+  const FS = { building: 'Capy is building it', built: 'Built and reviewed, releasing', live: 'Live in your customer app', failed: 'Not shipped' };
+  $('features').innerHTML = u.features.map((f) => '<div class="alert" style="background:#EFE9FB;border-color:#D9D0EC;color:#3A1D6E"><i style="background:' + (f.status === 'live' ? '#1E9E55' : f.status === 'failed' ? '#B3261A' : '#5B2EE5') + '"></i><span><b>' + FS[f.status] + ':</b> ' + esc(f.request) + '</span></div>').join('');
   $('payLines').innerHTML = [['Collected today', d.today.paidCents], ['Still unpaid', d.today.unpaidCents], ['Average order', d.today.averageCents]].map((r) => '<div class="row"><span>' + r[0] + '</span><b>' + money(r[1]) + '</b></div>').join('');
   $('invoices').innerHTML = u.sales.length ? u.sales.map((o, k) => '<div class="line3"><span>' + esc(o.customer) + '<small>' + esc(o.items) + '</small></span><b>' + money(o.totalCents) + '</b><button data-inv="' + k + '">Invoice</button></div>').join('') : '<p class="empty">Receipts and invoices appear with your first sale.</p>';
   $('bookings').innerHTML = u.bookings.length ? u.bookings.map((b) => '<div class="line3"><span>' + esc(b.customer) + '<small>' + esc(b.service) + ', ' + esc(b.when) + (b.status === 'cancelled' ? ' (cancelled)' : b.reminded ? ' (reminded)' : '') + '</small></span>' + (b.status === 'booked' ? '<button data-do="remind" data-id="' + b.id + '">Remind</button><button data-do="cancelBooking" data-id="' + b.id + '">Cancel</button>' : '<span></span><span></span>') + '</div>').join('') : '<p class="empty">No bookings yet. Customers can text "book me for 5 PM tomorrow".</p>';
@@ -427,7 +430,7 @@ function openStudio() {
     wired = true;
     wireChat('custForm', 'custInput', 'custThread', '/public/chat', { session: session });
     const tell = wireChat('ownerForm', 'ownerInput', 'ownerThread', '/public/owner', {});
-    ['Accept the newest order', 'How much did we make today?', 'We have 12 samosas left', 'Tell customers we close early today'].forEach((t) => {
+    ['Accept the newest order', 'How much did we make today?', 'We have 12 samosas left', 'Add a favourites list to my customer app'].forEach((t) => {
       const c = document.createElement('button'); c.type = 'button'; c.textContent = t; c.onclick = () => tell(t); $('chips').append(c);
     });
     setInterval(refresh, 2500);

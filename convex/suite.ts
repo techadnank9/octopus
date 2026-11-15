@@ -53,6 +53,11 @@ export const overview = internalQuery({
         reviews.map(async (r) => ({ id: r._id, customer: await name(r.customerId), rating: r.rating, text: r.text, reply: r.reply ?? null })),
       ),
       reorder: items.filter((i) => i.stock !== undefined && i.stock <= LOW_STOCK).map((i) => ({ name: i.name, left: i.stock! })),
+      features: (await ctx.db.query("features").withIndex("by_shop", (q) => q.eq("shopId", shopId)).order("desc").take(6)).map((f) => ({
+        request: f.request,
+        status: f.status,
+        detail: f.detail ?? null,
+      })),
       audience: {
         all: customers.length,
         quiet: customers.filter((c) => (c.lastOrderAt ?? 0) < Date.now() - QUIET_AFTER_MS).length,

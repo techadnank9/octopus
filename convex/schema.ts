@@ -78,6 +78,15 @@ export default defineSchema({
     reply: v.optional(v.string()),
   }).index("by_shop", ["shopId"]),
 
+  features: defineTable({
+    shopId: v.id("shops"),
+    request: v.string(),
+    threadId: v.optional(v.string()),
+    status: v.union(v.literal("building"), v.literal("built"), v.literal("live"), v.literal("failed")),
+    detail: v.optional(v.string()),
+    polls: v.number(),
+  }).index("by_shop", ["shopId"]),
+
   events: defineTable({
     shopId: v.id("shops"),
     arm: v.number(),

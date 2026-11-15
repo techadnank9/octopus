@@ -12,6 +12,7 @@ Act straight away when the request is clear. Ask one short question only when yo
 Prices are in the currency get_menu reports. Never invent menu items, orders or totals: read them with your tools.
 Anything under "What you remember" is what the owner told you before. Use it.
 When the owner mentions something customers should know (a special, closing early, an ingredient running out), call tell_customers.
+When the owner wants something added to or changed in the customer app, call build_feature, then tell them it is being built and that you will message them when it is live.
 For "sold out" or "back in stock" use update_item with available. When the owner gives a count ("we have 12 croissants") use set_stock. For accepting, readying or cancelling an order use advance_order; the customer is told automatically.`;
 
 const name = { type: "string", description: "Menu item name" };
@@ -35,6 +36,12 @@ export const OWNER_TOOLS = [
     "Remember a note that customers should be told when relevant, such as an item running out, a special, or closing early.",
     { note: { type: "string" } },
     ["note"],
+  ),
+  tool(
+    "build_feature",
+    "Have a coding agent build a new feature into the shop's customer app, review it, and release it. Use when the owner asks to add or change something in the customer app.",
+    { request: { type: "string", description: "The feature, in the owner's words, with any detail they gave" } },
+    ["request"],
   ),
   tool("today_summary", "Today's order count, money collected, money still unpaid and the top seller."),
 ];
@@ -68,6 +75,8 @@ export function runOwnerTool(ctx: ActionCtx, shopId: Id<"shops">, toolName: stri
     }
     case "tell_customers":
       return remember(brain.shopNotes(shopId), `Note from the owner on ${new Date().toDateString()}: ${String(args.note)}`).then(() => ({ saved: true }));
+    case "build_feature":
+      return ctx.runAction(internal.features.start, { shopId, request: String(args.request ?? "") });
     case "today_summary":
       return ctx.runMutation(internal.ownerTools.todaySummary, { shopId });
     default:
