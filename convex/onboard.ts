@@ -224,3 +224,20 @@ export const store = internalQuery({
     };
   },
 });
+
+/** Shops that already exist, for the home page picker. The shop the text lines serve comes first. */
+export const list = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const shops = await ctx.db.query("shops").order("desc").take(40);
+    const rows = await Promise.all(
+      shops.map(async (shop) => ({
+        id: shop._id,
+        name: shop.name,
+        items: (await ctx.db.query("items").withIndex("by_shop", (q) => q.eq("shopId", shop._id)).collect()).length,
+        textLine: shop._id === process.env.DEMO_SHOP_ID,
+      })),
+    );
+    return rows.filter((r) => r.items > 0).sort((a, b) => Number(b.textLine) - Number(a.textLine));
+  },
+});

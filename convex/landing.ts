@@ -55,6 +55,10 @@ main { padding:0 clamp(20px,5vw,72px); }
 body.dash .hero, body.dash .gets { display:none; }
 body.dash .topbar { display:flex; }
 body.dash #studio { padding-top:32px; }
+.pick { border-top:1px solid #3A2C63; padding-top:14px; }
+.pickrow { display:flex; gap:8px; margin-top:6px; }
+.pick select { flex:1; min-width:0; background:#150D27; border:1.5px solid #3A2C63; border-radius:14px; padding:13px 14px; color:var(--paper); font:inherit; }
+.pick button { background:none; border:1.5px solid var(--coral); color:var(--coral); border-radius:14px; padding:0 20px; font-weight:800; cursor:pointer; }
 .resume { color:#CFC6E6; font-size:.92rem; }
 .resume a { color:var(--coral); font-weight:700; }
 #studio.on { display:block; }
@@ -173,6 +177,7 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
       <button class="go" id="go">Build my shop</button>
       <p class="err" id="err" role="alert"></p>
       <p class="resume" id="resume" hidden>Already set up? <a id="resumeLink">Open your dashboard</a></p>
+      <div class="pick" id="pick" hidden><label for="shops">Or open an existing shop</label><div class="pickrow"><select id="shops"></select><button type="button" id="openShop">Open</button></div></div>
       <ol class="steps" id="steps" hidden>
         <li>Finding and reading your site</li><li>Building your menu</li><li>Opening your text line</li><li>Waking your octopus</li>
       </ol>
@@ -472,6 +477,12 @@ $('build').addEventListener('submit', async (e) => {
 });
 
 $('navNew').href = ROOT;
+if (!dashId) fetch(API + '/public/shops').then((r) => r.json()).then((shops) => {
+  if (!shops.length) return;
+  $('shops').innerHTML = shops.map((s) => '<option value="' + esc(s.id) + '">' + esc(s.name) + ' (' + s.items + ' items' + (s.textLine ? ', on the text line' : '') + ')</option>').join('');
+  $('pick').hidden = false;
+  $('openShop').onclick = () => { location.href = DASH + encodeURIComponent($('shops').value); };
+}).catch(() => {});
 if (dashId) { $('navStore').href = STORE + encodeURIComponent(dashId); openStudio(); }
 else if (lastShop) { $('resume').hidden = false; $('resumeLink').href = DASH + encodeURIComponent(lastShop); }
 </script>

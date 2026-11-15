@@ -135,6 +135,8 @@ export function addSiteRoutes(http: HttpRouter) {
     ),
   });
 
+  http.route({ path: "/public/shops", method: "GET", handler: page((ctx) => ctx.runQuery(internal.onboard.list, {})) });
+
   http.route({
     path: "/public/store",
     method: "GET",
