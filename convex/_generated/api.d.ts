@@ -11,6 +11,7 @@
 import type * as agent from "../agent.js";
 import type * as agentLoop from "../agentLoop.js";
 import type * as chat from "../chat.js";
+import type * as dashboard from "../dashboard.js";
 import type * as events from "../events.js";
 import type * as http from "../http.js";
 import type * as items from "../items.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   agent: typeof agent;
   agentLoop: typeof agentLoop;
   chat: typeof chat;
+  dashboard: typeof dashboard;
   events: typeof events;
   http: typeof http;
   items: typeof items;

@@ -11,7 +11,7 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
-            OrdersView(store: orders)
+            OrdersView(store: orders, shopId: shop.id)
                 .tabItem { Label("Orders", systemImage: "tray.full.fill") }
             MenuView(shopId: shop.id)
                 .tabItem { Label("Menu", systemImage: "camera.fill") }

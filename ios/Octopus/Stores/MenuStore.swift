@@ -43,16 +43,28 @@ final class MenuStore: ObservableObject {
     }
 
     func save(id: String?, name: String, priceCents: Double) async {
-        do {
+        let shopId = shopId
+        await run {
             try await ConvexService.shared.saveItem(shopId: shopId, id: id, name: name, priceCents: priceCents)
-        } catch {
-            errorMessage = error.plainMessage
         }
     }
 
     func remove(_ item: Item) async {
+        await run { try await ConvexService.shared.removeItem(id: item.id) }
+    }
+
+    /// Pass nil to stop counting the item.
+    func setStock(_ item: Item, to stock: Double?) async {
+        await run { try await ConvexService.shared.setStock(id: item.id, stock: stock) }
+    }
+
+    func setAvailable(_ item: Item, to available: Bool) async {
+        await run { try await ConvexService.shared.setAvailable(id: item.id, available: available) }
+    }
+
+    private func run(_ work: () async throws -> Void) async {
         do {
-            try await ConvexService.shared.removeItem(id: item.id)
+            try await work()
         } catch {
             errorMessage = error.plainMessage
         }

@@ -25,3 +25,25 @@ export const remove = mutation({
   args: { id: v.id("items") },
   handler: (ctx, { id }) => ctx.db.delete(id),
 });
+
+/** Sets how many units are left, or stops counting when stock is omitted. Zero switches the item off. */
+export const setStock = mutation({
+  args: { id: v.id("items"), stock: v.optional(v.number()) },
+  handler: async (ctx, { id, stock }) => {
+    if (stock === undefined) {
+      await ctx.db.patch(id, { stock: undefined });
+      return null;
+    }
+    const left = Math.max(0, Math.floor(stock));
+    await ctx.db.patch(id, { stock: left, available: left > 0 });
+    return null;
+  },
+});
+
+export const setAvailable = mutation({
+  args: { id: v.id("items"), available: v.boolean() },
+  handler: async (ctx, { id, available }) => {
+    await ctx.db.patch(id, { available });
+    return null;
+  },
+});

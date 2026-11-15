@@ -20,10 +20,12 @@ struct Item: Decodable, Equatable, Identifiable {
     @ConvexFloat var priceCents: Double
     let description: String?
     let available: Bool
+    /// Units left. Nil when the owner is not counting this item.
+    @OptionalConvexFloat var stock: Double?
 
     enum CodingKeys: String, CodingKey {
         case id = "_id"
-        case name, priceCents, description, available
+        case name, priceCents, description, available, stock
     }
 }
 
@@ -75,4 +77,30 @@ struct ChatMessage: Decodable, Equatable, Identifiable {
         case role, text, link
         case creationTime = "_creationTime"
     }
+}
+
+struct Dashboard: Decodable, Equatable {
+    let today: DayStats
+    let topSellers: [TopSeller]
+    let alerts: [String]
+    let customers: [Customer]
+}
+
+struct DayStats: Decodable, Equatable {
+    @ConvexFloat var orders: Double
+    @ConvexFloat var paidCents: Double
+    @ConvexFloat var unpaidCents: Double
+    @ConvexFloat var averageCents: Double
+}
+
+struct TopSeller: Decodable, Equatable {
+    let name: String
+    @ConvexFloat var qty: Double
+}
+
+struct Customer: Decodable, Equatable {
+    let name: String
+    @ConvexFloat var orders: Double
+    @ConvexFloat var spentCents: Double
+    let usual: String?
 }

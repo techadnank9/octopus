@@ -2,10 +2,10 @@
 
 _meta:
     remote_id: dfbcf190-b87b-448e-9146-64ad1ed74334
-    remote_version: 2
-    local_version: 2
-    last_synced_at: "2026-11-15T14:56:09-08:00"
-    checksum: e9760baff4327c70a3c3f2d7df4ebb3ec0f6977d6fcaffa44b6096fe41557b75
+    remote_version: 3
+    local_version: 3
+    last_synced_at: "2026-11-15T15:31:28-08:00"
+    checksum: 9d9b46b7aa940d6ea0a1b79300a87fd2b89c31a433f211a2cfacb0c6a6dfb826
 test:
     metadata:
         name: create-shop-and-menu
@@ -16,6 +16,8 @@ test:
     build:
         name: octopus ios
     blocks:
+        - type: instructions
+          step_description: Wait until the loading spinner is gone and either the welcome screen with a "Shop name" field or the tab bar is showing.
         - type: validation
           step_description: The welcome screen is visible with a "Shop name" text field.
         - type: instructions

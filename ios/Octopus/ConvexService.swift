@@ -47,6 +47,17 @@ struct ConvexService {
         try await client.mutation("items:remove", with: ["id": id])
     }
 
+    /// Pass nil to stop counting. Zero switches the item off.
+    func setStock(id: String, stock: Double?) async throws {
+        var args: [String: ConvexEncodable?] = ["id": id]
+        if let stock { args["stock"] = stock }
+        try await client.mutation("items:setStock", with: args)
+    }
+
+    func setAvailable(id: String, available: Bool) async throws {
+        try await client.mutation("items:setAvailable", with: ["id": id, "available": available])
+    }
+
     // MARK: Menu photo
 
     /// Uploads the photo, asks the backend to read it, and returns how many items were saved.
@@ -84,6 +95,12 @@ struct ConvexService {
 
     func createDemoOrder(shopId: String) async throws {
         try await client.mutation("orders:createDemo", with: ["shopId": shopId])
+    }
+
+    // MARK: Dashboard
+
+    func dashboard(shopId: String) -> AnyPublisher<Dashboard, ClientError> {
+        client.subscribe(to: "dashboard:get", with: ["shopId": shopId], yielding: Dashboard.self)
     }
 
     // MARK: Arms

@@ -37,16 +37,7 @@ struct MenuView: View {
 
                 Section("Your menu") {
                     ForEach(store.items) { item in
-                        Button { draft = ItemDraft(item: item) } label: {
-                            HStack {
-                                Text(item.name)
-                                Spacer()
-                                Text(Money.string(cents: item.priceCents))
-                                    .fontWeight(.bold)
-                            }
-                            .font(Theme.body)
-                            .frame(minHeight: 44)
-                        }
+                        ItemRow(item: item, store: store) { draft = ItemDraft(item: item) }
                     }
                     .onDelete { offsets in
                         let removed = offsets.map { store.items[$0] }

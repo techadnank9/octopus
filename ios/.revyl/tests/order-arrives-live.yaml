@@ -2,10 +2,10 @@
 
 _meta:
     remote_id: eec809a0-75d9-4cdd-be76-c49be5713bb8
-    remote_version: 2
-    local_version: 2
-    last_synced_at: "2026-11-15T14:56:10-08:00"
-    checksum: 1c14133054bf8e37a13f78161a23e018358ad9234346e00c39996e9444bf7d47
+    remote_version: 3
+    local_version: 3
+    last_synced_at: "2026-11-15T15:31:24-08:00"
+    checksum: 429da474185fe498d0ac17a15768be5bae60dda906b74bac492ef8f8c8172d45
 test:
     metadata:
         name: order-arrives-live
@@ -15,6 +15,8 @@ test:
     build:
         name: octopus ios
     blocks:
+        - type: instructions
+          step_description: Wait until the loading spinner is gone and either the welcome screen with a "Shop name" field or the tab bar is showing.
         - type: if
           condition: Is the welcome screen with a "Shop name" text field visible?
           then:
