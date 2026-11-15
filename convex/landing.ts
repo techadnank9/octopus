@@ -345,7 +345,7 @@ $('build').addEventListener('submit', async (e) => {
   try {
     const made = await post('/onboard', { query: query });
     localStorage.setItem('octopusShop', made.shopId);
-    localStorage.setItem('octopusSource', made.source ? 'Read from ' + made.source.replace(/^https?:\/\//, '').replace(/\/$/, '') + '. Not your site? Enter the full address above.' : 'No website found. Tell your octopus what you sell.');
+    localStorage.setItem('octopusSource', made.source ? 'Read from ' + made.source.replace(/^https?:\/\//, '').replace(/\/$/, '') + '. Wrong site? Set up another shop with the full address.' : 'No website found. Tell your octopus what you sell.');
     seenOrders = null; wired = false;
     steps.forEach((li) => { li.className = 'done'; });
     location.href = DASH + encodeURIComponent(made.shopId);
