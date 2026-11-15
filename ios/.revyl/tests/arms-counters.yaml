@@ -2,10 +2,10 @@
 
 _meta:
     remote_id: 18250d9b-073a-4bfa-929d-7ec44766da3b
-    remote_version: 3
-    local_version: 3
-    last_synced_at: "2026-11-15T15:31:26-08:00"
-    checksum: a519807e0f819509c2872c9e75ecade4e008f85b96c280c79bac4eee7861cc7a
+    remote_version: 4
+    local_version: 4
+    last_synced_at: "2026-11-15T15:55:48-08:00"
+    checksum: cd9f534310853e1ee9a48607a6cafa06fa0b6814a668c33acb9e72e9ed8fbfbe
 test:
     metadata:
         name: arms-counters
@@ -50,4 +50,4 @@ test:
         - type: instructions
           step_description: Open the Arms tab.
         - type: validation
-          step_description: The Arms screen lists eight numbered arms, and at least one of them shows a counter value greater than zero.
+          step_description: The Arms screen shows the octopus at the top and a grid of numbered business tiles below it, and the "Sales and orders" tile shows a number of at least 1.
