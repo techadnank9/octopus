@@ -19,6 +19,8 @@ struct MainTabView: View {
                 .tabItem { Label("Number", systemImage: "qrcode") }
             ArmsView(shopId: shop.id)
                 .tabItem { Label("Arms", systemImage: "sparkles") }
+            ChatView(shopId: shop.id)
+                .tabItem { Label("Chat", systemImage: "message") }
         }
     }
 }

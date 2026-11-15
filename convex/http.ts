@@ -86,4 +86,44 @@ http.route({
   ),
 });
 
+http.route({
+  path: "/agent/createPaymentLink",
+  method: "POST",
+  handler: tool(async (ctx, { shopId, channelId }) => {
+    const latest = await ctx.runQuery(internal.agent.getOrderStatus, { shopId, channelId: needChannel(channelId) });
+    const orderId = latest.found ? latest.orderId : undefined;
+    if (!orderId) throw new Error("No order to pay for yet");
+    return ctx.runAction(internal.payments.createLink, { orderId });
+  }),
+});
+
+/** Standard Webhooks check: HMAC-SHA256 over "id.timestamp.body", base64, sent as "v1,<signature>". */
+async function signedByWhop(request: Request, body: string) {
+  const secret = process.env.WHOP_WEBHOOK_SECRET;
+  const id = request.headers.get("webhook-id");
+  const timestamp = request.headers.get("webhook-timestamp");
+  const sent = (request.headers.get("webhook-signature") ?? "").split(" ").map((part) => part.split(",")[1]);
+  if (!secret || !id || !timestamp) return false;
+  if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false;
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${id}.${timestamp}.${body}`));
+  const expected = btoa(String.fromCharCode(...new Uint8Array(mac)));
+  return sent.includes(expected);
+}
+
+http.route({
+  path: "/whop/webhook",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const body = await request.text();
+    if (!(await signedByWhop(request, body))) return json({ error: "Bad signature" }, 401);
+    const event = JSON.parse(body) as { type?: string; data?: { metadata?: { orderId?: string } } };
+    const orderId = event.data?.metadata?.orderId;
+    if (event.type === "payment.succeeded" && orderId) {
+      await ctx.runMutation(internal.orders.markPaidByWebhook, { orderId });
+    }
+    return json({ ok: true });
+  }),
+});
+
 export default http;

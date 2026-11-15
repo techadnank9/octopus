@@ -56,3 +56,21 @@ struct Order: Decodable, Equatable, Identifiable {
         case creationTime = "_creationTime"
     }
 }
+
+enum ChatRole: String, Decodable {
+    case customer, agent
+}
+
+struct ChatMessage: Decodable, Equatable, Identifiable {
+    let id: String
+    let role: ChatRole
+    let text: String
+    let link: String?
+    @ConvexFloat var creationTime: Double
+
+    enum CodingKeys: String, CodingKey {
+        case id = "_id"
+        case role, text, link
+        case creationTime = "_creationTime"
+    }
+}

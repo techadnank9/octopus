@@ -47,6 +47,14 @@ export default defineSchema({
     .index("by_shop", ["shopId"])
     .index("by_customer", ["customerId"]),
 
+  messages: defineTable({
+    shopId: v.id("shops"),
+    channelId: v.string(),
+    role: v.union(v.literal("customer"), v.literal("agent")),
+    text: v.string(),
+    link: v.optional(v.string()),
+  }).index("by_thread", ["shopId", "channelId"]),
+
   events: defineTable({
     shopId: v.id("shops"),
     arm: v.number(),

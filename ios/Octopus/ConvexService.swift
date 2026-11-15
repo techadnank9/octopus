@@ -86,4 +86,15 @@ struct ConvexService {
     func armCounts(shopId: String) -> AnyPublisher<[Double], ClientError> {
         client.subscribe(to: "events:countsToday", with: ["shopId": shopId], yielding: [Double].self)
     }
+
+    // MARK: Chat
+
+    func chatThread(shopId: String, channelId: String) -> AnyPublisher<[ChatMessage], ClientError> {
+        client.subscribe(
+            to: "chat:thread", with: ["shopId": shopId, "channelId": channelId], yielding: [ChatMessage].self)
+    }
+
+    func sendChat(shopId: String, channelId: String, text: String) async throws {
+        try await client.action("chat:send", with: ["shopId": shopId, "channelId": channelId, "text": text])
+    }
 }

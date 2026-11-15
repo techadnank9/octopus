@@ -1,6 +1,7 @@
-import { internalMutation, mutation, query, type MutationCtx } from "./_generated/server";
+import { internalMutation, internalQuery, mutation, query, type MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 import { ARMS, logArm } from "./events";
 
 export const list = query({
@@ -64,7 +65,10 @@ export const setStatus = mutation({
     const order = await ctx.db.get(orderId);
     if (!order) throw new Error("Order not found");
     await ctx.db.patch(orderId, { status });
-    if (status === "ready") await logArm(ctx, order.shopId, ARMS.tellsCustomerReady);
+    if (status === "cancelled") return;
+    await logArm(ctx, order.shopId, ARMS.tellsCustomerReady);
+    // The customer texted first, so we may message them back about their own order.
+    await ctx.scheduler.runAfter(0, internal.notify.orderUpdate, { orderId, status });
   },
 });
 
@@ -73,9 +77,12 @@ export const markPaidDemo = mutation({
   handler: (ctx, { orderId }) => ctx.db.patch(orderId, { paymentStatus: "paid" }),
 });
 
-export const markPaid = internalMutation({
-  args: { orderId: v.id("orders") },
-  handler: (ctx, { orderId }) => ctx.db.patch(orderId, { paymentStatus: "paid" }),
+export const markPaidByWebhook = internalMutation({
+  args: { orderId: v.string() },
+  handler: async (ctx, { orderId }) => {
+    const id = ctx.db.normalizeId("orders", orderId);
+    if (id && (await ctx.db.get(id))) await ctx.db.patch(id, { paymentStatus: "paid" });
+  },
 });
 
 export const createDemo = mutation({
@@ -92,5 +99,26 @@ export const createDemo = mutation({
       requestedTime: "3 PM",
       lines: catalog.map((item, i) => ({ name: item.name, qty: i === 0 ? 2 : 1 })),
     });
+  },
+});
+
+export const get = internalQuery({
+  args: { orderId: v.id("orders") },
+  handler: async (ctx, { orderId }) => {
+    const order = await ctx.db.get(orderId);
+    if (!order) throw new Error("Order not found");
+    const customer = await ctx.db.get(order.customerId);
+    const shop = await ctx.db.get(order.shopId);
+    return { order, channelId: customer!.channelId, shopName: shop!.name };
+  },
+});
+
+export const setPaymentLink = internalMutation({
+  args: { orderId: v.id("orders"), paymentLink: v.string() },
+  handler: async (ctx, { orderId, paymentLink }) => {
+    const order = await ctx.db.get(orderId);
+    if (!order) throw new Error("Order not found");
+    await ctx.db.patch(orderId, { paymentLink });
+    await logArm(ctx, order.shopId, ARMS.sendsPayLink);
   },
 });
