@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Octopus: build plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+} }
+</script>
+<link rel="stylesheet" href="plan.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-copy">
+    <p class="brand"><span class="dot"></span>Octopus</p>
+    <h1>Snap your menu. Customers text your shop. Octopus runs it.</h1>
+    <p class="lede">Build plan for the YC Consumer Mobile Hackathon. One owner, one phone, no staff. Submission closes at 6:00 PM today.</p>
+    <nav class="jump">
+      <a href="#loop">Play the mock</a>
+      <a href="#sponsors">Sponsors</a>
+      <a href="#system">How it's built</a>
+      <a href="#clock">Today's clock</a>
+      <a href="#decide">Your calls</a>
+    </nav>
+  </div>
+  <div class="hero-stage">
+    <div id="octo" aria-label="Animated 3D octopus mascot. Drag to turn it."></div>
+    <p class="stage-note">Drag to turn it. Model made with Meshy today.</p>
+  </div>
+  <ol class="arms" id="armList" aria-label="The eight arms"></ol>
+</header>
+
+<main>
+
+<section id="loop" class="band">
+  <div class="sec-head">
+    <h2>The whole loop, on two phones</h2>
+    <p>Left is the owner's app, right is a customer's messages. Press play, or tap any step. The diagram further down follows the same step.</p>
+  </div>
+  <div class="loop">
+    <div class="phones">
+      <figure class="phone owner" id="ownerPhone">
+        <div class="screen" id="ownerScreen"></div>
+        <div class="tabs" id="ownerTabs"></div>
+        <figcaption>Owner's phone</figcaption>
+      </figure>
+      <figure class="phone cust">
+        <div class="screen chat" id="chat">
+          <div class="chat-top"><span class="avatar" style="color:#fff;font-weight:700">M</span><div><b>Maya's Coffee Cart</b><small>Text to order</small></div></div>
+          <div class="thread" id="thread"></div>
+        </div>
+        <figcaption>Customer's phone</figcaption>
+      </figure>
+    </div>
+    <div class="stepper">
+      <div class="controls">
+        <button id="play" class="btn solid">Play demo</button>
+        <button id="prev" class="btn" aria-label="Previous step">Back</button>
+        <button id="next" class="btn" aria-label="Next step">Next</button>
+        <label class="snd"><input type="checkbox" id="sound" checked> Sound</label>
+      </div>
+      <ol id="steps" class="steps"></ol>
+    </div>
+  </div>
+</section>
+
+<section id="sponsors" class="band tint">
+  <div class="sec-head">
+    <h2>Where each sponsor earns its place</h2>
+    <p>Three are required. Three more we use because they each remove a whole piece of work. Candle is skipped.</p>
+  </div>
+  <div class="sponsors" id="sponsorGrid"></div>
+</section>
+
+<section id="system" class="band">
+  <div class="sec-head">
+    <h2>How it's built</h2>
+    <p>Tap a box for its detail. The lit path is the current step from the mock above.</p>
+  </div>
+  <div class="sys">
+    <div class="sys-diagram">
+      <svg id="arch" viewBox="0 0 1000 600" role="img" aria-label="Architecture diagram"></svg>
+      <div class="caption" id="caption"></div>
+    </div>
+    <aside class="detail" id="detail"></aside>
+  </div>
+
+  <h3 class="sub">Data in Convex</h3>
+  <div class="tables" id="tables"></div>
+
+  <h3 class="sub">What the text agent can call</h3>
+  <div class="endpoints" id="endpoints"></div>
+</section>
+
+<section id="clock" class="band tint">
+  <div class="sec-head">
+    <h2>Today's clock</h2>
+    <p>It is early afternoon, so the brief's full-day order is compressed. Each block ends with something that can be shown.</p>
+  </div>
+  <div class="clock" id="timeline"></div>
+  <div class="split">
+    <div>
+      <h3 class="sub">Parallel agents on Capy</h3>
+      <div id="agents" class="agents"></div>
+    </div>
+    <div>
+      <h3 class="sub">Revyl flows, rerun after every merge</h3>
+      <ol id="tests" class="tests"></ol>
+      <h3 class="sub">If something isn't ready</h3>
+      <ul id="fallbacks" class="fallbacks"></ul>
+    </div>
+  </div>
+</section>
+
+<section id="decide" class="band">
+  <div class="sec-head">
+    <h2>Your calls before code starts</h2>
+    <p>Each has my pick marked. Say "go" to take all picks.</p>
+  </div>
+  <div id="decisions" class="decisions"></div>
+</section>
+
+</main>
+
+<footer>Eight arms. One shop. Zero staff.</footer>
+
+<script type="module" src="plan-data.js"></script>
+<script type="module" src="plan.js"></script>
+</body>
+</html>
