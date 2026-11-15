@@ -80,6 +80,8 @@ struct MenuView: View {
                     if let data = try? await photo.loadTransferable(type: Data.self),
                        let image = UIImage(data: data) {
                         read(image)
+                    } else {
+                        store.errorMessage = "We could not open that photo. Try another one."
                     }
                 }
             }

@@ -1,0 +1,55 @@
+# Revyl Test Definition
+
+_meta:
+    remote_id: d21284dd-6236-4dc6-b265-e894d1767bb0
+    remote_version: 2
+    local_version: 2
+    last_synced_at: "2026-11-15T14:56:12-08:00"
+    checksum: fbb7d4255bcfa443a3327b9ef7ad8b55360f4ac7c48f1cfa6e8c430270cd2790
+test:
+    metadata:
+        name: accept-then-ready
+        platform: ios
+        tags:
+            - orders
+    build:
+        name: octopus ios
+    blocks:
+        - type: if
+          condition: Is the welcome screen with a "Shop name" text field visible?
+          then:
+            - type: instructions
+              step_description: Type "Revyl Test Shop" in the "Shop name" field.
+            - type: instructions
+              step_description: Tap the primary button below the fields that sets up the shop (labelled "Set up my shop" or "Continue").
+        - type: validation
+          step_description: The tab bar with Orders, Menu, Number, Arms and Octopus tabs is visible.
+        - type: instructions
+          step_description: Open the Menu tab.
+        - type: if
+          condition: Is the "Your menu" section empty, showing no items above the "Add item" row?
+          then:
+            - type: instructions
+              step_description: Tap "Add item".
+            - type: instructions
+              step_description: Type "Latte" in the Name field.
+            - type: instructions
+              step_description: Type "4.50" in the Price field.
+            - type: instructions
+              step_description: Tap Save.
+        - type: validation
+          step_description: The "Your menu" section lists at least one item with a price.
+        - type: instructions
+          step_description: Open the Orders tab.
+        - type: instructions
+          step_description: Tap "Add test order" in the top-right toolbar of the Orders screen.
+        - type: validation
+          step_description: An order card with a customer name, at least one line item, a total and the status "New" is visible on the Orders screen, without any refresh.
+        - type: instructions
+          step_description: Tap the Accept button on the newest order card, the one at the top with status "New".
+        - type: validation
+          step_description: That order card now shows the status "Accepted" and a Ready button instead of Accept.
+        - type: instructions
+          step_description: Tap the Ready button on that same order card.
+        - type: validation
+          step_description: That order card now shows the status "Ready" and no Accept or Ready button.

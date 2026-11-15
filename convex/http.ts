@@ -2,6 +2,8 @@ import { httpRouter } from "convex/server";
 import { httpAction, type ActionCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
+import { runOwnerTool } from "./owner";
+import { brain, recall, remember } from "./memory";
 
 type Input = Record<string, unknown>;
 type Call = { shopId: Id<"shops">; channelId: string; input: Input };
@@ -9,12 +11,13 @@ type Call = { shopId: Id<"shops">; channelId: string; input: Input };
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 
-/** Accepts our own secret header, or the key Keiki sends with each webhook tool call. */
+/** Accepts our own secret (header, or query for webhook tools that cannot set headers), or the key Keiki sends. */
 function authorised(request: Request) {
   const ours = process.env.AGENT_SECRET;
   const keiki = process.env.KEIKI_API_KEY;
   return (
     (!!ours && request.headers.get("x-octopus-secret") === ours) ||
+    (!!ours && new URL(request.url).searchParams.get("secret") === ours) ||
     (!!keiki && request.headers.get("x-orchid-api-key") === keiki)
   );
 }
@@ -52,14 +55,16 @@ http.route({
 http.route({
   path: "/agent/createOrder",
   method: "POST",
-  handler: tool((ctx, { shopId, channelId, input }) =>
-    ctx.runMutation(internal.agent.createOrder, {
+  handler: tool(async (ctx, { shopId, channelId, input }) => {
+    const placed = await ctx.runMutation(internal.agent.createOrder, {
       shopId,
       channelId: needChannel(channelId),
       requestedTime: typeof input.requestedTime === "string" ? input.requestedTime : undefined,
       lines: (input.lines as { name: string; qty: number }[]).map((l) => ({ name: String(l.name), qty: Number(l.qty) })),
-    }),
-  ),
+    });
+    await remember(brain.customer(shopId, channelId), `Ordered ${placed.lines.join(", ")} for $${placed.total} on ${new Date().toDateString()}.`);
+    return placed;
+  }),
 });
 
 http.route({
@@ -73,17 +78,24 @@ http.route({
 http.route({
   path: "/agent/getCustomerMemory",
   method: "POST",
-  handler: tool((ctx, { shopId, channelId }) =>
-    ctx.runMutation(internal.agent.getCustomerMemory, { shopId, channelId: needChannel(channelId) }),
-  ),
+  handler: tool(async (ctx, { shopId, channelId }) => {
+    const known = await ctx.runMutation(internal.agent.getCustomerMemory, { shopId, channelId: needChannel(channelId) });
+    const [shopNotes, remembered] = await Promise.all([
+      recall(brain.shopNotes(shopId), "what should customers know today"),
+      recall(brain.customer(shopId, channelId), "usual order and preferences"),
+    ]);
+    return { ...known, shopNotes, remembered };
+  }),
 });
 
 http.route({
   path: "/agent/saveCustomerMemory",
   method: "POST",
-  handler: tool((ctx, { shopId, channelId, input }) =>
-    ctx.runMutation(internal.agent.saveCustomerMemory, { shopId, channelId: needChannel(channelId), note: String(input.note ?? "") }),
-  ),
+  handler: tool(async (ctx, { shopId, channelId, input }) => {
+    const note = String(input.note ?? "");
+    await remember(brain.customer(shopId, needChannel(channelId)), note);
+    return ctx.runMutation(internal.agent.saveCustomerMemory, { shopId, channelId, note });
+  }),
 });
 
 http.route({
@@ -96,6 +108,15 @@ http.route({
     return ctx.runAction(internal.payments.createLink, { orderId });
   }),
 });
+
+/** Owner line: one route per tool, same secret. Only give this line to the shop owner. */
+for (const name of ["get_menu", "add_item", "update_item", "remove_item", "set_hours", "list_orders", "advance_order", "tell_customers", "today_summary"]) {
+  http.route({
+    path: `/owner/${name}`,
+    method: "POST",
+    handler: tool((ctx, { shopId, input }) => runOwnerTool(ctx, shopId, name, input)),
+  });
+}
 
 /** Standard Webhooks check: HMAC-SHA256 over "id.timestamp.body", base64, sent as "v1,<signature>". */
 async function signedByWhop(request: Request, body: string) {

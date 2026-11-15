@@ -1,0 +1,60 @@
+# Revyl Test Definition
+
+_meta:
+    remote_id: dfbcf190-b87b-448e-9146-64ad1ed74334
+    remote_version: 2
+    local_version: 2
+    last_synced_at: "2026-11-15T14:56:09-08:00"
+    checksum: e9760baff4327c70a3c3f2d7df4ebb3ec0f6977d6fcaffa44b6096fe41557b75
+test:
+    metadata:
+        name: create-shop-and-menu
+        platform: ios
+        tags:
+            - onboarding
+            - menu
+    build:
+        name: octopus ios
+    blocks:
+        - type: validation
+          step_description: The welcome screen is visible with a "Shop name" text field.
+        - type: instructions
+          step_description: Type "Revyl Test Shop" in the "Shop name" field.
+        - type: instructions
+          step_description: Tap the primary button below the fields that sets up the shop (labelled "Set up my shop" or "Continue").
+        - type: validation
+          step_description: The tab bar with Orders, Menu, Number, Arms and Octopus tabs is visible.
+        - type: instructions
+          step_description: Open the Menu tab.
+        - type: instructions
+          step_description: Tap "Add item" in the "Your menu" section.
+        - type: instructions
+          step_description: Type "Latte" in the Name field.
+        - type: instructions
+          step_description: Type "4.50" in the Price field.
+        - type: instructions
+          step_description: Tap Save.
+        - type: validation
+          step_description: The "Your menu" section lists "Latte" with a price.
+        - type: instructions
+          step_description: Tap "Add item" in the "Your menu" section.
+        - type: instructions
+          step_description: Type "Croissant" in the Name field.
+        - type: instructions
+          step_description: Type "3.25" in the Price field.
+        - type: instructions
+          step_description: Tap Save.
+        - type: validation
+          step_description: The "Your menu" section lists "Croissant" with a price.
+        - type: instructions
+          step_description: Tap "Add item" in the "Your menu" section.
+        - type: instructions
+          step_description: Type "Iced Tea" in the Name field.
+        - type: instructions
+          step_description: Type "2.75" in the Price field.
+        - type: instructions
+          step_description: Tap Save.
+        - type: validation
+          step_description: The "Your menu" section lists "Iced Tea" with a price.
+        - type: validation
+          step_description: The "Your menu" section lists at least three items - Latte, Croissant and Iced Tea - each with a price.

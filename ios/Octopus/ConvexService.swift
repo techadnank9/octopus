@@ -97,4 +97,8 @@ struct ConvexService {
     func sendChat(shopId: String, channelId: String, text: String) async throws {
         try await client.action("chat:send", with: ["shopId": shopId, "channelId": channelId, "text": text])
     }
+
+    func sendOwner(shopId: String, text: String) async throws {
+        try await client.action("owner:send", with: ["shopId": shopId, "text": text])
+    }
 }

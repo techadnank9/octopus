@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		152357B370E292B05A8CBE81 /* NumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19C25827251EBDC8447D88D /* NumberView.swift */; };
 		1E342C12AD823BD30FDE3128 /* UIImage+Upload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92368D187D53400A87A643FA /* UIImage+Upload.swift */; };
+		20464DE8F7524ABE85BBFEA6 /* ChatThreadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9619D4536A51722673DB8B3A /* ChatThreadView.swift */; };
+		2935F940968FFFF79FF274A3 /* SmsLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02C8E828D0E5A21A53261984 /* SmsLink.swift */; };
+		2B221A43DE20AEF899E0E8A8 /* PlainError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F88D7A08B075852F87CA3B4 /* PlainError.swift */; };
 		308090FEDDE697E346148B36 /* ConvexMobile in Frameworks */ = {isa = PBXBuildFile; productRef = 75820FBE0E402E99ED0188B2 /* ConvexMobile */; };
 		33759DBC06AA61DCBA1D8041 /* MenuStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C9C5E86900BF4D664B8EFF /* MenuStore.swift */; };
 		363D4DAC42C682AB2F7FF211 /* OctopusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74E105FEED84FC599326010D /* OctopusApp.swift */; };
@@ -31,14 +34,17 @@
 		89AADF347689AE9EC4117D16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48439F6B1E8866E48D4C17E4 /* Assets.xcassets */; };
 		9F6F452C8A1FA21BD97D660A /* octopus.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 56612BEF2F99734965614A45 /* octopus.usdz */; };
 		A17496419BC0057376B370C5 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF7EFB2491ED1FBEEB482A7F /* ChatView.swift */; };
+		A1E99AAED5807497A8F0FCD3 /* ChatBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62EA1ED6F1265110C0D87045 /* ChatBubble.swift */; };
 		C341989EE8865A0ECD2C898D /* OrdersStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 890A7DFC6664283590E74867 /* OrdersStore.swift */; };
 		D83A9C34D3A8AD8D25C900C6 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839DC2403F95A89A40C38673 /* Money.swift */; };
+		D9EE0EADD619BF8AE994D83F /* ChatMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97F58C2B1D16065A56A8A541 /* ChatMode.swift */; };
 		E8FAD7771EFD31E1A06B10BF /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F0BDEF591AB149C307BACE /* RootView.swift */; };
 		F35DAE0472C455E4E9ABE727 /* ItemDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A64476C370821892358962 /* ItemDraft.swift */; };
 		FC12DD01C28E9342071B092F /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766657A97A296C7CAF05E928 /* WelcomeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		02C8E828D0E5A21A53261984 /* SmsLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmsLink.swift; sourceTree = "<group>"; };
 		272514D83821C8FEEBC283F0 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		342C4A7266CB5838A5024D5D /* ArmRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArmRow.swift; sourceTree = "<group>"; };
 		3A771A55A89685AF2BE7F23B /* QRCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeView.swift; sourceTree = "<group>"; };
@@ -47,6 +53,8 @@
 		578107FBBB68B00EC52A9F59 /* OrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersView.swift; sourceTree = "<group>"; };
 		58EABAF72B25D60E2119A112 /* ChatStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStore.swift; sourceTree = "<group>"; };
 		59A64476C370821892358962 /* ItemDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDraft.swift; sourceTree = "<group>"; };
+		5F88D7A08B075852F87CA3B4 /* PlainError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainError.swift; sourceTree = "<group>"; };
+		62EA1ED6F1265110C0D87045 /* ChatBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubble.swift; sourceTree = "<group>"; };
 		63CA9F1541A6DA82D3A40C38 /* OctopusMascotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OctopusMascotView.swift; sourceTree = "<group>"; };
 		6D6B1CF86906E3CDDF4AEFCE /* Octopus.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Octopus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		70F0BDEF591AB149C307BACE /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -57,7 +65,9 @@
 		890A7DFC6664283590E74867 /* OrdersStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersStore.swift; sourceTree = "<group>"; };
 		8EF3970580D5BB1B3385F964 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		92368D187D53400A87A643FA /* UIImage+Upload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Upload.swift"; sourceTree = "<group>"; };
+		9619D4536A51722673DB8B3A /* ChatThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatThreadView.swift; sourceTree = "<group>"; };
 		96C9C5E86900BF4D664B8EFF /* MenuStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuStore.swift; sourceTree = "<group>"; };
+		97F58C2B1D16065A56A8A541 /* ChatMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMode.swift; sourceTree = "<group>"; };
 		AF7EFB2491ED1FBEEB482A7F /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		BC1C5083A9AE2B7583392D33 /* ItemEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemEditorView.swift; sourceTree = "<group>"; };
 		C44000AAE02264813D390670 /* AppStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStore.swift; sourceTree = "<group>"; };
@@ -107,12 +117,15 @@
 			isa = PBXGroup;
 			children = (
 				48439F6B1E8866E48D4C17E4 /* Assets.xcassets */,
+				97F58C2B1D16065A56A8A541 /* ChatMode.swift */,
 				D4B8737F38D4078CB3520BF4 /* ConvexService.swift */,
 				80256BA30A621B2D67F4D026 /* Info.plist */,
 				E1D9C625C16B3EA07C92B13A /* Models.swift */,
 				839DC2403F95A89A40C38673 /* Money.swift */,
 				74E105FEED84FC599326010D /* OctopusApp.swift */,
 				C7223857AD15B16999CCC22D /* OwnerIdentity.swift */,
+				5F88D7A08B075852F87CA3B4 /* PlainError.swift */,
+				02C8E828D0E5A21A53261984 /* SmsLink.swift */,
 				272514D83821C8FEEBC283F0 /* Theme.swift */,
 				92368D187D53400A87A643FA /* UIImage+Upload.swift */,
 				282A5391735593FBB9BDF5E3 /* Resources */,
@@ -145,6 +158,8 @@
 				342C4A7266CB5838A5024D5D /* ArmRow.swift */,
 				FDEE2AD4F226B44337D2C355 /* ArmsView.swift */,
 				CC681A8793B9CB29EB2A610E /* CameraPicker.swift */,
+				62EA1ED6F1265110C0D87045 /* ChatBubble.swift */,
+				9619D4536A51722673DB8B3A /* ChatThreadView.swift */,
 				AF7EFB2491ED1FBEEB482A7F /* ChatView.swift */,
 				59A64476C370821892358962 /* ItemDraft.swift */,
 				BC1C5083A9AE2B7583392D33 /* ItemEditorView.swift */,
@@ -247,7 +262,10 @@
 				48DB24E7757FBADB97B12C6E /* ArmRow.swift in Sources */,
 				740E0F644606DD7FC05FBCFB /* ArmsView.swift in Sources */,
 				429B169D1C3746C2129D5F07 /* CameraPicker.swift in Sources */,
+				A1E99AAED5807497A8F0FCD3 /* ChatBubble.swift in Sources */,
+				D9EE0EADD619BF8AE994D83F /* ChatMode.swift in Sources */,
 				42376F89C10CA1B0ACEFEE0A /* ChatStore.swift in Sources */,
+				20464DE8F7524ABE85BBFEA6 /* ChatThreadView.swift in Sources */,
 				A17496419BC0057376B370C5 /* ChatView.swift in Sources */,
 				862A152A25626065B71F96E2 /* ConvexService.swift in Sources */,
 				F35DAE0472C455E4E9ABE727 /* ItemDraft.swift in Sources */,
@@ -264,8 +282,10 @@
 				C341989EE8865A0ECD2C898D /* OrdersStore.swift in Sources */,
 				76E643DD094A9BE8FFE0E84D /* OrdersView.swift in Sources */,
 				55892BE6FF031C329997158A /* OwnerIdentity.swift in Sources */,
+				2B221A43DE20AEF899E0E8A8 /* PlainError.swift in Sources */,
 				39B3BF0765E65C51EF63438C /* QRCodeView.swift in Sources */,
 				E8FAD7771EFD31E1A06B10BF /* RootView.swift in Sources */,
+				2935F940968FFFF79FF274A3 /* SmsLink.swift in Sources */,
 				7C49F659A774F5BAAFA53760 /* Theme.swift in Sources */,
 				1E342C12AD823BD30FDE3128 /* UIImage+Upload.swift in Sources */,
 				FC12DD01C28E9342071B092F /* WelcomeView.swift in Sources */,

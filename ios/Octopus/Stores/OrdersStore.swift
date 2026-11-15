@@ -5,6 +5,7 @@ import SwiftUI
 final class OrdersStore: ObservableObject {
     @Published private(set) var orders: [Order] = []
     @Published private(set) var hasLoaded = false
+    @Published private(set) var highlightedIds: Set<String> = []
     @Published var errorMessage: String?
 
     private let shopId: String
@@ -20,7 +21,7 @@ final class OrdersStore: ObservableObject {
                     self?.receive(orders)
                 }
             } catch {
-                self?.errorMessage = error.localizedDescription
+                self?.errorMessage = error.plainMessage
             }
         }
     }
@@ -31,18 +32,26 @@ final class OrdersStore: ObservableObject {
 
     private func receive(_ latest: [Order]) {
         let ids = Set(latest.map(\.id))
-        let hasNewOrder = hasLoaded && !ids.isSubset(of: knownIds)
+        let newIds = hasLoaded ? ids.subtracting(knownIds) : []
         knownIds.formUnion(ids)
         hasLoaded = true
-        if hasNewOrder { announceNewOrder() }
+        if !newIds.isEmpty { announce(newIds) }
         withAnimation(.spring(response: 0.45, dampingFraction: 0.72)) {
             orders = latest
         }
     }
 
-    private func announceNewOrder() {
+    /// Sound, haptic, and a highlight ring that fades after a few seconds.
+    private func announce(_ newIds: Set<String>) {
         AudioServicesPlaySystemSound(1007)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
+        highlightedIds.formUnion(newIds)
+        Task { [weak self] in
+            try? await Task.sleep(for: .seconds(4))
+            withAnimation(.easeOut(duration: 1)) {
+                self?.highlightedIds.subtract(newIds)
+            }
+        }
     }
 
     func setStatus(_ order: Order, to status: OrderStatus) async {
@@ -59,10 +68,11 @@ final class OrdersStore: ObservableObject {
     }
 
     private func run(_ work: () async throws -> Void) async {
+        errorMessage = nil
         do {
             try await work()
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.plainMessage
         }
     }
 }

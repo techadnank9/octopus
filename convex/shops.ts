@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const mine = query({
@@ -21,5 +21,14 @@ export const create = mutation({
       channelLink: process.env.SHOP_CHANNEL_LINK,
       createdAt: Date.now(),
     });
+  },
+});
+
+/** Points every shop at the current text line. Run after the channel link changes. */
+export const refreshChannelLink = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const link = process.env.SHOP_CHANNEL_LINK;
+    for (const shop of await ctx.db.query("shops").collect()) await ctx.db.patch(shop._id, { channelLink: link });
   },
 });

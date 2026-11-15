@@ -9,13 +9,17 @@
  */
 
 import type * as agent from "../agent.js";
+import type * as agentLoop from "../agentLoop.js";
 import type * as chat from "../chat.js";
 import type * as events from "../events.js";
 import type * as http from "../http.js";
 import type * as items from "../items.js";
+import type * as memory from "../memory.js";
 import type * as menu from "../menu.js";
 import type * as notify from "../notify.js";
 import type * as orders from "../orders.js";
+import type * as owner from "../owner.js";
+import type * as ownerTools from "../ownerTools.js";
 import type * as payments from "../payments.js";
 import type * as shops from "../shops.js";
 
@@ -27,13 +31,17 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   agent: typeof agent;
+  agentLoop: typeof agentLoop;
   chat: typeof chat;
   events: typeof events;
   http: typeof http;
   items: typeof items;
+  memory: typeof memory;
   menu: typeof menu;
   notify: typeof notify;
   orders: typeof orders;
+  owner: typeof owner;
+  ownerTools: typeof ownerTools;
   payments: typeof payments;
   shops: typeof shops;
 }>;

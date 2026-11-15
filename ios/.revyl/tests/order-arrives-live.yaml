@@ -1,0 +1,47 @@
+# Revyl Test Definition
+
+_meta:
+    remote_id: eec809a0-75d9-4cdd-be76-c49be5713bb8
+    remote_version: 2
+    local_version: 2
+    last_synced_at: "2026-11-15T14:56:10-08:00"
+    checksum: 1c14133054bf8e37a13f78161a23e018358ad9234346e00c39996e9444bf7d47
+test:
+    metadata:
+        name: order-arrives-live
+        platform: ios
+        tags:
+            - orders
+    build:
+        name: octopus ios
+    blocks:
+        - type: if
+          condition: Is the welcome screen with a "Shop name" text field visible?
+          then:
+            - type: instructions
+              step_description: Type "Revyl Test Shop" in the "Shop name" field.
+            - type: instructions
+              step_description: Tap the primary button below the fields that sets up the shop (labelled "Set up my shop" or "Continue").
+        - type: validation
+          step_description: The tab bar with Orders, Menu, Number, Arms and Octopus tabs is visible.
+        - type: instructions
+          step_description: Open the Menu tab.
+        - type: if
+          condition: Is the "Your menu" section empty, showing no items above the "Add item" row?
+          then:
+            - type: instructions
+              step_description: Tap "Add item".
+            - type: instructions
+              step_description: Type "Latte" in the Name field.
+            - type: instructions
+              step_description: Type "4.50" in the Price field.
+            - type: instructions
+              step_description: Tap Save.
+        - type: validation
+          step_description: The "Your menu" section lists at least one item with a price.
+        - type: instructions
+          step_description: Open the Orders tab.
+        - type: instructions
+          step_description: Tap "Add test order" in the top-right toolbar of the Orders screen.
+        - type: validation
+          step_description: An order card with a customer name, at least one line item, a total and the status "New" is visible on the Orders screen, without any refresh.

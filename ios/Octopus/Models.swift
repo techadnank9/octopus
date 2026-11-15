@@ -48,11 +48,12 @@ struct Order: Decodable, Equatable, Identifiable {
     let requestedTime: String?
     let status: OrderStatus
     let paymentStatus: PaymentStatus
+    let paymentLink: String?
     @ConvexFloat var creationTime: Double
 
     enum CodingKeys: String, CodingKey {
         case id = "_id"
-        case customerName, lines, totalCents, requestedTime, status, paymentStatus
+        case customerName, lines, totalCents, requestedTime, status, paymentStatus, paymentLink
         case creationTime = "_creationTime"
     }
 }

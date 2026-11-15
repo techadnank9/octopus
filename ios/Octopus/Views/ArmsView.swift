@@ -4,6 +4,8 @@ struct ArmsView: View {
     let shopId: String
 
     @State private var counts: [Double] = []
+    @State private var pulsing: Set<Int> = []
+    @State private var errorMessage: String?
 
     private static let arms = [
         "Takes orders by text",
@@ -22,7 +24,14 @@ struct ArmsView: View {
                 VStack(spacing: 12) {
                     OctopusMascotView(height: 180)
                     ForEach(Array(Self.arms.enumerated()), id: \.offset) { index, title in
-                        ArmRow(number: index + 1, title: title, value: value(at: index))
+                        ArmRow(
+                            number: index + 1, title: title, value: value(at: index),
+                            isPulsing: pulsing.contains(index))
+                    }
+                    if let errorMessage {
+                        Text(errorMessage)
+                            .font(Theme.caption)
+                            .foregroundStyle(Theme.coral)
                     }
                     Text("Eight arms. One shop. Zero staff.")
                         .font(Theme.headline)
@@ -34,13 +43,26 @@ struct ArmsView: View {
             .screenBackground()
             .navigationTitle("Arms")
             .task {
-                let latest = ConvexService.shared.armCounts(shopId: shopId)
-                    .replaceError(with: [])
-                    .values
-                for await counts in latest {
-                    self.counts = counts
+                do {
+                    for try await latest in ConvexService.shared.armCounts(shopId: shopId).values {
+                        receive(latest)
+                    }
+                } catch {
+                    errorMessage = error.plainMessage
                 }
             }
+        }
+    }
+
+    /// Rows whose counter changed pulse briefly. The first load does not pulse.
+    private func receive(_ latest: [Double]) {
+        let changed = Set(latest.indices.filter { $0 < counts.count && counts[$0] != latest[$0] })
+        counts = latest
+        guard !changed.isEmpty else { return }
+        pulsing.formUnion(changed)
+        Task {
+            try? await Task.sleep(for: .seconds(0.8))
+            pulsing.subtract(changed)
         }
     }
 

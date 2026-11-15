@@ -18,7 +18,7 @@ final class MenuStore: ObservableObject {
                     self?.items = items
                 }
             } catch {
-                self?.errorMessage = error.localizedDescription
+                self?.errorMessage = error.plainMessage
             }
         }
     }
@@ -28,14 +28,17 @@ final class MenuStore: ObservableObject {
     }
 
     func readMenu(from image: UIImage) async {
-        guard let jpeg = image.jpegForUpload() else { return }
+        guard let jpeg = image.jpegForUpload() else {
+            errorMessage = "We could not use that photo. Try another one."
+            return
+        }
         isReading = true
         defer { isReading = false }
         do {
             let saved = try await ConvexService.shared.extractMenu(shopId: shopId, jpeg: jpeg)
             if saved == 0 { errorMessage = "We could not find any items in that photo. Try another one." }
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.plainMessage
         }
     }
 
@@ -43,7 +46,7 @@ final class MenuStore: ObservableObject {
         do {
             try await ConvexService.shared.saveItem(shopId: shopId, id: id, name: name, priceCents: priceCents)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.plainMessage
         }
     }
 
@@ -51,7 +54,7 @@ final class MenuStore: ObservableObject {
         do {
             try await ConvexService.shared.removeItem(id: item.id)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.plainMessage
         }
     }
 }

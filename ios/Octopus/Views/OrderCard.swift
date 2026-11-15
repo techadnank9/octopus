@@ -41,6 +41,11 @@ struct OrderCard: View {
                 Button("Ready") { Task { await store.setStatus(order, to: .ready) } }
                     .buttonStyle(PrimaryButtonStyle())
             }
+            if !isPaid && order.paymentLink != nil {
+                Label("Pay link sent", systemImage: "link")
+                    .font(Theme.caption)
+                    .foregroundStyle(Theme.purple)
+            }
             if !isPaid {
                 Button("Mark paid (demo)") { Task { await store.markPaidDemo(order) } }
                     .font(Theme.caption)
@@ -51,7 +56,8 @@ struct OrderCard: View {
         .card()
         .overlay {
             RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous)
-                .stroke(Theme.coral, lineWidth: isNew ? 3 : 0)
+                .stroke(Theme.coral, lineWidth: 4)
+                .opacity(store.highlightedIds.contains(order.id) ? 1 : 0)
         }
     }
 

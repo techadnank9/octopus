@@ -13,6 +13,7 @@ final class AppStore: ObservableObject {
 
     let ownerId = OwnerIdentity.id
     private var task: Task<Void, Never>?
+    private var timeout: Task<Void, Never>?
 
     init() {
         watchShop()
@@ -20,10 +21,12 @@ final class AppStore: ObservableObject {
 
     deinit {
         task?.cancel()
+        timeout?.cancel()
     }
 
     func watchShop() {
         task?.cancel()
+        timeout?.cancel()
         phase = .loading
         let shops = ConvexService.shared.shop(ownerId: ownerId).values
         task = Task { [weak self] in
@@ -32,8 +35,14 @@ final class AppStore: ObservableObject {
                     self?.phase = shop.map(Phase.ready) ?? .needsSetup
                 }
             } catch {
-                self?.phase = .failed(error.localizedDescription)
+                self?.phase = .failed(error.plainMessage)
             }
+        }
+        // The connection retries quietly, so stop waiting after a while and say so.
+        timeout = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(12))
+            guard !Task.isCancelled, self?.phase == .loading else { return }
+            self?.phase = .failed("This is taking too long. Check your connection and try again.")
         }
     }
 

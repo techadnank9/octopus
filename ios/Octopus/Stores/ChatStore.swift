@@ -2,25 +2,27 @@ import SwiftUI
 
 @MainActor
 final class ChatStore: ObservableObject {
-    static let channelId = "demo:in-app"
-
     @Published private(set) var messages: [ChatMessage] = []
+    @Published private(set) var hasLoaded = false
     @Published private(set) var isSending = false
     @Published var errorMessage: String?
 
+    let mode: ChatMode
     private let shopId: String
     private var task: Task<Void, Never>?
 
-    init(shopId: String) {
+    init(shopId: String, mode: ChatMode) {
         self.shopId = shopId
-        let thread = ConvexService.shared.chatThread(shopId: shopId, channelId: Self.channelId).values
+        self.mode = mode
+        let thread = ConvexService.shared.chatThread(shopId: shopId, channelId: mode.channelId).values
         task = Task { [weak self] in
             do {
                 for try await messages in thread {
                     self?.messages = messages
+                    self?.hasLoaded = true
                 }
             } catch {
-                self?.errorMessage = error.localizedDescription
+                self?.errorMessage = error.plainMessage
             }
         }
     }
@@ -29,13 +31,19 @@ final class ChatStore: ObservableObject {
         task?.cancel()
     }
 
+    /// The reply arrives through the thread subscription.
     func send(_ text: String) async {
         isSending = true
         errorMessage = nil
         do {
-            try await ConvexService.shared.sendChat(shopId: shopId, channelId: Self.channelId, text: text)
+            switch mode {
+            case .owner:
+                try await ConvexService.shared.sendOwner(shopId: shopId, text: text)
+            case .customer:
+                try await ConvexService.shared.sendChat(shopId: shopId, channelId: mode.channelId, text: text)
+            }
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.plainMessage
         }
         isSending = false
     }

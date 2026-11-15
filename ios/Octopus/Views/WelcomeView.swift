@@ -14,10 +14,11 @@ struct WelcomeView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(spacing: 18) {
                 OctopusMascotView()
-                Text("Set up your shop")
+                Text("Run your shop by text")
                     .font(Theme.largeTitle)
+                    .multilineTextAlignment(.center)
                 Text("Eight arms. One shop. Zero staff.")
                     .font(Theme.body)
                     .opacity(0.7)
@@ -28,7 +29,7 @@ struct WelcomeView: View {
                         .font(Theme.caption)
                         .foregroundStyle(Theme.coral)
                 }
-                Button(isSaving ? "Setting up" : "Continue") { createShop() }
+                Button(isSaving ? "Setting up" : "Set up my shop") { createShop() }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(!canContinue)
                     .opacity(canContinue ? 1 : 0.5)
@@ -54,7 +55,7 @@ struct WelcomeView: View {
             do {
                 try await store.createShop(name: name, hours: hours)
             } catch {
-                errorMessage = error.localizedDescription
+                errorMessage = error.plainMessage
             }
             isSaving = false
         }

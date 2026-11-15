@@ -1,0 +1,28 @@
+project:
+    id: eba4a1b7-54b4-4b5b-ae21-92f016006e66
+session:
+    idle_timeout_seconds: 1800
+build:
+    framework: ios
+    profiles:
+        preview:
+            ios:
+                app_id: "f5c287d9-a1fb-48df-b3f2-c12c09e74ae6"
+                setup_commands:
+                    - name: Install XcodeGen
+                      run: command -v xcodegen >/dev/null 2>&1 || HOMEBREW_NO_AUTO_UPDATE=1 brew install xcodegen
+                    - name: Generate Xcode project
+                      run: xcodegen generate
+                build_commands:
+                    - name: Build simulator app
+                      run: xcodebuild -project 'Octopus.xcodeproj' -scheme 'Octopus' -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' ARCHS=arm64 -derivedDataPath build CODE_SIGNING_ALLOWED=NO
+                output_path: build/Build/Products/Debug-iphonesimulator/Octopus.app
+pr_review:
+    enabled: true
+    build:
+        kind: revyl
+        profile: preview
+    proof_of_changes:
+        enabled: true
+        harness:
+            kind: revyl

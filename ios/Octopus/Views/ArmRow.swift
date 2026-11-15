@@ -4,6 +4,7 @@ struct ArmRow: View {
     let number: Int
     let title: String
     let value: String
+    let isPulsing: Bool
 
     var body: some View {
         HStack(spacing: 14) {
@@ -17,10 +18,18 @@ struct ArmRow: View {
             Spacer()
             Text(value)
                 .font(Theme.title)
+                .foregroundStyle(isPulsing ? Theme.coral : Theme.ink)
                 .contentTransition(.numericText())
                 .animation(.default, value: value)
         }
         .foregroundStyle(Theme.ink)
         .card()
+        .overlay {
+            RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous)
+                .stroke(Theme.coral, lineWidth: 3)
+                .opacity(isPulsing ? 1 : 0)
+        }
+        .scaleEffect(isPulsing ? 1.03 : 1)
+        .animation(.spring(response: 0.35, dampingFraction: 0.6), value: isPulsing)
     }
 }

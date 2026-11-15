@@ -1,0 +1,51 @@
+# Revyl Test Definition
+
+_meta:
+    remote_id: 18250d9b-073a-4bfa-929d-7ec44766da3b
+    remote_version: 2
+    local_version: 2
+    last_synced_at: "2026-11-15T14:56:14-08:00"
+    checksum: 9f653e52527248b4c947f108b08428763ed9b8bc017ce775790059143cb0a0cc
+test:
+    metadata:
+        name: arms-counters
+        platform: ios
+        tags:
+            - arms
+    build:
+        name: octopus ios
+    blocks:
+        - type: if
+          condition: Is the welcome screen with a "Shop name" text field visible?
+          then:
+            - type: instructions
+              step_description: Type "Revyl Test Shop" in the "Shop name" field.
+            - type: instructions
+              step_description: Tap the primary button below the fields that sets up the shop (labelled "Set up my shop" or "Continue").
+        - type: validation
+          step_description: The tab bar with Orders, Menu, Number, Arms and Octopus tabs is visible.
+        - type: instructions
+          step_description: Open the Menu tab.
+        - type: if
+          condition: Is the "Your menu" section empty, showing no items above the "Add item" row?
+          then:
+            - type: instructions
+              step_description: Tap "Add item".
+            - type: instructions
+              step_description: Type "Latte" in the Name field.
+            - type: instructions
+              step_description: Type "4.50" in the Price field.
+            - type: instructions
+              step_description: Tap Save.
+        - type: validation
+          step_description: The "Your menu" section lists at least one item with a price.
+        - type: instructions
+          step_description: Open the Orders tab.
+        - type: instructions
+          step_description: Tap "Add test order" in the top-right toolbar of the Orders screen.
+        - type: validation
+          step_description: An order card with a customer name, at least one line item, a total and the status "New" is visible on the Orders screen, without any refresh.
+        - type: instructions
+          step_description: Open the Arms tab.
+        - type: validation
+          step_description: The Arms screen lists eight numbered arms, and at least one of them shows a counter value greater than zero.
