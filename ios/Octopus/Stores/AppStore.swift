@@ -40,7 +40,7 @@ final class AppStore: ObservableObject {
         }
         // The connection retries quietly, so stop waiting after a while and say so.
         timeout = Task { [weak self] in
-            try? await Task.sleep(for: .seconds(12))
+            try? await Task.sleep(for: .seconds(30))
             guard !Task.isCancelled, self?.phase == .loading else { return }
             self?.phase = .failed("This is taking too long. Check your connection and try again.")
         }
