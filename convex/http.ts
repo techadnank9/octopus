@@ -3,6 +3,7 @@ import { httpAction, type ActionCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { runOwnerTool } from "./owner";
+import { addSiteRoutes } from "./site";
 import { brain, recall, remember } from "./memory";
 
 type Input = Record<string, unknown>;
@@ -146,5 +147,7 @@ http.route({
     return json({ ok: true });
   }),
 });
+
+addSiteRoutes(http);
 
 export default http;

@@ -14,14 +14,17 @@ import type * as chat from "../chat.js";
 import type * as events from "../events.js";
 import type * as http from "../http.js";
 import type * as items from "../items.js";
+import type * as landing from "../landing.js";
 import type * as memory from "../memory.js";
 import type * as menu from "../menu.js";
 import type * as notify from "../notify.js";
+import type * as onboard from "../onboard.js";
 import type * as orders from "../orders.js";
 import type * as owner from "../owner.js";
 import type * as ownerTools from "../ownerTools.js";
 import type * as payments from "../payments.js";
 import type * as shops from "../shops.js";
+import type * as site from "../site.js";
 
 import type {
   ApiFromModules,
@@ -36,14 +39,17 @@ declare const fullApi: ApiFromModules<{
   events: typeof events;
   http: typeof http;
   items: typeof items;
+  landing: typeof landing;
   memory: typeof memory;
   menu: typeof menu;
   notify: typeof notify;
+  onboard: typeof onboard;
   orders: typeof orders;
   owner: typeof owner;
   ownerTools: typeof ownerTools;
   payments: typeof payments;
   shops: typeof shops;
+  site: typeof site;
 }>;
 
 /**
