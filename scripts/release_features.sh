@@ -1,10 +1,12 @@
 #!/bin/sh
-# Release step for customer-app features built by Capy.
+# Build-machine runner: releases customer-app features built by Capy, and runs the phone app on Revyl when the dashboard asks.
 # For each request Capy has finished: find its pull request, check it touches only the customer app page
 # and that the page still parses, merge it, deploy to Convex, and tell the owner. A failed check leaves
 # the customer app untouched and says why. Run from the repository root; needs gh, node and the Convex CLI.
 set -u
 REPO=techadnank9/octopus
+REVYL_APP=f5c287d9-a1fb-48df-b3f2-c12c09e74ae6
+PATH="$HOME/.revyl/bin:$PATH"
 cd "$(dirname "$0")/.."
 
 check_page() {
@@ -50,8 +52,32 @@ release() { # feature id
   echo "released feature $id via PR #$pr"
 }
 
-echo "watching for finished features (ctrl-c to stop)"
+run_phone() { # id kind name
+  if [ "$2" = "device" ]; then
+    url=$(cd ios && revyl device start --app-id "$REVYL_APP" --json </dev/null 2>/dev/null | node -e '
+      let t = ""; process.stdin.on("data", (d) => (t += d)).on("end", () => { const m = t.match(/"viewer_url":\s*"([^"]+)"/); console.log(m ? m[1] : ""); });')
+    if [ -n "$url" ]; then st=open; else st=failed; fi
+  else
+    out=$(cd ios && revyl test run "$3" --json </dev/null 2>&1)
+    url=$(printf '%s' "$out" | node -e '
+      let t = ""; process.stdin.on("data", (d) => (t += d)).on("end", () => { const m = t.match(/"report_link":\s*"([^"]+)"/); console.log(m ? m[1] : ""); });')
+    if printf '%s' "$out" | grep -q '"success": true'; then st=passed; else st=failed; fi
+  fi
+  npx convex run phone:finish "{\"id\":\"$1\",\"status\":\"$st\"${url:+,\"url\":\"$url\"}}" >/dev/null 2>&1
+  echo "phone run $3: $st $url"
+}
+
+next_phone() {
+  npx convex run phone:claim 2>/dev/null | node -e '
+    let t = ""; process.stdin.on("data", (d) => (t += d)).on("end", () => { try { const r = JSON.parse(t); if (r) console.log(r.id + "|" + r.kind + "|" + r.name); } catch {} });'
+}
+
+echo "watching for finished features and phone runs (ctrl-c to stop)"
 while :; do
+  job=$(next_phone)
+  if [ -n "$job" ]; then
+    (run_phone "$(echo "$job" | cut -d"|" -f1)" "$(echo "$job" | cut -d"|" -f2)" "$(echo "$job" | cut -d"|" -f3)") &
+  fi
   for id in $(npx convex run features:awaitingRelease 2>/dev/null | node -e '
       let t = ""; process.stdin.on("data", (d) => (t += d)).on("end", () => { try { JSON.parse(t).forEach((f) => console.log(f.id)); } catch {} });'); do
     release "$id"

@@ -51,7 +51,7 @@ export function addSiteRoutes(http: HttpRouter) {
   http.route({ path: "/shop", method: "GET", handler: html(STOREFRONT) });
   http.route({ path: "/dashboard", method: "GET", handler: html(LANDING) });
 
-  for (const path of ["/onboard", "/public/chat", "/public/owner", "/public/order", "/public/placeOrder", "/public/item", "/public/do", "/public/book", "/public/review"]) {
+  for (const path of ["/onboard", "/public/chat", "/public/owner", "/public/order", "/public/placeOrder", "/public/item", "/public/do", "/public/book", "/public/review", "/public/phone"]) {
     http.route({ path, method: "OPTIONS", handler: preflight });
   }
 
@@ -105,6 +105,14 @@ export function addSiteRoutes(http: HttpRouter) {
           throw new Error("Unknown action");
       }
     }),
+  });
+
+  http.route({
+    path: "/public/phone",
+    method: "POST",
+    handler: page((ctx, body) =>
+      ctx.runMutation(internal.phone.request, { kind: body.kind === "test" ? "test" : "device", name: typeof body.name === "string" ? body.name : undefined }),
+    ),
   });
 
   http.route({

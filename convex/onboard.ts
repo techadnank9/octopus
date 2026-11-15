@@ -169,6 +169,7 @@ export const state = internalQuery({
       items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, available: i.available, stock: i.stock ?? null })),
       dashboard,
       suite,
+      phoneRuns: await ctx.runQuery(internal.phone.recent, {}),
       orders: orders.slice(0, 8).map((o) => ({
         id: o._id,
         customer: o.customerName,

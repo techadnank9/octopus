@@ -147,6 +147,7 @@ body.dash main { padding-top:0; }
 .line3 { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:10px; align-items:center; padding:8px 0; border-bottom:1px solid #F0EBF8; font-size:.92rem; }
 .line3 small { color:var(--muted); display:block; }
 .line3 button { border:1.5px solid var(--line); background:#fff; border-radius:10px; padding:6px 10px; font-weight:700; font-size:.8rem; cursor:pointer; color:var(--ink); }
+.phonebar { margin-top:24px; grid-column:auto; }
 .share { display:flex; gap:20px; align-items:center; margin-top:24px; padding:20px; border-top:2px solid var(--ink); }
 .share .qr { margin:0; width:130px; height:130px; flex:none; }
 .share p { max-width:40ch; color:var(--muted); }
@@ -215,6 +216,10 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
       <article class="tile"><header><span class="num">11</span><div><h3>Reviews and reputation</h3><p>Asks happy customers for a review and drafts your replies.</p></div><b class="live" id="l11"></b></header><div class="tbody"><div id="reviews"></div><div class="acts" style="margin-top:10px"><button data-do="askReviews">Ask recent customers for a review</button></div></div></article>
       <article class="tile"><header><span class="num">12</span><div><h3>Taxes and compliance</h3><p>Keeps tidy records of sales and the tax inside them.</p></div><b class="live" id="l12"></b></header><div class="tbody"><form class="send" id="taxForm"><input id="taxRate" inputmode="decimal" placeholder="Tax rate %" aria-label="Tax rate in percent"><button>Save rate</button></form><div id="taxLines" style="margin-top:10px"></div></div></article>
     </div>
+    <div class="panel phonebar"><h3>The iPhone app, on a cloud iPhone</h3><p class="hint">Runs the owner app on a Revyl simulator. A live phone opens in Revyl; tests come back with a video report.</p>
+      <div class="acts"><button class="main" data-phone="device">Open a live iPhone</button><button data-phone="test" data-name="create-shop-and-menu">Test: set up shop and menu</button><button data-phone="test" data-name="order-arrives-live">Test: order arrives live</button><button data-phone="test" data-name="accept-then-ready">Test: accept then ready</button><button data-phone="test" data-name="arms-counters">Test: dashboard counters</button></div>
+      <div id="phoneRuns" style="margin-top:12px"></div>
+      <p class="hint" style="margin-top:10px"><a href="https://app.revyl.ai" target="_blank" rel="noopener" style="color:var(--violet);font-weight:700">Open Revyl</a></p></div>
     <div class="share"><img class="qr" id="storeQr" alt="QR code for your customer app"><p>Customers scan this to open your shop's own app: menu, cart, pay and live order status.</p></div>
   </section>
 </main>
@@ -331,6 +336,8 @@ async function refresh() {
   live('l12', money(u.tax.taxCents), 'tax in sales');
   const FS = { building: 'Capy is building it', built: 'Built and reviewed, releasing', live: 'Live in your customer app', failed: 'Not shipped' };
   $('features').innerHTML = u.features.map((f) => '<div class="alert" style="background:#EFE9FB;border-color:#D9D0EC;color:#3A1D6E"><i style="background:' + (f.status === 'live' ? '#1E9E55' : f.status === 'failed' ? '#B3261A' : '#5B2EE5') + '"></i><span><b>' + FS[f.status] + ':</b> ' + esc(f.request) + '</span></div>').join('');
+  const PS = { queued: 'Waiting for a phone', running: 'Running on a cloud iPhone', passed: 'Passed', failed: 'Failed', open: 'Live' };
+  $('phoneRuns').innerHTML = s.phoneRuns.map((r) => '<div class="line3"><span>' + esc(r.name) + '<small>' + PS[r.status] + '</small></span><span></span>' + (r.url ? '<a class="tog" style="text-decoration:none;border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;font-weight:700;font-size:.82rem;color:var(--ink)" target="_blank" rel="noopener" href="' + esc(r.url) + '">' + (r.kind === 'device' ? 'Open phone' : 'Watch report') + '</a>' : '<span></span>') + '</div>').join('');
   $('payLines').innerHTML = [['Collected today', d.today.paidCents], ['Still unpaid', d.today.unpaidCents], ['Average order', d.today.averageCents]].map((r) => '<div class="row"><span>' + r[0] + '</span><b>' + money(r[1]) + '</b></div>').join('');
   $('invoices').innerHTML = u.sales.length ? u.sales.map((o, k) => '<div class="line3"><span>' + esc(o.customer) + '<small>' + esc(o.items) + '</small></span><b>' + money(o.totalCents) + '</b><button data-inv="' + k + '">Invoice</button></div>').join('') : '<p class="empty">Receipts and invoices appear with your first sale.</p>';
   $('bookings').innerHTML = u.bookings.length ? u.bookings.map((b) => '<div class="line3"><span>' + esc(b.customer) + '<small>' + esc(b.service) + ', ' + esc(b.when) + (b.status === 'cancelled' ? ' (cancelled)' : b.reminded ? ' (reminded)' : '') + '</small></span>' + (b.status === 'booked' ? '<button data-do="remind" data-id="' + b.id + '">Remind</button><button data-do="cancelBooking" data-id="' + b.id + '">Cancel</button>' : '<span></span><span></span>') + '</div>').join('') : '<p class="empty">No bookings yet. Customers can text "book me for 5 PM tomorrow".</p>';
@@ -370,6 +377,8 @@ async function act(action, extra, button) {
 $('studio').addEventListener('click', (e) => {
   const b = e.target.closest('button[data-do]');
   if (b) { act(b.dataset.do, b.dataset.id ? { id: b.dataset.id } : null, b); return; }
+  const ph = e.target.closest('button[data-phone]');
+  if (ph) { post('/public/phone', { kind: ph.dataset.phone, name: ph.dataset.name }).then(() => { toast('Queued. It appears below in a moment.'); refresh(); }).catch((err) => toast(err.message)); return; }
   const inv = e.target.closest('button[data-inv]');
   if (inv) invoice(sales[Number(inv.dataset.inv)]);
 });

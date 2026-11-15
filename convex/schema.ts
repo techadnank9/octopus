@@ -87,6 +87,13 @@ export default defineSchema({
     polls: v.number(),
   }).index("by_shop", ["shopId"]),
 
+  phoneRuns: defineTable({
+    kind: v.union(v.literal("device"), v.literal("test")),
+    name: v.string(),
+    status: v.union(v.literal("queued"), v.literal("running"), v.literal("passed"), v.literal("failed"), v.literal("open")),
+    url: v.optional(v.string()),
+  }),
+
   events: defineTable({
     shopId: v.id("shops"),
     arm: v.number(),
