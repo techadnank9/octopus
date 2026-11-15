@@ -5,9 +5,16 @@ import type { Id } from "./_generated/dataModel";
 import { cleanError } from "./agentLoop";
 import { OWNER_CHANNEL } from "./owner";
 import { LANDING } from "./landing";
+import { STOREFRONT } from "./storefront";
+
+/** The pages are also hosted on a second address, so the JSON endpoints answer any origin. They carry no cookies. */
+const CORS = { "access-control-allow-origin": "*", "access-control-allow-headers": "content-type", "access-control-allow-methods": "GET, POST, OPTIONS" };
 
 const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+  new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", ...CORS } });
+
+const html = (page: string) => httpAction(async () => new Response(page, { headers: { "content-type": "text/html; charset=utf-8" } }));
+const preflight = httpAction(async () => new Response(null, { status: 204, headers: CORS }));
 
 type Body = Record<string, unknown>;
 
@@ -25,6 +32,9 @@ function page(run: (ctx: ActionCtx, body: Body) => Promise<unknown>) {
 
 const shopOf = (body: Body) => String(body.shopId ?? "") as Id<"shops">;
 
+/** One thread and one customer record per browser, shared by the storefront cart and its chat. */
+const webChannel = (body: Body) => `demo:web-${String(body.session ?? "visitor").replace(/[^a-z0-9]/gi, "").slice(0, 24)}`;
+
 async function threadOf(ctx: ActionCtx, shopId: Id<"shops">, channelId: string) {
   const messages = await ctx.runQuery(api.chat.thread, { shopId, channelId });
   return { messages: messages.map((m) => ({ role: m.role, text: m.text, link: m.link ?? null })) };
@@ -34,7 +44,41 @@ export function addSiteRoutes(http: HttpRouter) {
   http.route({
     path: "/",
     method: "GET",
-    handler: httpAction(async () => new Response(LANDING, { headers: { "content-type": "text/html; charset=utf-8" } })),
+    handler: html(LANDING),
+  });
+
+  http.route({ path: "/shop", method: "GET", handler: html(STOREFRONT) });
+
+  for (const path of ["/onboard", "/public/chat", "/public/owner", "/public/order", "/public/placeOrder"]) {
+    http.route({ path, method: "OPTIONS", handler: preflight });
+  }
+
+  http.route({
+    path: "/public/store",
+    method: "GET",
+    handler: page((ctx, body) =>
+      ctx.runQuery(internal.onboard.store, { shopId: shopOf(body), orderId: typeof body.orderId === "string" ? body.orderId : undefined }),
+    ),
+  });
+
+  http.route({
+    path: "/public/placeOrder",
+    method: "POST",
+    handler: page(async (ctx, body) => {
+      const shopId = shopOf(body);
+      const name = String(body.name ?? "").trim().slice(0, 40);
+      if (!name) throw new Error("Tell us your name so the shop knows who the order is for");
+      const orderId = await ctx.runMutation(internal.orders.placeFromStore, {
+        shopId,
+        channelId: webChannel(body),
+        displayName: name,
+        requestedTime: typeof body.requestedTime === "string" && body.requestedTime.trim() ? body.requestedTime.trim().slice(0, 40) : undefined,
+        lines: (body.lines as { name: string; qty: number }[]).map((l) => ({ name: String(l.name), qty: Number(l.qty) })),
+      });
+      // The order stands even if the pay link cannot be made; the shop can still take payment at pickup.
+      await ctx.runAction(internal.payments.createLink, { orderId }).catch(() => null);
+      return { orderId };
+    }),
   });
 
   http.route({
@@ -60,7 +104,7 @@ export function addSiteRoutes(http: HttpRouter) {
     method: "POST",
     handler: page(async (ctx, body) => {
       const shopId = shopOf(body);
-      const channelId = `demo:web-${String(body.session ?? "visitor").replace(/[^a-z0-9]/gi, "").slice(0, 24)}`;
+      const channelId = webChannel(body);
       if (body.text) await ctx.runAction(api.chat.send, { shopId, channelId, text: String(body.text) });
       return threadOf(ctx, shopId, channelId);
     }),

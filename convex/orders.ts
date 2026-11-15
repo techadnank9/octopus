@@ -122,3 +122,17 @@ export const setPaymentLink = internalMutation({
     await logArm(ctx, order.shopId, ARMS.sendsPayLink);
   },
 });
+
+export const placeFromStore = internalMutation({
+  args: {
+    shopId: v.id("shops"),
+    channelId: v.string(),
+    displayName: v.string(),
+    requestedTime: v.optional(v.string()),
+    lines: v.array(v.object({ name: v.string(), qty: v.number() })),
+  },
+  handler: async (ctx, args) => {
+    const { orderId } = await placeOrder(ctx, args);
+    return orderId;
+  },
+});

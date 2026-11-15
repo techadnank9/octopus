@@ -170,3 +170,30 @@ export const claim = mutation({
     return shop._id;
   },
 });
+
+/** What a shop's customer app shows: the menu, and that customer's current order if they have one. */
+export const store = internalQuery({
+  args: { shopId: v.id("shops"), orderId: v.optional(v.string()) },
+  handler: async (ctx, { shopId, orderId }) => {
+    const shop = await ctx.db.get(shopId);
+    if (!shop) throw new Error("Shop not found");
+    const items = await ctx.runQuery(api.items.list, { shopId });
+    const id = orderId ? ctx.db.normalizeId("orders", orderId) : null;
+    const order = id ? await ctx.db.get(id) : null;
+    return {
+      shop: { name: shop.name, hours: shop.hours ?? null },
+      items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, description: i.description ?? null, available: i.available })),
+      order:
+        order && order.shopId === shopId
+          ? {
+              lines: order.lines.map((l) => `${l.qty} × ${l.name}`),
+              totalCents: order.totalCents,
+              status: order.status,
+              paid: order.paymentStatus === "paid",
+              paymentLink: order.paymentLink ?? null,
+              requestedTime: order.requestedTime ?? null,
+            }
+          : null,
+    };
+  },
+});

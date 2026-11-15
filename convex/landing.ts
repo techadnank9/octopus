@@ -129,6 +129,7 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
     <div class="grid">
       <div class="panel"><h3>Your menu</h3><p class="hint">Read from what you gave us. Change it by telling your octopus.</p><div id="menu"></div></div>
       <div class="panel"><h3>Your text line</h3><p class="hint">Customers scan this and text. Post it anywhere.</p><img class="qr" id="qr" alt="QR code for your text line"><p id="lineText" style="text-align:center;font-weight:700"></p></div>
+      <div class="panel"><h3>Your customer app</h3><p class="hint">A storefront made for your shop: menu, cart, pay and live order status. Share the link or the code.</p><img class="qr" id="storeQr" alt="QR code for your customer app"><a id="storeLink" target="_blank" rel="noopener" style="text-align:center;font-weight:700;color:var(--violet)">Open your customer app</a></div>
       <div class="panel"><h3>Try it as a customer</h3><p class="hint">This is what your customers get when they text.</p><div class="thread" id="custThread"></div><form class="send" id="custForm"><input id="custInput" placeholder="two coffees for 3 PM" aria-label="Message as a customer"><button>Send</button></form></div>
       <div class="panel wide"><h3>Orders</h3><p class="hint">They land here, and on your phone, the moment a customer confirms.</p><div id="orders"></div></div>
       <div class="panel dark"><h3>Tell your octopus</h3><p class="hint">You message, it does the work.</p><p class="hint" id="ownerLine"></p><div class="chips" id="chips"></div><div class="thread" id="ownerThread"></div><form class="send" id="ownerForm"><input id="ownerInput" placeholder="Banana bread is sold out" aria-label="Message your octopus"><button>Send</button></form></div>
@@ -140,6 +141,8 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
 <footer>Eight arms. One shop. Zero staff.</footer>
 
 <script type="module">
+const API = window.OCTOPUS_API || '';
+const STORE = window.OCTOPUS_API ? 'shop/?id=' : '/shop?id=';
 const $ = (id) => document.getElementById(id);
 const ARMS = ['Takes orders by text','Answers customer questions','Sends the pay link','Remembers every regular','Reads your menu','Pings you when an order lands','Tells customers when the order is ready',"Sends you the day's total"];
 const money = (c) => '$' + (c / 100).toFixed(2);
@@ -155,7 +158,7 @@ import('https://cdn.jsdelivr.net/gh/techadnank9/octopus@plan/plan/octo3d.js')
   .catch(() => { $('octo').innerHTML = '<img alt="Octopus" style="width:100%;height:100%;object-fit:contain" src="https://cdn.jsdelivr.net/gh/techadnank9/octopus@plan/plan/assets/octopus-concept.png">'; });
 
 async function post(path, body) {
-  const res = await fetch(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  const res = await fetch(API + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Something went wrong');
   return data;
@@ -196,7 +199,7 @@ function wireChat(formId, inputId, threadId, path, extra) {
 
 async function refresh() {
   if (!shopId) return;
-  const res = await fetch('/public/state?shopId=' + encodeURIComponent(shopId));
+  const res = await fetch(API + '/public/state?shopId=' + encodeURIComponent(shopId));
   if (!res.ok) { if (res.status === 400) { localStorage.removeItem('octopusShop'); shopId = null; $('studio').classList.remove('on'); } return; }
   const s = await res.json();
   $('shopName').textContent = s.shop.name;
@@ -210,6 +213,9 @@ async function refresh() {
   } else { $('lineText').textContent = 'Your text line is being set up'; }
   const om = s.shop.ownerLink && /^sms:([^&?]+)[&?]body=(.*)$/.exec(s.shop.ownerLink);
   $('ownerLine').textContent = om ? 'Or from your phone: text ' + decodeURIComponent(om[2]) + ' to ' + om[1] : '';
+  const storeUrl = new URL(STORE + encodeURIComponent(shopId), location.href).href;
+  $('storeLink').href = storeUrl;
+  if ($('storeQr').dataset.u !== storeUrl) { $('storeQr').dataset.u = storeUrl; $('storeQr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=380x380&data=' + encodeURIComponent(storeUrl); }
   $('claim').textContent = s.shop.claimCode || 'Already on your phone';
   const ids = s.orders.map((o) => o.id);
   const fresh = seenOrders ? ids.filter((id) => seenOrders.indexOf(id) < 0) : [];

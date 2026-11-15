@@ -25,6 +25,7 @@ import type * as ownerTools from "../ownerTools.js";
 import type * as payments from "../payments.js";
 import type * as shops from "../shops.js";
 import type * as site from "../site.js";
+import type * as storefront from "../storefront.js";
 
 import type {
   ApiFromModules,
@@ -50,6 +51,7 @@ declare const fullApi: ApiFromModules<{
   payments: typeof payments;
   shops: typeof shops;
   site: typeof site;
+  storefront: typeof storefront;
 }>;
 
 /**
