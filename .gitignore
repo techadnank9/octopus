@@ -4,3 +4,6 @@ node_modules/
 dist/
 plan/assets/octopus-real*
 .DS_Store
+
+# local convex
+.convex/

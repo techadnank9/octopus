@@ -1,0 +1,55 @@
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+
+export const orderLine = v.object({
+  itemId: v.id("items"),
+  name: v.string(),
+  qty: v.number(),
+  priceCents: v.number(),
+});
+
+export default defineSchema({
+  shops: defineTable({
+    name: v.string(),
+    ownerId: v.string(),
+    hours: v.optional(v.string()),
+    channelLink: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_owner", ["ownerId"]),
+
+  items: defineTable({
+    shopId: v.id("shops"),
+    name: v.string(),
+    priceCents: v.number(),
+    description: v.optional(v.string()),
+    available: v.boolean(),
+  }).index("by_shop", ["shopId"]),
+
+  customers: defineTable({
+    shopId: v.id("shops"),
+    channelId: v.string(),
+    displayName: v.optional(v.string()),
+    lastOrderAt: v.optional(v.number()),
+    notes: v.optional(v.array(v.string())),
+  }).index("by_shop_channel", ["shopId", "channelId"]),
+
+  orders: defineTable({
+    shopId: v.id("shops"),
+    customerId: v.id("customers"),
+    lines: v.array(orderLine),
+    totalCents: v.number(),
+    requestedTime: v.optional(v.string()),
+    status: v.union(v.literal("new"), v.literal("accepted"), v.literal("ready"), v.literal("cancelled")),
+    paymentStatus: v.union(v.literal("unpaid"), v.literal("paid")),
+    paymentLink: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_shop", ["shopId"])
+    .index("by_customer", ["customerId"]),
+
+  events: defineTable({
+    shopId: v.id("shops"),
+    arm: v.number(),
+    createdAt: v.number(),
+  }).index("by_shop_time", ["shopId", "createdAt"]),
+});
