@@ -238,6 +238,11 @@ export const list = internalQuery({
         textLine: shop._id === process.env.DEMO_SHOP_ID,
       })),
     );
-    return rows.filter((r) => r.items > 0).sort((a, b) => Number(b.textLine) - Number(a.textLine));
+    // One entry per name, text-line shop first; shops made by automated tests are left out.
+    const seen = new Set<string>();
+    return rows
+      .filter((r) => r.items > 0 && !/test/i.test(r.name))
+      .sort((a, b) => Number(b.textLine) - Number(a.textLine))
+      .filter((r) => !seen.has(r.name) && seen.add(r.name));
   },
 });
