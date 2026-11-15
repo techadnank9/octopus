@@ -14,6 +14,8 @@ export default defineSchema({
     ownerId: v.string(),
     hours: v.optional(v.string()),
     channelLink: v.optional(v.string()),
+    /** ISO 4217 code in lower case, such as "usd" or "eur". Dollars when absent. */
+    currency: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_owner", ["ownerId"]),
 

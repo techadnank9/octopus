@@ -145,7 +145,8 @@ const API = window.OCTOPUS_API || '';
 const STORE = window.OCTOPUS_API ? 'shop/?id=' : '/shop?id=';
 const $ = (id) => document.getElementById(id);
 const ARMS = ['Takes orders by text','Answers customer questions','Sends the pay link','Remembers every regular','Reads your menu','Pings you when an order lands','Tells customers when the order is ready',"Sends you the day's total"];
-const money = (c) => '$' + (c / 100).toFixed(2);
+let currency = 'usd';
+const money = (c) => new Intl.NumberFormat(undefined, { style: 'currency', currency: currency.toUpperCase() }).format(c / 100);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 let shopId = localStorage.getItem('octopusShop');
 let session = localStorage.getItem('octopusSession');
@@ -202,6 +203,7 @@ async function refresh() {
   const res = await fetch(API + '/public/state?shopId=' + encodeURIComponent(shopId));
   if (!res.ok) { if (res.status === 400) { localStorage.removeItem('octopusShop'); shopId = null; $('studio').classList.remove('on'); } return; }
   const s = await res.json();
+  currency = s.shop.currency || 'usd';
   $('shopName').textContent = s.shop.name;
   $('shopHours').textContent = s.shop.hours ? 'Open ' + s.shop.hours : '';
   $('menu').innerHTML = s.items.length ? s.items.map((i) => '<div class="row' + (i.available ? '' : ' off') + '"><span>' + esc(i.name) + '</span><b>' + money(i.priceCents) + '</b></div>').join('')

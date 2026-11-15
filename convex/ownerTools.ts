@@ -26,7 +26,7 @@ export const menu = internalQuery({
   handler: async (ctx, { shopId }) => {
     const shop = await ctx.db.get(shopId);
     const items = await ctx.db.query("items").withIndex("by_shop", (q) => q.eq("shopId", shopId)).collect();
-    return { shopName: shop!.name, hours: shop!.hours ?? null, items: items.map((i) => ({ name: i.name, price: money(i.priceCents), available: i.available })) };
+    return { shopName: shop!.name, hours: shop!.hours ?? null, currency: shop!.currency ?? "usd", items: items.map((i) => ({ name: i.name, price: money(i.priceCents), available: i.available })) };
   },
 });
 

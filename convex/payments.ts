@@ -8,7 +8,7 @@ const WHOP_API = process.env.WHOP_API_BASE ?? "https://sandbox-api.whop.com/api/
 export const createLink = internalAction({
   args: { orderId: v.id("orders") },
   handler: async (ctx, { orderId }): Promise<{ url: string; total: string }> => {
-    const { order, shopName } = await ctx.runQuery(internal.orders.get, { orderId });
+    const { order, shopName, currency } = await ctx.runQuery(internal.orders.get, { orderId });
     const total = (order.totalCents / 100).toFixed(2);
     if (order.paymentLink) return { url: order.paymentLink, total };
     const key = process.env.WHOP_API_KEY;
@@ -22,7 +22,7 @@ export const createLink = internalAction({
         variant: {
           billing_type: "one_time",
           initial_price: order.totalCents / 100,
-          currency: "usd",
+          currency,
           title: `${shopName} order`,
           force_create_new_plan: true,
         },

@@ -23,6 +23,7 @@ export const getMenu = internalMutation({
     return {
       shopName: shop!.name,
       hours: shop!.hours ?? null,
+      currency: shop!.currency ?? "usd",
       items: items
         .filter((i) => i.available)
         .map((i) => ({ name: i.name, price: (i.priceCents / 100).toFixed(2), description: i.description ?? null })),

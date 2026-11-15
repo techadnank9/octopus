@@ -98,7 +98,8 @@ footer a { color:var(--plum); font-weight:700; }
 <script>
 const API = window.OCTOPUS_API || '';
 const $ = (id) => document.getElementById(id);
-const money = (c) => '$' + (c / 100).toFixed(2);
+let currency = 'usd';
+const money = (c) => new Intl.NumberFormat(undefined, { style: 'currency', currency: currency.toUpperCase() }).format(c / 100);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const shopId = new URLSearchParams(location.search).get('id');
 let session = localStorage.getItem('octopusSession');
@@ -148,12 +149,14 @@ async function refresh() {
   try {
     const s = await call('/public/store?shopId=' + encodeURIComponent(shopId) + (orderId ? '&orderId=' + encodeURIComponent(orderId) : ''));
     document.title = 'Order from ' + s.shop.name;
+    const moneyChanged = currency !== s.shop.currency;
+    currency = s.shop.currency || 'usd';
     $('shopName').textContent = s.shop.name;
     $('shopHours').textContent = s.shop.hours ? 'Open ' + s.shop.hours : 'Order ahead by tapping, or ask the octopus';
     const changed = JSON.stringify(s.items) !== JSON.stringify(items);
     items = s.items;
     items.forEach((i) => { if (!i.available) delete cart[i.name]; });
-    if (changed) drawMenu();
+    if (changed || moneyChanged) drawMenu();
     drawStatus(s.order);
   } catch (err) { $('shopName').textContent = 'Shop not found'; }
 }

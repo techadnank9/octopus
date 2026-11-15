@@ -109,7 +109,7 @@ export const get = internalQuery({
     if (!order) throw new Error("Order not found");
     const customer = await ctx.db.get(order.customerId);
     const shop = await ctx.db.get(order.shopId);
-    return { order, channelId: customer!.channelId, shopName: shop!.name };
+    return { order, channelId: customer!.channelId, shopName: shop!.name, currency: shop!.currency ?? "usd" };
   },
 });
 

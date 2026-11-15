@@ -4,12 +4,12 @@ import type { Id } from "./_generated/dataModel";
 import { v } from "convex/values";
 import { brain, remember } from "./memory";
 
-type Draft = { name: string; hours: string | null; about: string | null; unpriced: string[]; items: { name: string; price: number; description: string | null }[] };
+type Draft = { name: string; currency: string | null; hours: string | null; about: string | null; unpriced: string[]; items: { name: string; price: number; description: string | null }[] };
 
 const PROMPT = `You set up a small shop from what its owner gave you: text from their website, or their own description.
-Reply with JSON only: {"name": string, "hours": string|null, "about": string|null, "items": [{"name": string, "price": number, "description": string|null}], "unpriced": [string]}.
-name is the business name. about is one plain sentence on what they sell. price is a number in the main currency unit.
-items holds only things that have a clear price in the text. unpriced lists up to 15 things they clearly sell where no price is given. Never invent items, prices or hours. At most 25 items.`;
+Reply with JSON only: {"name": string, "currency": string|null, "hours": string|null, "about": string|null, "items": [{"name": string, "price": number, "description": string|null}], "unpriced": [string]}.
+name is the business name. currency is the ISO 4217 code the prices are in, such as "usd" or "eur". about is one plain sentence on what they sell. price is a number in the main currency unit.
+items holds only things that have a clear price in the text. unpriced lists up to 15 things they clearly sell where no price is given. Never invent items, prices or hours. At most 40 items.`;
 
 type Scrape = { markdown: string; links: string[] };
 
@@ -88,13 +88,15 @@ export const createShop = internalMutation({
   args: {
     name: v.string(),
     hours: v.optional(v.string()),
+    currency: v.optional(v.string()),
     claimCode: v.string(),
     items: v.array(v.object({ name: v.string(), priceCents: v.number(), description: v.optional(v.string()) })),
   },
-  handler: async (ctx, { name, hours, claimCode, items }) => {
+  handler: async (ctx, { name, hours, currency, claimCode, items }) => {
     const shopId = await ctx.db.insert("shops", {
       name,
       hours,
+      currency,
       ownerId: `web:${claimCode}`,
       channelLink: process.env.SHOP_CHANNEL_LINK,
       createdAt: Date.now(),
@@ -117,10 +119,11 @@ export const fromWeb = internalAction({
     const name = (draft.name ?? "").trim() || "My shop";
     const items = (draft.items ?? [])
       .filter((i) => typeof i.name === "string" && i.name.trim() && typeof i.price === "number" && i.price >= 0)
-      .slice(0, 25)
+      .slice(0, 40)
       .map((i) => ({ name: i.name.trim(), priceCents: Math.round(i.price * 100), description: i.description ?? undefined }));
     const claimCode = Math.random().toString(36).slice(2, 8).toUpperCase();
-    const shopId = await ctx.runMutation(internal.onboard.createShop, { name, hours: draft.hours ?? undefined, claimCode, items });
+    const currency = /^[a-z]{3}$/i.test(draft.currency ?? "") ? draft.currency!.toLowerCase() : undefined;
+    const shopId = await ctx.runMutation(internal.onboard.createShop, { name, hours: draft.hours ?? undefined, currency, claimCode, items });
     if (draft.about) await remember(brain.shopNotes(shopId), `About the shop: ${draft.about}`);
     if (draft.unpriced?.length) {
       await remember(brain.shopNotes(shopId), `The shop also sells these, but the price is not set yet, so ask the owner before taking an order for them: ${draft.unpriced.slice(0, 15).join(", ")}`);
@@ -141,7 +144,7 @@ export const state = internalQuery({
       ctx.runQuery(api.events.countsToday, { shopId }),
     ]);
     return {
-      shop: { name: shop.name, hours: shop.hours ?? null, channelLink: shop.channelLink ?? null, claimCode: shop.ownerId.startsWith("web:") ? shop.ownerId.slice(4) : null, ownerLink: process.env.OWNER_CHANNEL_LINK ?? null },
+      shop: { name: shop.name, currency: shop.currency ?? "usd", hours: shop.hours ?? null, channelLink: shop.channelLink ?? null, claimCode: shop.ownerId.startsWith("web:") ? shop.ownerId.slice(4) : null, ownerLink: process.env.OWNER_CHANNEL_LINK ?? null },
       items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, available: i.available })),
       orders: orders.slice(0, 8).map((o) => ({
         id: o._id,
@@ -181,7 +184,7 @@ export const store = internalQuery({
     const id = orderId ? ctx.db.normalizeId("orders", orderId) : null;
     const order = id ? await ctx.db.get(id) : null;
     return {
-      shop: { name: shop.name, hours: shop.hours ?? null },
+      shop: { name: shop.name, currency: shop.currency ?? "usd", hours: shop.hours ?? null },
       items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, description: i.description ?? null, available: i.available })),
       order:
         order && order.shopId === shopId
