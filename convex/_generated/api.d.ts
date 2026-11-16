@@ -28,6 +28,7 @@ import type * as payments from "../payments.js";
 import type * as phone from "../phone.js";
 import type * as shops from "../shops.js";
 import type * as site from "../site.js";
+import type * as store from "../store.js";
 import type * as storefront from "../storefront.js";
 import type * as suite from "../suite.js";
 
@@ -58,6 +59,7 @@ declare const fullApi: ApiFromModules<{
   phone: typeof phone;
   shops: typeof shops;
   site: typeof site;
+  store: typeof store;
   storefront: typeof storefront;
   suite: typeof suite;
 }>;

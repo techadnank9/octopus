@@ -132,6 +132,11 @@ body.dash main { padding-top:0; }
 .dhero .links b { font-family:var(--display); letter-spacing:.06em; color:var(--coral); }
 .dstage { position:relative; min-height:38vh; }
 #octoDash { position:absolute; inset:-20px -40px; cursor:grab; }
+.brandbox { background:#fff; border:1px solid var(--line); border-radius:18px; padding:14px 18px; margin-bottom:20px; }
+.brandbox summary { cursor:pointer; font-size:1rem; }
+.brandbox summary span { color:var(--muted); font-size:.9rem; }
+.brandbox p { margin:10px 0 6px; font-weight:500; }
+.brandbox ul { margin:0; padding-left:18px; display:grid; gap:4px; font-size:.92rem; }
 .tell { margin-bottom:20px; }
 .tell .thread { min-height:0; max-height:200px; }
 .toast { min-height:1.4em; font-weight:700; color:var(--plum); margin-bottom:8px; }
@@ -206,6 +211,7 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
       <div class="dstage"><div id="octoDash" aria-label="3D octopus. Drag to turn it."></div></div>
     </div>
     <div id="alerts"></div>
+    <details class="brandbox" id="brandBox" hidden><summary><b>Brand brain</b> <span id="brandCount"></span></summary><p id="brandVoice"></p><ul id="brandFacts"></ul><p class="hint">Stored in Supermemory. Both of your agents recall it before they answer.</p></details>
     <div class="panel dark tell"><h3>Tell your octopus</h3><p class="hint">You message, it does the work. <span id="ownerLine"></span></p><div class="chips" id="chips"></div><div class="thread" id="ownerThread"></div><form class="send" id="ownerForm"><input id="ownerInput" placeholder="We have 12 samosas left" aria-label="Message your octopus"><button>Send</button></form></div>
     <div id="features"></div>
     <p class="toast" id="toast" role="status"></p>
@@ -302,6 +308,12 @@ async function refresh() {
   if (!res.ok) { if (res.status === 400) { localStorage.removeItem('octopusShop'); location.href = ROOT; } return; }
   const s = await res.json();
   currency = s.shop.currency || 'usd';
+  if (s.shop.brand && s.shop.brand.facts.length) {
+    $('brandBox').hidden = false;
+    $('brandCount').textContent = s.shop.brand.facts.length + ' things learned about your business';
+    $('brandVoice').textContent = s.shop.brand.voice ? 'Voice: ' + s.shop.brand.voice : '';
+    $('brandFacts').innerHTML = s.shop.brand.facts.map((f) => '<li>' + esc(f) + '</li>').join('');
+  }
   $('shopName').textContent = s.shop.name;
   $('source').textContent = localStorage.getItem('octopusSource') || '';
   if (!menuBusy()) $('menu').innerHTML = s.items.length ? s.items.map((i) => {

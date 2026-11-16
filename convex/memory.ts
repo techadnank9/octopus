@@ -5,6 +5,8 @@ const safe = (part: string) => part.toLowerCase().replace(/[^a-z0-9]+/g, "_");
 export const brain = {
   /** Everything the owner said and what was done about it. Never shown to customers. */
   owner: (shopId: string) => `octopus_shop_${safe(shopId)}_owner`,
+  /** The brand itself: what the business is, how it speaks, where it is, its policies. Learned from its website. */
+  brand: (shopId: string) => `octopus_shop_${safe(shopId)}_brand`,
   /** Notes the owner wants customers to be told, such as "no oat milk today". */
   shopNotes: (shopId: string) => `octopus_shop_${safe(shopId)}_notes`,
   /** One space per customer per shop. */

@@ -94,7 +94,7 @@ export const send = action({
       system: SYSTEM,
       tools: OWNER_TOOLS,
       run: (toolName, args) => runOwnerTool(ctx, shopId, toolName, args),
-      recallFrom: [brain.owner(shopId), brain.shopNotes(shopId)],
+      recallFrom: [brain.owner(shopId), brain.brand(shopId), brain.shopNotes(shopId)],
       learnInto: brain.owner(shopId),
       speaker: "The owner",
     }),

@@ -142,6 +142,8 @@ export const fromWeb = internalAction({
     const currency = /^[a-z]{3}$/i.test(draft.currency ?? "") ? draft.currency!.toLowerCase() : undefined;
     const shopId = await ctx.runMutation(internal.onboard.createShop, { name, hours: draft.hours ?? undefined, currency, claimCode, items });
     if (draft.about) await remember(brain.shopNotes(shopId), `About the shop: ${draft.about}`);
+    // Learn the brand in the background so the dashboard opens straight away.
+    await ctx.scheduler.runAfter(0, internal.onboard.learnBrand, { shopId, source: site ?? told ?? name });
     if (draft.unpriced?.length) {
       await remember(brain.shopNotes(shopId), `The shop also sells these, but the price is not set yet, so ask the owner before taking an order for them: ${draft.unpriced.slice(0, 15).join(", ")}`);
     }
@@ -165,7 +167,7 @@ export const state = internalQuery({
     ]);
     const suite: Awaited<ReturnType<typeof suiteOf>> = await suiteOf(ctx, shopId);
     return {
-      shop: { name: shop.name, currency: shop.currency ?? "usd", hours: shop.hours ?? null, channelLink: shop.channelLink ?? null, claimCode: shop.ownerId.startsWith("web:") ? shop.ownerId.slice(4) : null, ownerLink: process.env.OWNER_CHANNEL_LINK ?? null },
+      shop: { name: shop.name, brand: shop.brand ?? null, currency: shop.currency ?? "usd", hours: shop.hours ?? null, channelLink: shop.channelLink ?? null, claimCode: shop.ownerId.startsWith("web:") ? shop.ownerId.slice(4) : null, ownerLink: process.env.OWNER_CHANNEL_LINK ?? null },
       items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, available: i.available, stock: i.stock ?? null })),
       dashboard,
       suite,
@@ -244,5 +246,49 @@ export const list = internalQuery({
       .filter((r) => r.items > 0 && !/test/i.test(r.name))
       .sort((a, b) => Number(b.textLine) - Number(a.textLine))
       .filter((r) => !seen.has(r.name) && seen.add(r.name));
+  },
+});
+
+const BRAND_PROMPT = `From this text about a small business, write what an assistant must know to speak for the brand.
+Reply with JSON only: {"voice": string, "facts": [string]}.
+voice is one sentence on how the brand sounds (for example "warm, family-run, proud of authentic ingredients").
+facts are up to 14 short, plain statements taken from the text: what they sell and are known for, who it is for, where they are and which areas they serve, delivery and pickup, payment, returns, contact details, opening times, their story. Never invent anything.`;
+
+export const saveBrand = internalMutation({
+  args: { shopId: v.id("shops"), voice: v.string(), facts: v.array(v.string()) },
+  handler: (ctx, { shopId, voice, facts }) => ctx.db.patch(shopId, { brand: { voice, facts } }),
+});
+
+/** Builds the brand's brain in Supermemory from its website: a voice, a list of facts, and the pages themselves for recall. */
+export const learnBrand = internalAction({
+  args: { shopId: v.id("shops"), source: v.string() },
+  handler: async (ctx, { shopId, source }): Promise<{ facts: number }> => {
+    const text = /^\S+\.[a-z]{2,}(\/\S*)?$/i.test(source.trim()) || /^https?:/i.test(source.trim()) ? await readWebsite(source.trim()) : source;
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "content-type": "application/json" },
+      body: JSON.stringify({
+        model: process.env.CHAT_MODEL ?? "gpt-4.1-mini",
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: BRAND_PROMPT },
+          { role: "user", content: text.slice(0, 24000) },
+        ],
+      }),
+    });
+    if (!res.ok) throw new Error(`Could not learn the brand (${res.status})`);
+    const body = (await res.json()) as { choices: { message: { content: string } }[] };
+    const brand = JSON.parse(body.choices[0].message.content) as { voice?: string; facts?: string[] };
+    const facts = (brand.facts ?? []).filter((f) => typeof f === "string" && f.trim()).slice(0, 14);
+    const voice = (brand.voice ?? "").trim();
+    await ctx.runMutation(internal.onboard.saveBrand, { shopId, voice, facts });
+    const space = brain.brand(shopId);
+    await Promise.all([
+      ...(voice ? [remember(space, `How the brand sounds: ${voice}`)] : []),
+      ...facts.map((fact) => remember(space, fact)),
+      // The pages too, so questions the fact list did not anticipate can still be answered.
+      ...[0, 1, 2, 3].map((i) => text.slice(i * 1800, (i + 1) * 1800)).filter(Boolean).map((chunk) => remember(space, chunk)),
+    ]);
+    return { facts: facts.length };
   },
 });

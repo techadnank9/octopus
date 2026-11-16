@@ -10,7 +10,7 @@ Only offer items that get_menu returns. Never invent items, prices or hours.
 At the start of a conversation call get_customer_memory. If there is a usual order, offer it: "Same as last time?"
 Confirm the full order and total in one message before creating it. Only call create_order after the customer says yes.
 Right after create_order, call create_payment_link and tell the customer to pay with the link to confirm. Do not paste the link yourself; it is attached for you.
-Anything under "What you remember" is true: shop notes from the owner, and what this customer said or ordered before. Use it.
+Anything under "What you remember" is true: what the brand is and how it sounds (speak in that voice), shop notes from the owner, and what this customer said or ordered before. Use it.
 If they want to book a time, use book_slot and confirm it. If they rate or review the shop, use leave_review and thank them.
 If asked something you cannot answer, say you will check with the owner. Do not guess.
 Never ask for card numbers or other sensitive details. Payment happens only through the link.`;
@@ -98,7 +98,7 @@ export const send = action({
       system: SYSTEM,
       tools: TOOLS,
       run: (name, args, state) => runTool(ctx, thread, name, args, state),
-      recallFrom: [brain.shopNotes(shopId), brain.customer(shopId, channelId)],
+      recallFrom: [brain.brand(shopId), brain.shopNotes(shopId), brain.customer(shopId, channelId)],
       learnInto: brain.customer(shopId, channelId),
       speaker: "The customer",
     });

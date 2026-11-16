@@ -18,6 +18,8 @@ export default defineSchema({
     currency: v.optional(v.string()),
     /** Sales tax or VAT included in prices, in percent. */
     taxRate: v.optional(v.number()),
+    /** What the octopus learned about the brand, as shown on the dashboard. The same facts live in Supermemory. */
+    brand: v.optional(v.object({ voice: v.string(), facts: v.array(v.string()) })),
     createdAt: v.number(),
   }).index("by_owner", ["ownerId"]),
 

@@ -81,11 +81,12 @@ http.route({
   method: "POST",
   handler: tool(async (ctx, { shopId, channelId }) => {
     const known = await ctx.runMutation(internal.agent.getCustomerMemory, { shopId, channelId: needChannel(channelId) });
-    const [shopNotes, remembered] = await Promise.all([
+    const [brand, shopNotes, remembered] = await Promise.all([
+      recall(brain.brand(shopId), "what the business is, where it is, delivery, payment, contact", 6),
       recall(brain.shopNotes(shopId), "what should customers know today"),
       recall(brain.customer(shopId, channelId), "usual order and preferences"),
     ]);
-    return { ...known, shopNotes, remembered };
+    return { ...known, brand, shopNotes, remembered };
   }),
 });
 
