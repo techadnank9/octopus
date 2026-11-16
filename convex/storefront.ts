@@ -58,6 +58,10 @@ header p { color:#CFC6E6; margin-top:8px; font-size:.95rem; }
 .err { color:#B3261A; font-size:.9rem; min-height:1.2em; }
 .status { background:#fff; border:1.5px solid var(--line); border-radius:22px; padding:20px; margin-top:18px; display:grid; gap:14px; }
 .status h2 { font-size:1.4rem; font-weight:800; }
+.stamps { display:flex; gap:10px; }
+.stamp { display:grid; place-items:center; width:44px; height:44px; border:2px solid var(--line); border-radius:50%; font-weight:700; }
+.stamp.filled { background:var(--violet); border-color:var(--violet); color:#fff; }
+.loyalty-note { font-size:.85rem; color:var(--muted); }
 .track { display:flex; gap:6px; }
 .track div { flex:1; text-align:center; font-size:.78rem; font-weight:700; color:var(--muted); padding-top:10px; border-top:5px solid var(--line); }
 .track div.on { color:var(--ink); border-color:var(--violet); }
@@ -159,6 +163,15 @@ footer a { display:inline-block; padding:12px 2px; margin:-12px 0; }
   </div>
   <section id="menuView" role="tabpanel" aria-labelledby="tabMenu">
     <div id="status"></div>
+    <section class="status" aria-labelledby="loyaltyTitle">
+      <h2 id="loyaltyTitle" tabindex="-1">Your stamp card</h2>
+      <p>One stamp per order placed here. Five stamps earn one free item at pickup.</p>
+      <div class="stamps" id="loyaltyStamps" aria-hidden="true"></div>
+      <p id="loyaltyProgress" role="status"></p>
+      <button type="button" class="primary" id="redeemLoyalty" hidden>Redeem a free item</button>
+      <p class="loyalty-note">Saved in this browser for this shop. Show the card to the shop before redeeming; online prices stay the same.</p>
+      <p class="err" id="loyaltyErr" role="alert"></p>
+    </section>
     <label class="search">Search the menu<input id="menuSearch" type="search" placeholder="Search the menu"></label>
     <button type="button" class="favourites-filter" id="favouritesFilter" aria-pressed="false" aria-controls="menu">Favourites</button>
     <button type="button" class="ghost" id="allItems" hidden>Show full menu</button>
@@ -217,6 +230,18 @@ const shopId = new URLSearchParams(location.search).get('id');
 let session = localStorage.getItem('octopusSession');
 if (!session) { session = Math.random().toString(36).slice(2, 12); localStorage.setItem('octopusSession', session); }
 const orderKey = 'octopusOrder:' + shopId;
+const loyaltyKey = 'octopusLoyalty:' + shopId;
+let loyalty = { orders: [], redeemed: 0 };
+function loadLoyalty() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(loyaltyKey));
+    if (!saved) loyalty = { orders: [], redeemed: 0 };
+    else if (Array.isArray(saved.orders) && saved.orders.every((id) => typeof id === 'string') && Number.isSafeInteger(saved.redeemed) && saved.redeemed >= 0 && saved.redeemed * 5 <= new Set(saved.orders).size) {
+      loyalty = { orders: Array.from(new Set(saved.orders)), redeemed: saved.redeemed };
+    }
+  } catch {}
+}
+loadLoyalty();
 const favouritesKey = 'octopusFavourites:' + shopId;
 let favourites = new Set(), favouritesOnly = false;
 try {
@@ -232,6 +257,39 @@ async function call(path, body) {
   if (!res.ok) throw new Error(data.error || 'Something went wrong');
   return data;
 }
+
+function drawLoyalty() {
+  const balance = loyalty.orders.length - loyalty.redeemed * 5;
+  const rewards = Math.floor(balance / 5);
+  $('loyaltyStamps').innerHTML = [1, 2, 3, 4, 5].map((n) => '<span class="stamp' + (n <= balance ? ' filled' : '') + '">' + n + '</span>').join('');
+  $('loyaltyProgress').textContent = rewards ? rewards + (rewards === 1 ? ' free item ready' : ' free items ready') + ' · ' + balance + ' stamps collected' : balance + ' of 5 stamps · ' + (5 - balance) + ' to your next free item';
+  $('redeemLoyalty').hidden = !rewards;
+}
+
+function saveLoyalty(next) {
+  try {
+    localStorage.setItem(loyaltyKey, JSON.stringify(next));
+    loyalty = next;
+    $('loyaltyErr').textContent = '';
+    drawLoyalty();
+  } catch {
+    $('loyaltyErr').textContent = 'Your stamp card could not be updated. Please ask the shop for help and allow browser storage for future stamps.';
+  }
+}
+
+$('redeemLoyalty').onclick = () => {
+  loadLoyalty();
+  drawLoyalty();
+  if (loyalty.orders.length - loyalty.redeemed * 5 < 5) return;
+  if (!window.confirm('Is the shop ready to give you your free item? Redeeming uses 5 stamps.')) return;
+  loadLoyalty();
+  if (loyalty.orders.length - loyalty.redeemed * 5 < 5) { drawLoyalty(); return; }
+  saveLoyalty({ orders: loyalty.orders, redeemed: loyalty.redeemed + 1 });
+  $('loyaltyTitle').focus();
+};
+window.addEventListener('storage', (e) => {
+  if (e.key === loyaltyKey || e.key === null) { loadLoyalty(); drawLoyalty(); }
+});
 
 function drawMenu() {
   const query = $('menuSearch').value.trim().toLowerCase();
@@ -330,6 +388,8 @@ $('orderForm').addEventListener('submit', async (e) => {
     const placed = await call('/public/placeOrder', { shopId: shopId, session: session, name: $('who').value.trim(), requestedTime: $('when').value.trim(),
       lines: Object.keys(cart).map((name) => ({ name: name, qty: cart[name] })) });
     orderId = placed.orderId; localStorage.setItem(orderKey, orderId);
+    loadLoyalty();
+    if (!loyalty.orders.includes(orderId)) saveLoyalty({ orders: loyalty.orders.concat(orderId), redeemed: loyalty.redeemed });
     cart = {}; drawMenu(); $('sheet').classList.remove('on');
     await refresh(); window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (err) { $('err').textContent = err.message; }
@@ -415,6 +475,7 @@ tabs.forEach((name, index) => {
   };
 });
 
+drawLoyalty();
 drawMenu();
 refresh();
 setInterval(refresh, 2500);
