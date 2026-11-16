@@ -1,6 +1,6 @@
 import { httpRouter } from "convex/server";
 import { httpAction, type ActionCtx } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { runOwnerTool } from "./owner";
 import { addSiteRoutes } from "./site";
@@ -81,12 +81,13 @@ http.route({
   method: "POST",
   handler: tool(async (ctx, { shopId, channelId }) => {
     const known = await ctx.runMutation(internal.agent.getCustomerMemory, { shopId, channelId: needChannel(channelId) });
-    const [brand, shopNotes, remembered] = await Promise.all([
-      recall(brain.brand(shopId), "what the business is, where it is, delivery, payment, contact", 6),
+    const [shop, shopNotes, remembered] = await Promise.all([
+      ctx.runQuery(api.shops.byId, { shopId }),
       recall(brain.shopNotes(shopId), "what should customers know today"),
       recall(brain.customer(shopId, channelId), "usual order and preferences"),
     ]);
-    return { ...known, brand, shopNotes, remembered };
+    // The whole brand card every time: it is short, and address or delivery questions must never miss.
+    return { ...known, brand: shop?.brand ?? null, shopNotes, remembered };
   }),
 });
 
