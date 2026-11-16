@@ -38,8 +38,7 @@ struct TileDetailView: View {
     @ViewBuilder private var content: some View {
         switch kind {
         case .service:
-            note("Customers text your shop number and your octopus answers from your menu and hours. "
-                + "Anything it cannot answer is passed to you.")
+            EmptyView() // The dashboard opens InboxView for this tile.
         case .updates:
             note("When you tap Accept or Ready on an order, the customer gets a text straight away.")
         case .sales:

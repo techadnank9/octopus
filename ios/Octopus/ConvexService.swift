@@ -150,4 +150,16 @@ struct ConvexService {
     func sendOwner(shopId: String, text: String) async throws {
         try await client.action("owner:send", with: ["shopId": shopId, "text": text])
     }
+
+    // MARK: Inbox
+
+    /// Every customer conversation, the ones that need the owner first.
+    func inbox(shopId: String) -> AnyPublisher<[InboxRow], ClientError> {
+        client.subscribe(to: "inbox:list", with: ["shopId": shopId], yielding: [InboxRow].self)
+    }
+
+    /// The owner's own reply. It arrives in the thread through the subscription.
+    func replyInbox(shopId: String, channelId: String, text: String) async throws {
+        try await client.action("inbox:reply", with: ["shopId": shopId, "channelId": channelId, "text": text])
+    }
 }

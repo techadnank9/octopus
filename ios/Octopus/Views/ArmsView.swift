@@ -36,7 +36,11 @@ struct ArmsView: View {
             .background(Theme.ink.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: TileKind.self) { kind in
-                TileDetailView(kind: kind, dashboard: dashboard.dashboard, store: store)
+                if kind == .service {
+                    InboxView(shopId: shop.id)
+                } else {
+                    TileDetailView(kind: kind, dashboard: dashboard.dashboard, store: store)
+                }
             }
         }
     }

@@ -72,13 +72,31 @@ struct ChatMessage: Decodable, Equatable, Identifiable {
     let role: ChatRole
     let text: String
     let link: String?
+    /// True when the owner wrote this reply by hand in the inbox.
+    let fromOwner: Bool?
     @ConvexFloat var creationTime: Double
 
     enum CodingKeys: String, CodingKey {
         case id = "_id"
-        case role, text, link
+        case role, text, link, fromOwner
         case creationTime = "_creationTime"
     }
+}
+
+/// One customer conversation in the inbox.
+struct InboxRow: Decodable, Equatable, Identifiable {
+    let channelId: String
+    let customer: String
+    let lastText: String
+    let lastFromCustomer: Bool
+    /// Milliseconds since 1970.
+    @ConvexFloat var lastAt: Double
+    @ConvexFloat var messages: Double
+    let needsYou: Bool
+    /// Why it needs the owner, for example "Complaint".
+    let reason: String?
+
+    var id: String { channelId }
 }
 
 struct Dashboard: Decodable, Equatable {

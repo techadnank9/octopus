@@ -8,7 +8,7 @@ REPO=techadnank9/octopus
 REVYL_APP=f5c287d9-a1fb-48df-b3f2-c12c09e74ae6
 SHOP_APP=a03a0ca7-fe63-4d30-98a7-f0baac8e83cd
 # Exact builds to open, so an older build finishing late on Revyl can never take their place.
-OWNER_BUILD=dea819eb-95de-4e25-aaea-a82caabf5be2
+OWNER_BUILD=a0d40b76-5244-4a09-a709-a8c8c5aaf972
 SHOP_BUILD=71d3ae06-bd47-4bc7-9fc7-f37f34436c17
 PATH="$HOME/.revyl/bin:$PATH"
 cd "$(dirname "$0")/.."
