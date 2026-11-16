@@ -1,3 +1,5 @@
+project:
+    id: 45b66441-a78f-4130-b2b5-9f9a97b6a9f9
 session:
     idle_timeout_seconds: 1800
 build:

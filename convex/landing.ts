@@ -54,6 +54,7 @@ main { padding:0 clamp(20px,5vw,72px); }
 .topbar a:hover { border-color:var(--coral); color:var(--paper); }
 body.dash .hero, body.dash .gets { display:none; }
 body.dash .topbar { display:flex; }
+body.dash { overflow-x:hidden; }
 body.dash #studio { padding-top:32px; }
 .pick { border-top:1px solid #3A2C63; padding-top:14px; }
 .pickrow { display:flex; gap:8px; margin-top:6px; }
@@ -168,7 +169,150 @@ body.dash main { padding-top:0; }
 .arm.lit i { background:var(--coral); }
 footer { background:var(--ink); color:var(--paper); text-align:center; padding:48px 20px; font:800 clamp(1.5rem,4vw,2.6rem) var(--display); }
 @media (max-width:980px) { .hero { grid-template-columns:1fr; } .stage { min-height:300px; order:-1; } .panel,.panel.wide { grid-column:span 12; } }
-@media (prefers-reduced-motion:reduce) { * { animation:none !important; } }
+/* polish pass: rhythm, targets, hierarchy */
+h1,h2,h3 { text-wrap:balance; }
+.lede,.gets p,.tile header p,.panel .hint { text-wrap:pretty; }
+a,button,summary,select { -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+input::placeholder,textarea::placeholder { color:#9488B5; }
+.send input::placeholder,#addForm input::placeholder { color:#7A7191; }
+.panel.dark .send input::placeholder { color:#9488B5; }
+input:focus-visible,select:focus-visible,textarea:focus-visible { outline-offset:1px; border-color:var(--coral); }
+form#build { padding:20px; gap:14px; }
+form#build input,.pick select { min-height:52px; font-size:1.02rem; }
+.go { min-height:54px; transition:transform .12s ease,filter .12s ease; }
+.go:hover { filter:brightness(1.06); }
+.go:active { transform:translateY(1px); }
+.go[disabled] { opacity:.75; filter:none; transform:none; }
+.err:empty { display:none; }
+.pick { padding-top:16px; }
+.pick button { min-height:52px; border-color:#4A3A75; color:var(--paper); }
+.pick button:hover { border-color:var(--coral); }
+.resume a { text-underline-offset:3px; cursor:pointer; }
+.steps { gap:8px; padding:12px 14px; background:#150D27; border-radius:14px; }
+.steps li { display:flex; align-items:center; gap:10px; }
+.steps li::before { content:''; width:8px; height:8px; border-radius:50%; background:#4A3A75; flex:none; }
+.steps li.on::before { background:var(--coral); animation:beat 1s ease-in-out infinite; }
+.steps li.done::before { background:#8FE0B0; }
+@keyframes beat { 50% { transform:scale(1.7); opacity:.55; } }
+.gets { gap:0 40px; margin:56px 0 64px; }
+.gets div { padding:22px 0 8px; }
+.gets h3 { font-size:1.35rem; line-height:1.15; margin-bottom:8px; }
+.gets p { font-size:1rem; max-width:36ch; }
+.topbar { gap:10px; padding-top:12px; padding-bottom:12px; }
+.topbar a { min-height:44px; display:inline-flex; align-items:center; padding:8px 16px; cursor:pointer; }
+.dhero { padding-top:20px; padding-bottom:36px; }
+.dhero h2 { letter-spacing:-.03em; overflow-wrap:anywhere; }
+.dhero .src { margin:10px 0 22px; }
+.dhero .src:empty { display:none; }
+.stats { gap:0 20px; margin-bottom:4px; }
+.stats div { padding:16px 0 18px; min-width:0; }
+.stats b { font-variant-numeric:tabular-nums; line-height:1.05; margin-bottom:4px; overflow-wrap:anywhere; }
+.stats span { display:block; line-height:1.3; }
+.dhero .stats b { color:var(--paper); }
+.dhero .links { gap:10px 12px; margin-top:18px; }
+.dhero .links a { min-height:48px; display:inline-flex; align-items:center; padding:12px 20px; transition:transform .12s ease,filter .12s ease; }
+.dhero .links a:hover { filter:brightness(1.06); }
+.dhero .links a:active { transform:translateY(1px); }
+.dhero .links a.alt { border-color:#4A3A75; color:var(--paper); }
+.dhero .links a.alt:hover { border-color:var(--coral); filter:none; }
+.dhero .links span { margin-left:4px; }
+.dhero .links b { color:var(--paper); }
+#storeLink { text-underline-offset:3px; }
+#alerts { display:grid; gap:8px; margin-bottom:24px; }
+#alerts:empty { display:none; }
+.alert { margin:0; padding:12px 16px; line-height:1.35; align-items:flex-start; }
+.alert i { margin-top:.45em; }
+.brandbox { margin-bottom:24px; padding:6px 18px; }
+.brandbox summary { min-height:44px; display:flex; align-items:center; gap:8px; }
+.brandbox[open] { padding-bottom:16px; }
+.tell { margin-bottom:24px; padding:24px; }
+.tell h3 { font-size:1.5rem; }
+.tell .hint { margin-bottom:16px; }
+.chips { gap:8px; margin-bottom:12px; }
+.chips:empty,.thread:empty,#reorder:empty,#phoneRuns:empty { display:none; }
+.chips button { min-height:44px; padding:8px 16px; font-size:.9rem; color:#E4DDF5; }
+.chips button:hover { border-color:var(--coral); color:var(--paper); }
+.thread { scrollbar-width:thin; overscroll-behavior:contain; }
+.msg { overflow-wrap:anywhere; }
+.typing { font-weight:700; color:var(--plum); }
+.panel.dark .typing { color:#CFC6E6; }
+.send { gap:8px; margin-top:12px; background:none; border:0; border-radius:0; padding:0; max-width:none; }
+.send input { flex:1; min-width:0; min-height:48px; }
+.send button { min-height:48px; padding:0 20px; flex:none; white-space:nowrap; }
+.tell .send button { background:var(--coral); color:var(--ink); font-weight:800; }
+.toast { margin:0 0 12px; }
+.tiles { gap:20px; align-items:start; }
+.tiles .group { grid-column:1 / -1; font-size:1.5rem; font-weight:800; padding-top:14px; border-top:2px solid var(--ink); margin-top:12px; }
+.tiles .group:first-child { margin-top:0; }
+.tile { padding:22px; align-self:stretch; }
+.tile:nth-of-type(9) { grid-column:1 / -1; }
+.tile header { gap:12px 14px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid #F0EBF8; min-height:86px; }
+.tile .num { width:32px; height:32px; font-size:.95rem; background:var(--wash); color:var(--plum); margin-top:1px; }
+.tile h3 { line-height:1.2; }
+.tile header p { margin-top:4px; line-height:1.4; }
+.tile .live { font-size:1.6rem; line-height:1.1; font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--ink); }
+.tile .live:empty { display:none; }
+.tile .live small { margin-top:4px; white-space:normal; font-size:.78rem; }
+.tbody { padding:3px; margin:-3px; scrollbar-width:thin; overscroll-behavior:contain; }
+.tbody > .hint { color:var(--muted); font-size:.88rem; }
+.row,.line3,.cust,.mrow,.arm { padding-top:11px; padding-bottom:11px; }
+.row b,.line3 b,.cust span,.arm b { font-variant-numeric:tabular-nums; }
+.row:last-child,.line3:last-child,.cust:last-child,.mrow:last-child { border-bottom:0; }
+.cust { align-items:baseline; }
+.empty { border:1.5px dashed var(--line); border-radius:16px; padding:20px 18px; text-align:center; background:#FCFAFF; line-height:1.45; text-wrap:balance; margin:2px 0; }
+.order { padding:16px; }
+.order .top { align-items:center; gap:10px; }
+.order .what { margin:6px 0 12px; }
+.pill { white-space:nowrap; padding:4px 10px; }
+.acts { gap:8px; align-items:center; }
+.acts button { min-height:44px; padding:10px 16px; font-size:.9rem; color:var(--ink); background:#fff; text-align:left; }
+.acts button:hover,.line3 button:hover,.stock button:hover,.mrow .tog:hover { border-color:var(--violet); }
+.acts button.main { background:var(--violet); border-color:var(--violet); color:#fff; padding:10px 22px; order:9; margin-left:auto; }
+.acts button.main:hover { filter:brightness(1.08); }
+.line3 button,.line3 a.tog { min-height:44px; padding:8px 14px !important; display:inline-flex; align-items:center; font-size:.85rem !important; }
+.mrow { grid-template-columns:minmax(0,1fr) 96px 184px 96px; }
+.mrow .nm { overflow-wrap:anywhere; }
+.mrow input { min-height:44px; font-variant-numeric:tabular-nums; }
+.stock { gap:6px; }
+.stock button { min-width:40px; min-height:44px; padding:6px 10px; font-size:.9rem; }
+.mrow .tog { min-height:44px; }
+#addForm { margin-top:14px; padding-top:14px; border-top:1px solid #F0EBF8; }
+.tbody .qr { border:1px solid var(--line); }
+.phonebar { margin-top:20px; padding:24px; }
+.phonebar .hint { max-width:70ch; }
+.share { margin-top:20px; padding:24px; background:#fff; border:1px solid var(--line); border-radius:24px; }
+.share .qr { border:1px solid var(--line); }
+.share p { color:var(--ink); font-size:1rem; }
+#studio { padding-bottom:56px; }
+@media (max-width:860px) { .dhero { min-height:0; padding-top:8px; } .dstage { min-height:200px; } }
+@media (max-width:700px) {
+  .hero { padding:24px 20px 40px; gap:8px; }
+  .hero .brand { margin-bottom:20px; }
+  .stage { min-height:230px; }
+  h1 { max-width:14ch; }
+  .lede { font-size:1.05rem; margin:16px 0 22px; }
+  .gets { margin:36px 0 44px; border-top:0; }
+  .gets div { border-top:2px solid var(--ink); padding:18px 0 22px; }
+  .mrow { grid-template-columns:minmax(0,1fr) 110px; }
+  .cust { gap:4px 10px; }
+  .dhero .links a { flex:1 1 100%; justify-content:center; }
+  .dhero .links span { margin:4px 0 0; }
+  .tell,.phonebar,.share,.tile { padding:18px; border-radius:20px; }
+  .tiles { gap:16px; }
+  .acts button { flex:1 1 auto; text-align:center; }
+  .acts button.main { margin-left:0; }
+  #addForm { flex-wrap:wrap; }
+  #addForm #addName { flex:1 1 100%; }
+  #addForm #addPrice { max-width:none !important; flex:1; }
+}
+@media (max-width:480px) {
+  .tile header { grid-template-columns:auto 1fr; min-height:0; }
+  .tile .live { grid-column:1 / -1; text-align:left; }
+  .tile .live small { display:inline; margin-left:6px; }
+  .share { flex-direction:column; align-items:flex-start; }
+  .topbar a { flex:1 1 auto; justify-content:center; }
+}
+@media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
 </style>
 </head>
 <body>
@@ -216,14 +360,17 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
     <div id="features"></div>
     <p class="toast" id="toast" role="status"></p>
     <div class="tiles">
+      <h3 class="group">Selling</h3>
       <article class="tile"><header><span class="num">1</span><div><h3>Customer service</h3><p>Answers questions about your menu and prices by text, at any hour.</p></div><b class="live" id="l1"></b></header><div class="tbody"><div class="thread" id="custThread"></div><form class="send" id="custForm"><input id="custInput" placeholder="Try it: do you have toor dal?" aria-label="Message as a customer"><button>Send</button></form></div></article>
       <article class="tile"><header><span class="num">2</span><div><h3>Sales and orders</h3><p>Takes the order, confirms items and total.</p></div><b class="live" id="l2"></b></header><div class="tbody"><div id="orders"></div></div></article>
       <article class="tile"><header><span class="num">3</span><div><h3>Payments</h3><p>Sends a pay link with every order and marks it paid.</p></div><b class="live" id="l3"></b></header><div class="tbody"><div id="payLines"></div><div class="acts"><button data-do="chaseUnpaid">Remind customers who have not paid</button></div></div></article>
       <article class="tile"><header><span class="num">4</span><div><h3>Invoices and receipts</h3><p>Sends a receipt after payment and makes an invoice for any order.</p></div><b class="live" id="l4"></b></header><div class="tbody"><div id="invoices"></div></div></article>
+      <h3 class="group">Customers</h3>
       <article class="tile"><header><span class="num">5</span><div><h3>Customer memory</h3><p>Remembers each customer's usual order and preferences.</p></div><b class="live" id="l5"></b></header><div class="tbody"><div id="customers"></div></div></article>
       <article class="tile"><header><span class="num">6</span><div><h3>Order updates</h3><p>Texts "accepted" and "ready" so nobody has to ask.</p></div><b class="live" id="l6"></b></header><div class="tbody"><p class="hint">Sent the moment you tap Accept or Ready. Customers reach you here:</p><img class="qr" id="qr" alt="QR code for your text line"><p id="lineText" style="text-align:center;font-weight:700"></p></div></article>
       <article class="tile"><header><span class="num">7</span><div><h3>Bookings and reminders</h3><p>Books time slots by text and reminds customers.</p></div><b class="live" id="l7"></b></header><div class="tbody"><div id="bookings"></div></div></article>
       <article class="tile"><header><span class="num">8</span><div><h3>Marketing</h3><p>Announces specials and texts regulars who have gone quiet.</p></div><b class="live" id="l8"></b></header><div class="tbody"><form class="send" id="announceForm"><input id="announceText" placeholder="Fresh mangoes arrive Friday" aria-label="Announcement"><button>Send to all</button></form><div class="acts" style="margin-top:10px"><button data-do="winback" id="winback">Win back quiet regulars</button></div><p class="hint" style="margin-top:10px">Only people who texted or ordered first are ever messaged.</p></div></article>
+      <h3 class="group">Back office</h3>
       <article class="tile"><header><span class="num">9</span><div><h3>Bookkeeping</h3><p>Logs every sale, sends you the daily total, exports for your accountant.</p></div><b class="live" id="l9"></b></header><div class="tbody"><div id="sellers"></div><div class="acts" style="margin-top:10px"><button data-do="dailyTotal">Send me today's total</button><button id="csv">Download sales (CSV)</button></div></div></article>
       <article class="tile wide2"><header><span class="num">10</span><div><h3>Inventory and suppliers</h3><p>Counts stock, switches sold-out items off, tells you what to reorder.</p></div><b class="live" id="l10"></b></header><div class="tbody"><div id="reorder"></div><div id="menu"></div><form class="send" id="addForm"><input id="addName" placeholder="New item" aria-label="New item name"><input id="addPrice" placeholder="Price" inputmode="decimal" aria-label="New item price" style="max-width:110px"><button>Add</button></form></div></article>
       <article class="tile"><header><span class="num">11</span><div><h3>Reviews and reputation</h3><p>Asks happy customers for a review and drafts your replies.</p></div><b class="live" id="l11"></b></header><div class="tbody"><div id="reviews"></div><div class="acts" style="margin-top:10px"><button data-do="askReviews">Ask recent customers for a review</button></div></div></article>
