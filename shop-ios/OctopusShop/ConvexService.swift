@@ -40,12 +40,6 @@ struct ConvexService {
         return try await client.action("store:placeOrder", with: args)
     }
 
-    func book(shopId: String, name: String, service: String, when: String) async throws {
-        try await client.mutation(
-            "store:book",
-            with: ["shopId": shopId, "device": Device.id, "name": name, "service": service, "when": when])
-    }
-
     func review(shopId: String, rating: Int, text: String) async throws {
         try await client.mutation(
             "store:review",

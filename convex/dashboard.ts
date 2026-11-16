@@ -41,6 +41,7 @@ export const run = action({
     action: v.union(
       v.literal("announce"), v.literal("winback"), v.literal("chaseUnpaid"), v.literal("askReviews"),
       v.literal("remind"), v.literal("cancelBooking"), v.literal("replyReview"), v.literal("setTax"), v.literal("dailyTotal"),
+      v.literal("sendInvoice"), v.literal("draftReorder"), v.literal("remindAll"), v.literal("draftSpecial"), v.literal("replyAll"),
     ),
     id: v.optional(v.string()),
     text: v.optional(v.string()),
@@ -70,6 +71,17 @@ export const run = action({
         return "Tax rate saved.";
       case "dailyTotal":
         return (await ctx.runAction(internal.suite.sendDailyTotal, { shopId })).text;
+      case "sendInvoice":
+        return `Invoice ${(await ctx.runAction(internal.suite2.sendInvoice, { shopId, orderId: id as Id<"orders"> })).invoice} sent to the customer.`;
+      case "draftReorder":
+        return (await ctx.runAction(internal.suite2.draftReorder, { shopId })).text;
+      case "remindAll":
+        return `Reminder sent for ${(await ctx.runAction(internal.suite2.remindAll, { shopId })).sent} bookings.`;
+      case "draftSpecial":
+        // The draft comes back for the owner to edit and send; nothing is sent yet.
+        return (await ctx.runAction(internal.suite2.draftSpecial, { shopId })).text;
+      case "replyAll":
+        return `Replied to ${(await ctx.runAction(internal.suite2.replyAll, { shopId })).sent} reviews.`;
     }
   },
 });

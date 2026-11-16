@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// A white rounded text field used on the checkout, booking and review forms.
+/// A white rounded text field used on the cart and review forms.
 struct FormField: View {
     let title: String
     @Binding var text: String

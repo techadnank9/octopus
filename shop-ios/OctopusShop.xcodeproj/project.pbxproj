@@ -7,45 +7,52 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0826797CBA172DE001A060DB /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A86EC5131517F88E5148EC0 /* CartView.swift */; };
 		08367335BD84AC48BA14E1E9 /* PlainError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06DBD16B7F84C130F01ECC91 /* PlainError.swift */; };
 		0900BABDD59BB7BEEB95A2E1 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D9CD875B17C6636D8420E0 /* Theme.swift */; };
+		14905BD6E8824F41BC60B724 /* ReviewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C1B47BF6CF428865203B63 /* ReviewRow.swift */; };
 		1E5CC1487127E0107142A1DE /* OctopusShopApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D15E3F0E9763FF61FFCC699 /* OctopusShopApp.swift */; };
 		1F94185BF46DD359D8445720 /* ShopPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A8E84B7BFF2F2AE122BFBF /* ShopPickerView.swift */; };
 		2809D12717D75DA32834A8D5 /* ConvexMobile in Frameworks */ = {isa = PBXBuildFile; productRef = B524653C17F4CB8AA9AE731B /* ConvexMobile */; };
+		2C9E08FB55607F07740A152C /* QuantityStepper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02EE360D430B5C01DF8C8E54 /* QuantityStepper.swift */; };
 		3146377B013DC0D53964ADF4 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2468A827A108D71855D6D8 /* MainTabView.swift */; };
 		3BA7FA0E5C0E48863EB83FF8 /* ConvexService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB77F3D87AAF2E3BF7CAEF22 /* ConvexService.swift */; };
 		43B5188465F8A1D48EDA7861 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6634239DAAE54123A69C7EC2 /* Assets.xcassets */; };
-		528542D80D33E817BE87B59B /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8455259B7CBB12B08C487953 /* ReviewView.swift */; };
+		49F3F659E30184166C7A640C /* ShopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2115330A143C66F7D1EE61D8 /* ShopView.swift */; };
+		4E1C3D46CC68E57A8BEF7294 /* ProductCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F241314B01B9B6AD6B2D8D1 /* ProductCard.swift */; };
 		588AFE1C9B61B4DB83572C83 /* FormField.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9AC026E3C2B042A989DD921 /* FormField.swift */; };
 		62BBD3C93067B6CC67D1494E /* ShopStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A35EE384A252E867A4C37D5 /* ShopStore.swift */; };
-		875493C5E5928F4C012FF512 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A078F43795F38A47C225DFE /* MenuView.swift */; };
-		8AFD47B7386C0E563B7E01C7 /* BookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF4D29731254C47318820001 /* BookView.swift */; };
 		8EC72D6CBCEAEC3E942A6A64 /* ChatBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3848EC980A86E7AB7174FC2 /* ChatBubble.swift */; };
-		961DCC5EEE538BEA5D5829AB /* MenuItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8A0A3F86DD49FBBD23BCA5 /* MenuItemRow.swift */; };
+		AD73F4D85D7442901648CEA0 /* OrdersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB643A9F0B5CDF032421F78B /* OrdersView.swift */; };
 		B6D15A6773006746CF874F12 /* AskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59D6549BC716CF7CC4EFEF2 /* AskView.swift */; };
-		C15C9AD34E2E14BDC85CAD20 /* CheckoutSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4393798D65459A8020E06B72 /* CheckoutSheet.swift */; };
 		C9F1B56E74991C9F7061D223 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3AD44525E3C188FD9E2CB3 /* RootView.swift */; };
+		CBDE7407BE29FAF6D4823CB8 /* ProductPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC3A0722EDD68651C23E54C0 /* ProductPhoto.swift */; };
 		D3822387DC98D30F28DE1687 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858CE614E0D003808AF67217 /* Money.swift */; };
 		D64258A79B806A106387FF77 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2A58D8312CB21136AF230A6 /* Device.swift */; };
 		D6DF99008D846F5E4837E523 /* ChatStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BD052C9593A89089902708A /* ChatStore.swift */; };
 		E7024D828ED9BE4D76F22AD1 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DC9765E6D99DB8FC9F884A /* Models.swift */; };
+		F1ACCB4D296AAA9A1838E08B /* EmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E138D0643099B69E9DD73F /* EmptyState.swift */; };
 		FE8987EB2A6C8EA1CE80E85C /* OrderStatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08558A70371543EC6D48744 /* OrderStatusCard.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		02EE360D430B5C01DF8C8E54 /* QuantityStepper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuantityStepper.swift; sourceTree = "<group>"; };
 		06DBD16B7F84C130F01ECC91 /* PlainError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainError.swift; sourceTree = "<group>"; };
-		3A078F43795F38A47C225DFE /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
+		11C1B47BF6CF428865203B63 /* ReviewRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewRow.swift; sourceTree = "<group>"; };
+		2115330A143C66F7D1EE61D8 /* ShopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopView.swift; sourceTree = "<group>"; };
 		3BD052C9593A89089902708A /* ChatStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStore.swift; sourceTree = "<group>"; };
-		4393798D65459A8020E06B72 /* CheckoutSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutSheet.swift; sourceTree = "<group>"; };
+		3F241314B01B9B6AD6B2D8D1 /* ProductCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCard.swift; sourceTree = "<group>"; };
 		4D15E3F0E9763FF61FFCC699 /* OctopusShopApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OctopusShopApp.swift; sourceTree = "<group>"; };
+		5A86EC5131517F88E5148EC0 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
 		6634239DAAE54123A69C7EC2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		8455259B7CBB12B08C487953 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
 		858CE614E0D003808AF67217 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
 		8E2468A827A108D71855D6D8 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		93A8E84B7BFF2F2AE122BFBF /* ShopPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopPickerView.swift; sourceTree = "<group>"; };
+		94E138D0643099B69E9DD73F /* EmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyState.swift; sourceTree = "<group>"; };
 		9A35EE384A252E867A4C37D5 /* ShopStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopStore.swift; sourceTree = "<group>"; };
 		A9AC026E3C2B042A989DD921 /* FormField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormField.swift; sourceTree = "<group>"; };
 		AA3AD44525E3C188FD9E2CB3 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		BB643A9F0B5CDF032421F78B /* OrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersView.swift; sourceTree = "<group>"; };
 		BB77F3D87AAF2E3BF7CAEF22 /* ConvexService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvexService.swift; sourceTree = "<group>"; };
 		BF71B94A6056C7695C17C436 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		C08558A70371543EC6D48744 /* OrderStatusCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderStatusCard.swift; sourceTree = "<group>"; };
@@ -54,10 +61,9 @@
 		E4DC9765E6D99DB8FC9F884A /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		E4E8400BE663D1CDDCC02223 /* OctopusShop.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = OctopusShop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8D9CD875B17C6636D8420E0 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
-		EF4D29731254C47318820001 /* BookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookView.swift; sourceTree = "<group>"; };
 		F3848EC980A86E7AB7174FC2 /* ChatBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubble.swift; sourceTree = "<group>"; };
 		F59D6549BC716CF7CC4EFEF2 /* AskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskView.swift; sourceTree = "<group>"; };
-		FE8A0A3F86DD49FBBD23BCA5 /* MenuItemRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuItemRow.swift; sourceTree = "<group>"; };
+		FC3A0722EDD68651C23E54C0 /* ProductPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductPhoto.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,17 +100,20 @@
 			isa = PBXGroup;
 			children = (
 				F59D6549BC716CF7CC4EFEF2 /* AskView.swift */,
-				EF4D29731254C47318820001 /* BookView.swift */,
+				5A86EC5131517F88E5148EC0 /* CartView.swift */,
 				F3848EC980A86E7AB7174FC2 /* ChatBubble.swift */,
-				4393798D65459A8020E06B72 /* CheckoutSheet.swift */,
+				94E138D0643099B69E9DD73F /* EmptyState.swift */,
 				A9AC026E3C2B042A989DD921 /* FormField.swift */,
 				8E2468A827A108D71855D6D8 /* MainTabView.swift */,
-				FE8A0A3F86DD49FBBD23BCA5 /* MenuItemRow.swift */,
-				3A078F43795F38A47C225DFE /* MenuView.swift */,
 				C08558A70371543EC6D48744 /* OrderStatusCard.swift */,
-				8455259B7CBB12B08C487953 /* ReviewView.swift */,
+				BB643A9F0B5CDF032421F78B /* OrdersView.swift */,
+				3F241314B01B9B6AD6B2D8D1 /* ProductCard.swift */,
+				FC3A0722EDD68651C23E54C0 /* ProductPhoto.swift */,
+				02EE360D430B5C01DF8C8E54 /* QuantityStepper.swift */,
+				11C1B47BF6CF428865203B63 /* ReviewRow.swift */,
 				AA3AD44525E3C188FD9E2CB3 /* RootView.swift */,
 				93A8E84B7BFF2F2AE122BFBF /* ShopPickerView.swift */,
+				2115330A143C66F7D1EE61D8 /* ShopView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -217,25 +226,28 @@
 			buildActionMask = 2147483647;
 			files = (
 				B6D15A6773006746CF874F12 /* AskView.swift in Sources */,
-				8AFD47B7386C0E563B7E01C7 /* BookView.swift in Sources */,
+				0826797CBA172DE001A060DB /* CartView.swift in Sources */,
 				8EC72D6CBCEAEC3E942A6A64 /* ChatBubble.swift in Sources */,
 				D6DF99008D846F5E4837E523 /* ChatStore.swift in Sources */,
-				C15C9AD34E2E14BDC85CAD20 /* CheckoutSheet.swift in Sources */,
 				3BA7FA0E5C0E48863EB83FF8 /* ConvexService.swift in Sources */,
 				D64258A79B806A106387FF77 /* Device.swift in Sources */,
+				F1ACCB4D296AAA9A1838E08B /* EmptyState.swift in Sources */,
 				588AFE1C9B61B4DB83572C83 /* FormField.swift in Sources */,
 				3146377B013DC0D53964ADF4 /* MainTabView.swift in Sources */,
-				961DCC5EEE538BEA5D5829AB /* MenuItemRow.swift in Sources */,
-				875493C5E5928F4C012FF512 /* MenuView.swift in Sources */,
 				E7024D828ED9BE4D76F22AD1 /* Models.swift in Sources */,
 				D3822387DC98D30F28DE1687 /* Money.swift in Sources */,
 				1E5CC1487127E0107142A1DE /* OctopusShopApp.swift in Sources */,
 				FE8987EB2A6C8EA1CE80E85C /* OrderStatusCard.swift in Sources */,
+				AD73F4D85D7442901648CEA0 /* OrdersView.swift in Sources */,
 				08367335BD84AC48BA14E1E9 /* PlainError.swift in Sources */,
-				528542D80D33E817BE87B59B /* ReviewView.swift in Sources */,
+				4E1C3D46CC68E57A8BEF7294 /* ProductCard.swift in Sources */,
+				CBDE7407BE29FAF6D4823CB8 /* ProductPhoto.swift in Sources */,
+				2C9E08FB55607F07740A152C /* QuantityStepper.swift in Sources */,
+				14905BD6E8824F41BC60B724 /* ReviewRow.swift in Sources */,
 				C9F1B56E74991C9F7061D223 /* RootView.swift in Sources */,
 				1F94185BF46DD359D8445720 /* ShopPickerView.swift in Sources */,
 				62BBD3C93067B6CC67D1494E /* ShopStore.swift in Sources */,
+				49F3F659E30184166C7A640C /* ShopView.swift in Sources */,
 				0900BABDD59BB7BEEB95A2E1 /* Theme.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

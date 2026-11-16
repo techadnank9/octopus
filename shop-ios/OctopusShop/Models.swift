@@ -26,6 +26,8 @@ struct MenuItem: Decodable, Equatable, Identifiable {
     let description: String?
     /// Product photo from the shop's own website. Nil when there is none.
     let imageUrl: String?
+    /// Shelf the shop files this under, for example "Rice and grains". Nil when unsorted.
+    let category: String?
     let available: Bool
     /// Units left. Nil when the shop is not counting this item.
     @OptionalConvexFloat var stock: Double?
