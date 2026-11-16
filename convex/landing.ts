@@ -316,7 +316,7 @@ form#build input,.pick select { min-height:52px; font-size:1.02rem; }
 </style>
 </head>
 <body>
-<nav class="topbar"><p class="brand"><i></i>Octopus</p><a id="navStore" target="_blank" rel="noopener">Open customer app</a><a id="navNew">Set up another shop</a></nav>
+<nav class="topbar"><p class="brand"><i></i>Octopus</p><a id="navStore" hidden></a><a id="navNew">Set up another shop</a></nav>
 <header class="hero">
   <div>
     <p class="brand"><i></i>Octopus</p>
@@ -350,7 +350,7 @@ form#build input,.pick select { min-height:52px; font-size:1.02rem; }
         <p id="source" class="src"></p>
         <div class="stats" id="stats"></div>
         <div class="links"><a id="simStore" href="#">Open customer app on iPhone</a><a id="simOwner" class="alt" href="#">Open owner app on iPhone</a><span>App code <b id="claim"></b></span></div>
-        <p class="src" style="margin:10px 0 0"><span id="simNote"></span> <a id="storeLink" target="_blank" rel="noopener" style="color:#CFC6E6">Or open the customer app in this browser</a></p>
+        <p class="src" style="margin:10px 0 0"><span id="simNote"></span><a id="storeLink" hidden></a></p>
       </div>
       <div class="dstage"><div id="octoDash" aria-label="3D octopus. Drag to turn it."></div></div>
     </div>
@@ -368,12 +368,12 @@ form#build input,.pick select { min-height:52px; font-size:1.02rem; }
       <h3 class="group">Customers</h3>
       <article class="tile"><header><span class="num">5</span><div><h3>Customer memory</h3><p>Remembers each customer's usual order and preferences.</p></div><b class="live" id="l5"></b></header><div class="tbody"><div id="customers"></div></div></article>
       <article class="tile"><header><span class="num">6</span><div><h3>Order updates</h3><p>Texts "accepted" and "ready" so nobody has to ask.</p></div><b class="live" id="l6"></b></header><div class="tbody"><p class="hint">Sent the moment you tap Accept or Ready. Customers reach you here:</p><img class="qr" id="qr" alt="QR code for your text line"><p id="lineText" style="text-align:center;font-weight:700"></p></div></article>
-      <article class="tile"><header><span class="num">7</span><div><h3>Bookings and reminders</h3><p>Books time slots by text and reminds customers.</p></div><b class="live" id="l7"></b></header><div class="tbody"><div id="bookings"></div></div></article>
-      <article class="tile"><header><span class="num">8</span><div><h3>Marketing</h3><p>Announces specials and texts regulars who have gone quiet.</p></div><b class="live" id="l8"></b></header><div class="tbody"><form class="send" id="announceForm"><input id="announceText" placeholder="Fresh mangoes arrive Friday" aria-label="Announcement"><button>Send to all</button></form><div class="acts" style="margin-top:10px"><button data-do="winback" id="winback">Win back quiet regulars</button></div><p class="hint" style="margin-top:10px">Only people who texted or ordered first are ever messaged.</p></div></article>
+      <article class="tile"><header><span class="num">7</span><div><h3>Bookings and reminders</h3><p>Books time slots by text and reminds customers.</p></div><b class="live" id="l7"></b></header><div class="tbody"><div id="bookings"></div><div class="acts" style="margin-top:10px"><button data-do="remindAll" id="remindAll" style="min-height:44px">Remind all upcoming bookings</button></div></div></article>
+      <article class="tile"><header><span class="num">8</span><div><h3>Marketing</h3><p>Announces specials and texts regulars who have gone quiet.</p></div><b class="live" id="l8"></b></header><div class="tbody"><form class="send" id="announceForm"><input id="announceText" placeholder="Fresh mangoes arrive Friday" aria-label="Announcement"><button>Send to all</button></form><div class="acts" style="margin-top:10px"><button data-do="draftSpecial" style="min-height:44px">Draft a special for me</button><button data-do="winback" id="winback">Win back quiet regulars</button></div><div id="audiences" style="margin-top:10px"></div><p class="hint" style="margin-top:10px">Only people who texted or ordered first are ever messaged.</p></div></article>
       <h3 class="group">Back office</h3>
-      <article class="tile"><header><span class="num">9</span><div><h3>Bookkeeping</h3><p>Logs every sale, sends you the daily total, exports for your accountant.</p></div><b class="live" id="l9"></b></header><div class="tbody"><div id="sellers"></div><div class="acts" style="margin-top:10px"><button data-do="dailyTotal">Send me today's total</button><button id="csv">Download sales (CSV)</button></div></div></article>
-      <article class="tile wide2"><header><span class="num">10</span><div><h3>Inventory and suppliers</h3><p>Counts stock, switches sold-out items off, tells you what to reorder.</p></div><b class="live" id="l10"></b></header><div class="tbody"><div id="reorder"></div><div id="menu"></div><form class="send" id="addForm"><input id="addName" placeholder="New item" aria-label="New item name"><input id="addPrice" placeholder="Price" inputmode="decimal" aria-label="New item price" style="max-width:110px"><button>Add</button></form></div></article>
-      <article class="tile"><header><span class="num">11</span><div><h3>Reviews and reputation</h3><p>Asks happy customers for a review and drafts your replies.</p></div><b class="live" id="l11"></b></header><div class="tbody"><div id="reviews"></div><div class="acts" style="margin-top:10px"><button data-do="askReviews">Ask recent customers for a review</button></div></div></article>
+      <article class="tile"><header><span class="num">9</span><div><h3>Bookkeeping</h3><p>Logs every sale, sends you the daily total, exports for your accountant.</p></div><b class="live" id="l9"></b></header><div class="tbody"><div id="sellers"></div><div id="week" style="margin-top:10px"></div><div class="acts" style="margin-top:10px"><button data-do="dailyTotal">Send me today's total</button><button id="csv">Download sales (CSV)</button></div></div></article>
+      <article class="tile wide2"><header><span class="num">10</span><div><h3>Inventory and suppliers</h3><p>Counts stock, switches sold-out items off, tells you what to reorder.</p></div><b class="live" id="l10"></b></header><div class="tbody"><div id="reorder"></div><div class="acts"><button data-do="draftReorder" style="min-height:44px">Draft reorder list</button></div><p class="hint" id="reorderDraft" style="white-space:pre-line;margin-top:8px"></p><div id="reorderPoints"></div><div id="menu"></div><form class="send" id="addForm"><input id="addName" placeholder="New item" aria-label="New item name"><input id="addPrice" placeholder="Price" inputmode="decimal" aria-label="New item price" style="max-width:110px"><button>Add</button></form></div></article>
+      <article class="tile"><header><span class="num">11</span><div><h3>Reviews and reputation</h3><p>Asks happy customers for a review and drafts your replies.</p></div><b class="live" id="l11"></b></header><div class="tbody"><div id="ratings"></div><div id="reviews"></div><div class="acts" style="margin-top:10px"><button data-do="askReviews">Ask recent customers for a review</button><button data-do="replyAll" id="replyAll" style="min-height:44px">Reply to all unanswered</button></div></div></article>
       <article class="tile"><header><span class="num">12</span><div><h3>Taxes and compliance</h3><p>Keeps tidy records of sales and the tax inside them.</p></div><b class="live" id="l12"></b></header><div class="tbody"><form class="send" id="taxForm"><input id="taxRate" inputmode="decimal" placeholder="Tax rate %" aria-label="Tax rate in percent"><button>Save rate</button></form><div id="taxLines" style="margin-top:10px"></div></div></article>
     </div>
     <div class="panel phonebar"><h3>The iPhone app, on a cloud iPhone</h3><p class="hint">Runs the owner app on a Revyl simulator. A live phone opens in Revyl; tests come back with a video report.</p>
@@ -487,7 +487,7 @@ async function refresh() {
   if ($('storeQr').dataset.u !== storeUrl) { $('storeQr').dataset.u = storeUrl; $('storeQr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=380x380&data=' + encodeURIComponent(storeUrl); }
   $('claim').textContent = s.shop.claimCode || 'Already on your phone';
   const u = s.suite, live = (id, value, label) => { $(id).innerHTML = value + '<small>' + label + '</small>'; };
-  sales = u.sales; taxInfo = u.tax;
+  sales = u.sales; taxInfo = u.tax; week = u.week;
   live('l1', s.arms[1], 'answered today');
   live('l2', d.today.orders, 'orders today');
   live('l3', money(d.today.paidCents), 'collected');
@@ -516,10 +516,17 @@ async function refresh() {
   const PS = { queued: 'Waiting for a phone', running: 'Starting on a cloud iPhone', passed: 'Passed', failed: 'Failed', open: 'Live', ended: 'Ended' };
   $('phoneRuns').innerHTML = s.phoneRuns.map((r) => '<div class="line3"><span>' + esc(r.name) + '<small>' + PS[r.status] + '</small></span><span></span>' + (r.url ? '<a class="tog" style="text-decoration:none;border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;font-weight:700;font-size:.82rem;color:var(--ink)" target="_blank" rel="noopener" href="' + esc(r.url) + '">' + (r.kind === 'test' ? 'Watch report' : 'Open phone') + '</a>' : '<span></span>') + '</div>').join('');
   $('payLines').innerHTML = [['Collected today', d.today.paidCents], ['Still unpaid', d.today.unpaidCents], ['Average order', d.today.averageCents]].map((r) => '<div class="row"><span>' + r[0] + '</span><b>' + money(r[1]) + '</b></div>').join('');
-  $('invoices').innerHTML = u.sales.length ? u.sales.map((o, k) => '<div class="line3"><span>' + esc(o.customer) + '<small>' + esc(o.items) + '</small></span><b>' + money(o.totalCents) + '</b><button data-inv="' + k + '">Invoice</button></div>').join('') : '<p class="empty">Receipts and invoices appear with your first sale.</p>';
+  $('invoices').innerHTML = u.sales.length ? u.sales.map((o, k) => '<div class="line3"><span>' + esc(o.customer) + '<small>' + (o.invoice ? esc(o.invoice) + ', ' : '') + esc(o.items) + '</small></span><b>' + money(o.totalCents) + '</b><span style="display:flex;gap:6px"><button data-inv="' + k + '" style="min-height:44px">Invoice</button><button data-do="sendInvoice" data-id="' + o.id + '" style="min-height:44px">Send invoice</button></span></div>').join('') : '<p class="empty">Receipts and invoices appear with your first sale.</p>';
   $('bookings').innerHTML = u.bookings.length ? u.bookings.map((b) => '<div class="line3"><span>' + esc(b.customer) + '<small>' + esc(b.service) + ', ' + esc(b.when) + (b.status === 'cancelled' ? ' (cancelled)' : b.reminded ? ' (reminded)' : '') + '</small></span>' + (b.status === 'booked' ? '<button data-do="remind" data-id="' + b.id + '">Remind</button><button data-do="cancelBooking" data-id="' + b.id + '">Cancel</button>' : '<span></span><span></span>') + '</div>').join('') : '<p class="empty">No bookings yet. Customers can text "book me for 5 PM tomorrow".</p>';
+  $('remindAll').textContent = 'Remind all upcoming bookings (' + u.bookings.filter((b) => b.status === 'booked' && !b.reminded).length + ')';
+  $('audiences').innerHTML = [['Everyone you can text', u.audiences.all], ['Quiet for 7 days or more', u.audiences.quiet], ['With an unpaid order', u.audiences.unpaid], ['Ordered today', u.audiences.today]].map((r) => '<div class="row"><span>' + r[0] + '</span><b>' + r[1] + '</b></div>').join('');
   $('winback').textContent = 'Win back quiet regulars (' + u.audience.quiet + ')';
   $('reorder').innerHTML = u.reorder.length ? '<p class="hint">Reorder soon: ' + u.reorder.map((r) => esc(r.name) + ' (' + r.left + ' left)').join(', ') + '</p>' : '';
+  if (!$('reorderPoints').contains(document.activeElement)) $('reorderPoints').innerHTML = u.stockPoints.map((p) => '<div class="row"><span>' + esc(p.name) + ' (' + p.left + ' left)</span><label>Reorder at <input data-rp="' + esc(p.name) + '" inputmode="numeric" value="' + p.point + '" style="width:64px;min-height:44px;padding:6px 8px;background:#fff;color:var(--ink);border-color:var(--line);border-radius:10px"></label></div>').join('');
+  const mostRated = Math.max.apply(null, u.ratings.map((r) => r.count));
+  $('ratings').innerHTML = mostRated ? u.ratings.map((r) => '<div style="display:grid;grid-template-columns:56px 1fr 24px;gap:8px;align-items:center;font-size:.85rem;padding:2px 0"><span>' + r.stars + (r.stars === 1 ? ' star' : ' stars') + '</span><span style="height:8px;border-radius:4px;background:#F0EBF8"><i style="display:block;height:8px;border-radius:4px;background:var(--violet);width:' + Math.round(100 * r.count / mostRated) + '%"></i></span><b>' + r.count + '</b></div>').join('') : '';
+  $('replyAll').textContent = 'Reply to all unanswered (' + u.unanswered + ')';
+  $('week').innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.85rem;text-align:right"><caption class="hint" style="text-align:left;padding-bottom:4px">Last 7 days</caption><tr><th style="text-align:left">Date</th><th>Orders</th><th>Gross</th><th>Tax</th><th>Net</th></tr>' + u.week.map((w) => '<tr style="border-top:1px solid #F0EBF8"><td style="text-align:left;padding:5px 0">' + new Date(w.endsAt).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) + '</td><td>' + w.orders + '</td><td>' + money(w.grossCents) + '</td><td>' + money(w.taxCents) + '</td><td>' + money(w.netCents) + '</td></tr>').join('') + '</table>';
   $('reviews').innerHTML = u.reviews.length ? u.reviews.map((r) => '<div class="line3"><span>' + '★'.repeat(r.rating) + ' ' + esc(r.customer) + '<small>' + esc(r.text) + (r.reply ? '<br>You replied: ' + esc(r.reply) : '') + '</small></span><span></span>' + (r.reply ? '<span></span>' : '<button data-do="replyReview" data-id="' + r.id + '">Draft and send reply</button>') + '</div>').join('') : '<p class="empty">No reviews yet. Ask after a good order.</p>';
   if (document.activeElement !== $('taxRate')) $('taxRate').value = u.tax.rate || '';
   $('taxLines').innerHTML = [['Sales today (incl. tax)', u.tax.grossCents], ['Tax inside at ' + u.tax.rate + '%', u.tax.taxCents], ['Net of tax', u.tax.netCents]].map((r) => '<div class="row"><span>' + r[0] + '</span><b>' + money(r[1]) + '</b></div>').join('');
@@ -536,7 +543,7 @@ async function refresh() {
   }).join('') : '<p class="empty">No orders yet. Text your line, or try the customer chat.</p>';
 }
 
-let sales = [], taxInfo = { rate: 0 };
+let sales = [], taxInfo = { rate: 0 }, week = [];
 const wantPhone = {};
 [['simOwner', 'device'], ['simStore', 'store']].forEach((pair) => {
   $(pair[0]).addEventListener('click', (e) => {
@@ -548,7 +555,7 @@ const wantPhone = {};
   });
 });
 const toast = (text) => { $('toast').textContent = text; setTimeout(() => { if ($('toast').textContent === text) $('toast').textContent = ''; }, 5000); };
-const DONE = { announce: 'Announcement sent to ', winback: 'Win-back text sent to ', chaseUnpaid: 'Payment reminder sent to ', askReviews: 'Review request sent to ' };
+const DONE = { remindAll: 'Booking reminder sent to ', replyAll: 'Reply drafted and sent to ', announce: 'Announcement sent to ', winback: 'Win-back text sent to ', chaseUnpaid: 'Payment reminder sent to ', askReviews: 'Review request sent to ' };
 async function act(action, extra, button) {
   if (button) button.disabled = true;
   try {
@@ -556,6 +563,10 @@ async function act(action, extra, button) {
     if (DONE[action]) toast(DONE[action] + out.sent + (out.sent === 1 ? ' customer.' : ' customers.'));
     else if (action === 'dailyTotal') toast(out.text);
     else if (action === 'replyReview') toast('Reply sent: ' + out.reply);
+    else if (action === 'draftReorder') { $('reorderDraft').textContent = out.text; toast(out.items ? 'Purchase list drafted. A copy is in your thread.' : out.text); }
+    else if (action === 'setReorderPoint') toast(out.name + ' will be flagged at ' + out.point + ' left.');
+    else if (action === 'draftSpecial') { $('announceText').value = out.text; $('announceText').focus(); toast('Draft is in the announcement box. Edit it, then send.'); }
+    else if (action === 'sendInvoice') toast('Invoice ' + out.invoice + ' sent to the customer.');
     else toast('Done.');
   } catch (err) { toast(err.message); }
   if (button) button.disabled = false;
@@ -570,15 +581,23 @@ $('studio').addEventListener('click', (e) => {
   if (inv) invoice(sales[Number(inv.dataset.inv)]);
 });
 $('announceForm').addEventListener('submit', (e) => { e.preventDefault(); const t = $('announceText').value.trim(); if (t) { $('announceText').value = ''; act('announce', { text: t }); } });
+$('reorderPoints').addEventListener('change', (e) => {
+  const f = e.target.closest('input[data-rp]');
+  if (f && Number(f.value) >= 0 && f.value.trim() !== '') { f.blur(); act('setReorderPoint', { name: f.dataset.rp, point: Number(f.value) }); }
+});
 $('taxForm').addEventListener('submit', (e) => { e.preventDefault(); act('setTax', { rate: Number($('taxRate').value) }); });
 function invoice(o) {
   const w = window.open('', '_blank');
   const tax = Math.round(o.totalCents - o.totalCents / (1 + taxInfo.rate / 100));
-  w.document.write('<title>Invoice</title><body style="font:16px system-ui;max-width:560px;margin:40px auto;padding:0 20px"><h1 style="margin-bottom:0">' + esc($('shopName').textContent) + '</h1><p>Invoice ' + esc(o.id.slice(-6).toUpperCase()) + ' · ' + new Date(o.at).toLocaleDateString() + '</p><p>Billed to: <b>' + esc(o.customer) + '</b></p><hr>' + o.items.split('; ').map((l) => '<p>' + esc(l) + '</p>').join('') + '<hr><p>Tax included (' + taxInfo.rate + '%): ' + money(tax) + '</p><h2>Total ' + money(o.totalCents) + '</h2><p>' + (o.paid ? 'Paid. Thank you.' : 'Payment due.') + '</p><script>print()<\/script></body>');
+  w.document.write('<title>Invoice</title><body style="font:16px system-ui;max-width:560px;margin:40px auto;padding:0 20px"><h1 style="margin-bottom:0">' + esc($('shopName').textContent) + '</h1><p>Invoice ' + esc(o.invoice || o.id.slice(-6).toUpperCase()) + ' · ' + new Date(o.at).toLocaleDateString() + '</p><p>Billed to: <b>' + esc(o.customer) + '</b></p><hr>' + o.items.split('; ').map((l) => '<p>' + esc(l) + '</p>').join('') + '<hr><p>Tax included (' + taxInfo.rate + '%): ' + money(tax) + '</p><h2>Total ' + money(o.totalCents) + '</h2><p>' + (o.paid ? 'Paid. Thank you.' : 'Payment due.') + '</p><script>print()<\/script></body>');
   w.document.close();
 }
 $('csv').onclick = () => {
   const rows = [['time', 'customer', 'items', 'total', 'tax_included', 'paid']].concat(sales.map((o) => [new Date(o.at).toISOString(), o.customer, o.items, (o.totalCents / 100).toFixed(2), ((o.totalCents - o.totalCents / (1 + taxInfo.rate / 100)) / 100).toFixed(2), o.paid ? 'yes' : 'no']));
+  const cents = (c) => (c / 100).toFixed(2);
+  // The accountant gets the week's daily totals under the sales, in the same file.
+  rows.push([''], ['date', 'orders', 'gross', 'tax_included', 'net']);
+  week.forEach((w) => rows.push([new Date(w.endsAt).toLocaleDateString(), w.orders, cents(w.grossCents), cents(w.taxCents), cents(w.netCents)]));
   const csv = rows.map((r) => r.map((c) => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'sales-today.csv'; a.click();
 };

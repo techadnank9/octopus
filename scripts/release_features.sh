@@ -6,6 +6,7 @@
 set -u
 REPO=techadnank9/octopus
 REVYL_APP=f5c287d9-a1fb-48df-b3f2-c12c09e74ae6
+SHOP_APP=a03a0ca7-fe63-4d30-98a7-f0baac8e83cd
 PATH="$HOME/.revyl/bin:$PATH"
 cd "$(dirname "$0")/.."
 
@@ -61,11 +62,18 @@ run_phone() { # id kind name target
     url=$(cd ios && revyl device start --app-id "$REVYL_APP" --app-link "$4" --json </dev/null 2>/dev/null | viewer_of viewer_url)
     [ -n "$url" ] && st=open
   elif [ "$2" = "store" ]; then
-    # Customer app: a cloud iPhone with the shop's page opened in Safari.
-    out=$(cd ios && revyl device start --platform ios --json </dev/null 2>/dev/null)
-    sid=$(printf '%s' "$out" | viewer_of session_id)
+    # Customer app: the native app opened straight into this shop. Until a native build exists, the shop's page in Safari.
+    out=$(cd shop-ios && revyl device start --app-id "$SHOP_APP" --app-link "$4" --json </dev/null 2>/dev/null)
     url=$(printf '%s' "$out" | viewer_of viewer_url)
-    if [ -n "$sid" ] && (cd ios && revyl device navigate --url "$4" --session-id "$sid" </dev/null >/dev/null 2>&1); then st=open; fi
+    if [ -n "$url" ]; then
+      st=open
+    else
+      out=$(cd ios && revyl device start --platform ios --json </dev/null 2>/dev/null)
+      sid=$(printf '%s' "$out" | viewer_of session_id)
+      url=$(printf '%s' "$out" | viewer_of viewer_url)
+      web="https://hushed-dove-252.convex.site/shop?id=${4##*/}"
+      if [ -n "$sid" ] && (cd ios && revyl device navigate --url "$web" --session-id "$sid" </dev/null >/dev/null 2>&1); then st=open; fi
+    fi
   else
     out=$(cd ios && revyl test run "$3" --json </dev/null 2>&1)
     url=$(printf '%s' "$out" | viewer_of report_link)

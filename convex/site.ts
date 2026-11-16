@@ -101,6 +101,18 @@ export function addSiteRoutes(http: HttpRouter) {
           return ctx.runMutation(internal.suite.setTaxRate, { shopId, rate: Number(body.rate) });
         case "dailyTotal":
           return ctx.runAction(internal.suite.sendDailyTotal, { shopId });
+        case "sendInvoice":
+          return ctx.runAction(internal.suite2.sendInvoice, { shopId, orderId: id as Id<"orders"> });
+        case "setReorderPoint":
+          return ctx.runMutation(internal.suite2.setReorderPoint, { shopId, name: String(body.name ?? ""), point: Number(body.point) });
+        case "draftReorder":
+          return ctx.runAction(internal.suite2.draftReorder, { shopId });
+        case "remindAll":
+          return ctx.runAction(internal.suite2.remindAll, { shopId });
+        case "draftSpecial":
+          return ctx.runAction(internal.suite2.draftSpecial, { shopId });
+        case "replyAll":
+          return ctx.runAction(internal.suite2.replyAll, { shopId });
         default:
           throw new Error("Unknown action");
       }

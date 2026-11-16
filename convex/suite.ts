@@ -4,10 +4,10 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { v } from "convex/values";
 import { findOrCreateCustomer } from "./orders";
 import { OWNER_CHANNEL } from "./owner";
+import { audienceCounts, invoiceLabel, reorderLines, stockPoints, weekOfSales } from "./suite2";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const QUIET_AFTER_MS = 7 * DAY_MS;
-const LOW_STOCK = 3;
 
 const cash = (shop: Doc<"shops">, cents: number) =>
   new Intl.NumberFormat("en", { style: "currency", currency: (shop.currency ?? "usd").toUpperCase() }).format(cents / 100);
@@ -18,9 +18,8 @@ export const overview = internalQuery({
   handler: async (ctx, { shopId }) => {
     const shop = (await ctx.db.get(shopId))!;
     const since = Date.now() - DAY_MS;
-    const orders = (await ctx.db.query("orders").withIndex("by_shop", (q) => q.eq("shopId", shopId)).order("desc").take(200)).filter(
-      (o) => o.createdAt >= since && o.status !== "cancelled",
-    );
+    const recent = (await ctx.db.query("orders").withIndex("by_shop", (q) => q.eq("shopId", shopId)).order("desc").take(500)).filter((o) => o.status !== "cancelled");
+    const orders = recent.filter((o) => o.createdAt >= since);
     const name = async (id: Id<"customers">) => {
       const c = await ctx.db.get(id);
       return c?.displayName ?? c?.channelId ?? "Customer";
@@ -30,6 +29,8 @@ export const overview = internalQuery({
     const tax = Math.round(gross - gross / (1 + rate / 100));
     const bookings = await ctx.db.query("bookings").withIndex("by_shop", (q) => q.eq("shopId", shopId)).order("desc").take(20);
     const reviews = await ctx.db.query("reviews").withIndex("by_shop", (q) => q.eq("shopId", shopId)).order("desc").take(20);
+    // The list above shows the newest twenty; the spread of ratings counts every review.
+    const allReviews = await ctx.db.query("reviews").withIndex("by_shop", (q) => q.eq("shopId", shopId)).collect();
     const items = await ctx.db.query("items").withIndex("by_shop", (q) => q.eq("shopId", shopId)).collect();
     const customers = await ctx.db.query("customers").withIndex("by_shop_channel", (q) => q.eq("shopId", shopId)).collect();
     return {
@@ -41,6 +42,7 @@ export const overview = internalQuery({
           items: o.lines.map((l) => `${l.qty} x ${l.name}`).join("; "),
           totalCents: o.totalCents,
           paid: o.paymentStatus === "paid",
+          invoice: o.invoiceNumber === undefined ? null : invoiceLabel(o.invoiceNumber),
         })),
       ),
       tax: { rate, grossCents: gross, taxCents: tax, netCents: gross - tax },
@@ -52,12 +54,17 @@ export const overview = internalQuery({
       reviews: await Promise.all(
         reviews.map(async (r) => ({ id: r._id, customer: await name(r.customerId), rating: r.rating, text: r.text, reply: r.reply ?? null })),
       ),
-      reorder: items.filter((i) => i.stock !== undefined && i.stock <= LOW_STOCK).map((i) => ({ name: i.name, left: i.stock! })),
+      ratings: [5, 4, 3, 2, 1].map((stars) => ({ stars, count: allReviews.filter((r) => r.rating === stars).length })),
+      unanswered: allReviews.filter((r) => !r.reply).length,
+      week: weekOfSales(recent, rate),
+      reorder: reorderLines(items),
+      stockPoints: stockPoints(items),
       features: (await ctx.db.query("features").withIndex("by_shop", (q) => q.eq("shopId", shopId)).order("desc").take(6)).map((f) => ({
         request: f.request,
         status: f.status,
         detail: f.detail ?? null,
       })),
+      audiences: audienceCounts(customers.filter((c) => c.channelId !== OWNER_CHANNEL), recent),
       audience: {
         all: customers.length,
         quiet: customers.filter((c) => (c.lastOrderAt ?? 0) < Date.now() - QUIET_AFTER_MS).length,
@@ -70,6 +77,12 @@ export const book = internalMutation({
   args: { shopId: v.id("shops"), channelId: v.string(), service: v.string(), when: v.string() },
   handler: async (ctx, { shopId, channelId, service, when }) => {
     if (!service.trim() || !when.trim()) throw new Error("A booking needs a service and a time");
+    // One slot, one booking. The times are free text, so the same slot is the same words, whatever the capitals or spacing.
+    const slot = (text: string) => text.trim().toLowerCase().replace(/\s+/g, " ");
+    const taken = (await ctx.db.query("bookings").withIndex("by_shop", (q) => q.eq("shopId", shopId)).collect()).some(
+      (b) => b.status === "booked" && slot(b.when) === slot(when),
+    );
+    if (taken) throw new Error(`${when.trim()} is already booked. Please pick another time.`);
     const customerId = await findOrCreateCustomer(ctx, shopId, channelId);
     await ctx.db.insert("bookings", { shopId, customerId, service: service.trim().slice(0, 80), when: when.trim().slice(0, 60), status: "booked", reminded: false });
     return { booked: true, service: service.trim(), when: when.trim() };

@@ -20,6 +20,8 @@ export default defineSchema({
     taxRate: v.optional(v.number()),
     /** What the octopus learned about the brand, as shown on the dashboard. The same facts live in Supermemory. */
     brand: v.optional(v.object({ voice: v.string(), facts: v.array(v.string()) })),
+    /** The last invoice number handed out, so numbers run in order with no gaps. */
+    invoiceSeq: v.optional(v.number()),
     createdAt: v.number(),
   }).index("by_owner", ["ownerId"]),
 
@@ -31,6 +33,8 @@ export default defineSchema({
     available: v.boolean(),
     /** Units left. Absent means the shop does not count this item. */
     stock: v.optional(v.number()),
+    /** Reorder when stock falls to this many. Three when absent. */
+    reorderPoint: v.optional(v.number()),
   }).index("by_shop", ["shopId"]),
 
   customers: defineTable({
@@ -50,6 +54,8 @@ export default defineSchema({
     status: v.union(v.literal("new"), v.literal("accepted"), v.literal("ready"), v.literal("cancelled")),
     paymentStatus: v.union(v.literal("unpaid"), v.literal("paid")),
     paymentLink: v.optional(v.string()),
+    /** Set the first time an invoice is made for the order. */
+    invoiceNumber: v.optional(v.number()),
     createdAt: v.number(),
   })
     .index("by_shop", ["shopId"])
