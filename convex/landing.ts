@@ -128,6 +128,7 @@ body.dash main { padding-top:0; }
 .dhero .stats span { color:#B9AEDA; }
 .dhero .links { display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:14px; font-size:.92rem; color:#CFC6E6; }
 .dhero .links a { background:var(--coral); color:var(--ink); font-weight:800; text-decoration:none; padding:10px 16px; border-radius:999px; }
+.dhero .links a.alt { background:none; border:1.5px solid var(--coral); color:var(--coral); }
 .dhero .links b { font-family:var(--display); letter-spacing:.06em; color:var(--coral); }
 .dstage { position:relative; min-height:38vh; }
 #octoDash { position:absolute; inset:-20px -40px; cursor:grab; }
@@ -199,7 +200,8 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
         <h2 id="shopName"></h2>
         <p id="source" class="src"></p>
         <div class="stats" id="stats"></div>
-        <div class="links"><a id="storeLink" target="_blank" rel="noopener">Open your customer app</a><span>App code <b id="claim"></b></span></div>
+        <div class="links"><a id="storeLink" target="_blank" rel="noopener">Open customer app</a><a id="iphoneLink" class="alt" href="#">Open owner app on iPhone</a><span>App code <b id="claim"></b></span></div>
+        <p class="src" id="iphoneNote" style="margin:10px 0 0"></p>
       </div>
       <div class="dstage"><div id="octoDash" aria-label="3D octopus. Drag to turn it."></div></div>
     </div>
@@ -341,6 +343,14 @@ async function refresh() {
   live('l12', money(u.tax.taxCents), 'tax in sales');
   const FS = { building: 'Capy is building it', built: 'Built and reviewed, releasing', live: 'Live in your customer app', failed: 'Not shipped' };
   $('features').innerHTML = u.features.map((f) => '<div class="alert" style="background:#EFE9FB;border-color:#D9D0EC;color:#3A1D6E"><i style="background:' + (f.status === 'live' ? '#1E9E55' : f.status === 'failed' ? '#B3261A' : '#5B2EE5') + '"></i><span><b>' + FS[f.status] + ':</b> ' + esc(f.request) + '</span></div>').join('');
+  const phone = s.phoneRuns.find((r) => r.kind === 'device');
+  if (phone && phone.status === 'open' && phone.url) {
+    $('iphoneLink').href = phone.url; $('iphoneLink').target = '_blank'; $('iphoneLink').rel = 'noopener'; $('iphoneLink').dataset.ready = '1';
+    $('iphoneNote').textContent = wantPhone ? 'Your cloud iPhone is ready. Tap the button again to open it.' : '';
+    if (wantPhone) { wantPhone = false; window.open(phone.url, '_blank'); }
+  } else if (phone && (phone.status === 'queued' || phone.status === 'running')) {
+    $('iphoneNote').textContent = 'Starting a cloud iPhone on Revyl. About a minute.';
+  }
   const PS = { queued: 'Waiting for a phone', running: 'Running on a cloud iPhone', passed: 'Passed', failed: 'Failed', open: 'Live' };
   $('phoneRuns').innerHTML = s.phoneRuns.map((r) => '<div class="line3"><span>' + esc(r.name) + '<small>' + PS[r.status] + '</small></span><span></span>' + (r.url ? '<a class="tog" style="text-decoration:none;border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;font-weight:700;font-size:.82rem;color:var(--ink)" target="_blank" rel="noopener" href="' + esc(r.url) + '">' + (r.kind === 'device' ? 'Open phone' : 'Watch report') + '</a>' : '<span></span>') + '</div>').join('');
   $('payLines').innerHTML = [['Collected today', d.today.paidCents], ['Still unpaid', d.today.unpaidCents], ['Average order', d.today.averageCents]].map((r) => '<div class="row"><span>' + r[0] + '</span><b>' + money(r[1]) + '</b></div>').join('');
@@ -364,7 +374,14 @@ async function refresh() {
   }).join('') : '<p class="empty">No orders yet. Text your line, or try the customer chat.</p>';
 }
 
-let sales = [], taxInfo = { rate: 0 };
+let sales = [], taxInfo = { rate: 0 }, wantPhone = false;
+$('iphoneLink').addEventListener('click', (e) => {
+  if ($('iphoneLink').dataset.ready === '1') return;
+  e.preventDefault();
+  wantPhone = true;
+  $('iphoneNote').textContent = 'Starting a cloud iPhone on Revyl. About a minute.';
+  post('/public/phone', { kind: 'device' }).then(refresh).catch((err) => { $('iphoneNote').textContent = err.message; });
+});
 const toast = (text) => { $('toast').textContent = text; setTimeout(() => { if ($('toast').textContent === text) $('toast').textContent = ''; }, 5000); };
 const DONE = { announce: 'Announcement sent to ', winback: 'Win-back text sent to ', chaseUnpaid: 'Payment reminder sent to ', askReviews: 'Review request sent to ' };
 async function act(action, extra, button) {
