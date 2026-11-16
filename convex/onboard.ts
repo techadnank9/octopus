@@ -145,6 +145,7 @@ export const fromWeb = internalAction({
     const shopId = await ctx.runMutation(internal.onboard.createShop, { name, hours: draft.hours ?? undefined, currency, claimCode, items });
     if (draft.about) await remember(brain.shopNotes(shopId), `About the shop: ${draft.about}`);
     if (site) await ctx.scheduler.runAfter(0, internal.onboard.addImages, { shopId, website: site });
+    else await ctx.scheduler.runAfter(0, internal.onboard.illustrate, { shopId });
     await ctx.scheduler.runAfter(0, internal.onboard.categorize, { shopId });
     // Learn the brand in the background so the dashboard opens straight away.
     await ctx.scheduler.runAfter(0, internal.onboard.learnBrand, { shopId, source: site ?? told ?? name });
@@ -367,7 +368,9 @@ export const addImages = internalAction({
   args: { shopId: v.id("shops"), website: v.string() },
   handler: async (ctx, { shopId, website }): Promise<{ matched: number }> => {
     const photos = [...(await productImages(website)).entries()].map(([name, imageUrl]) => ({ name, imageUrl }));
-    return { matched: await ctx.runMutation(internal.onboard.setImages, { shopId, photos }) };
+    const matched = await ctx.runMutation(internal.onboard.setImages, { shopId, photos });
+    await ctx.scheduler.runAfter(0, internal.onboard.illustrate, { shopId });
+    return { matched };
   },
 });
 
@@ -414,5 +417,57 @@ export const categorize = internalAction({
       .map((row) => ({ id: items[row.n].id, category: row.category.trim().slice(0, 40) }));
     await ctx.runMutation(internal.onboard.setCategories, { rows });
     return { categories: [...new Set(rows.map((r) => r.category))] };
+  },
+});
+
+export const unpictured = internalQuery({
+  args: { shopId: v.id("shops") },
+  handler: async (ctx, { shopId }) => {
+    const shop = await ctx.db.get(shopId);
+    const items = await ctx.db.query("items").withIndex("by_shop", (q) => q.eq("shopId", shopId)).collect();
+    return { shopName: shop?.name ?? "", items: items.filter((i) => !i.imageUrl).slice(0, 16).map((i) => ({ id: i._id, name: i.name, category: i.category ?? "" })) };
+  },
+});
+
+export const setImage = internalMutation({
+  args: { id: v.id("items"), imageUrl: v.string() },
+  handler: (ctx, { id, imageUrl }) => ctx.db.patch(id, { imageUrl }),
+});
+
+/**
+ * A shop described in a sentence has no website to take photos from, so every item without a photo
+ * gets a generated one. Real photos from the shop's own site always win; this only fills gaps.
+ */
+export const illustrate = internalAction({
+  args: { shopId: v.id("shops") },
+  handler: async (ctx, { shopId }): Promise<{ made: number }> => {
+    const key = process.env.OPENAI_API_KEY;
+    if (!key) return { made: 0 };
+    const { shopName, items } = await ctx.runQuery(internal.onboard.unpictured, { shopId });
+    const made = await Promise.all(
+      items.map(async (item) => {
+        const res = await fetch("https://api.openai.com/v1/images/generations", {
+          method: "POST",
+          headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
+          body: JSON.stringify({
+            model: process.env.IMAGE_MODEL ?? "gpt-image-1-mini",
+            size: "1024x1024",
+            quality: "low",
+            prompt: `Appetising, realistic product photo for the catalog of "${shopName}": ${item.name}${item.category ? ` (${item.category})` : ""}. One subject, centred, soft natural light, plain light background, square, no text, no logos, no people's faces.`,
+          }),
+        });
+        if (!res.ok) return false;
+        const body = (await res.json()) as { data?: { b64_json?: string }[] };
+        const encoded = body.data?.[0]?.b64_json;
+        if (!encoded) return false;
+        const bytes = Uint8Array.from(atob(encoded), (c) => c.charCodeAt(0));
+        const storageId = await ctx.storage.store(new Blob([bytes], { type: "image/png" }));
+        const url = await ctx.storage.getUrl(storageId);
+        if (!url) return false;
+        await ctx.runMutation(internal.onboard.setImage, { id: item.id, imageUrl: url });
+        return true;
+      }),
+    );
+    return { made: made.filter(Boolean).length };
   },
 });
