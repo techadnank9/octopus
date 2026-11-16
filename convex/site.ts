@@ -114,7 +114,7 @@ export function addSiteRoutes(http: HttpRouter) {
       ctx.runMutation(internal.phone.request, {
         kind: body.kind === "test" ? "test" : body.kind === "store" ? "store" : "device",
         name: typeof body.name === "string" ? body.name : undefined,
-        shopId: body.kind === "store" ? shopOf(body) : undefined,
+        shopId: body.kind === "test" ? undefined : shopOf(body),
       }),
     ),
   });

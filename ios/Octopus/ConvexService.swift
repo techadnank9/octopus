@@ -20,6 +20,11 @@ struct ConvexService {
         client.subscribe(to: "shops:mine", with: ["ownerId": ownerId], yielding: Shop?.self)
     }
 
+    /// One shop by its id, used when the app was opened from a link to that shop.
+    func shop(id: String) -> AnyPublisher<Shop?, ClientError> {
+        client.subscribe(to: "shops:byId", with: ["shopId": id], yielding: Shop?.self)
+    }
+
     func createShop(ownerId: String, name: String, hours: String?) async throws {
         var args: [String: ConvexEncodable?] = ["ownerId": ownerId, "name": name]
         if let hours { args["hours"] = hours }

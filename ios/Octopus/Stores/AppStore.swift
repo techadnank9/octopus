@@ -11,6 +11,8 @@ final class AppStore: ObservableObject {
 
     @Published private(set) var phase: Phase = .loading
 
+    static let openShopKey = "openShopId"
+
     let ownerId = OwnerIdentity.id
     private var task: Task<Void, Never>?
     private var timeout: Task<Void, Never>?
@@ -29,11 +31,19 @@ final class AppStore: ObservableObject {
         task?.cancel()
         timeout?.cancel()
         phase = .loading
-        let shops = ConvexService.shared.shop(ownerId: ownerId).values
+        let openShopId = UserDefaults.standard.string(forKey: Self.openShopKey)
+        let shops = openShopId.map { ConvexService.shared.shop(id: $0).values }
+            ?? ConvexService.shared.shop(ownerId: ownerId).values
         task = Task { [weak self] in
             do {
                 for try await shop in shops {
                     self?.attempts = 0
+                    if shop == nil, openShopId != nil {
+                        // The linked shop is gone, so go back to this device's own shop.
+                        UserDefaults.standard.removeObject(forKey: Self.openShopKey)
+                        self?.watchShop()
+                        return
+                    }
                     Money.currencyCode = (shop?.currency ?? "usd").uppercased()
                     self?.phase = shop.map(Phase.ready) ?? .needsSetup
                 }
@@ -52,6 +62,16 @@ final class AppStore: ObservableObject {
                 self.phase = .failed("This is taking too long. Check your connection and try again.")
             }
         }
+    }
+
+    /// Opens the shop named in a link like octopus://shop/<shopId>.
+    func open(url: URL) {
+        guard url.scheme == "octopus", url.host == "shop" else { return }
+        let shopId = url.pathComponents.first { $0 != "/" } ?? ""
+        guard !shopId.isEmpty else { return }
+        UserDefaults.standard.set(shopId, forKey: Self.openShopKey)
+        attempts = 0
+        watchShop()
     }
 
     func createShop(name: String) async throws {

@@ -29,5 +29,6 @@ struct RootView: View {
             }
         }
         .screenBackground()
+        .onOpenURL { store.open(url: $0) }
     }
 }

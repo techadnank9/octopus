@@ -32,3 +32,9 @@ export const refreshChannelLink = internalMutation({
     for (const shop of await ctx.db.query("shops").collect()) await ctx.db.patch(shop._id, { channelLink: link });
   },
 });
+
+/** Opens a shop by id. Used when the dashboard launches the owner app on a cloud iPhone for a given shop. */
+export const byId = query({
+  args: { shopId: v.id("shops") },
+  handler: (ctx, { shopId }) => ctx.db.get(shopId),
+});

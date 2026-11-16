@@ -1,0 +1,446 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		08367335BD84AC48BA14E1E9 /* PlainError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06DBD16B7F84C130F01ECC91 /* PlainError.swift */; };
+		0900BABDD59BB7BEEB95A2E1 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D9CD875B17C6636D8420E0 /* Theme.swift */; };
+		1E5CC1487127E0107142A1DE /* OctopusShopApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D15E3F0E9763FF61FFCC699 /* OctopusShopApp.swift */; };
+		1F94185BF46DD359D8445720 /* ShopPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A8E84B7BFF2F2AE122BFBF /* ShopPickerView.swift */; };
+		2809D12717D75DA32834A8D5 /* ConvexMobile in Frameworks */ = {isa = PBXBuildFile; productRef = B524653C17F4CB8AA9AE731B /* ConvexMobile */; };
+		3146377B013DC0D53964ADF4 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2468A827A108D71855D6D8 /* MainTabView.swift */; };
+		3BA7FA0E5C0E48863EB83FF8 /* ConvexService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB77F3D87AAF2E3BF7CAEF22 /* ConvexService.swift */; };
+		43B5188465F8A1D48EDA7861 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6634239DAAE54123A69C7EC2 /* Assets.xcassets */; };
+		528542D80D33E817BE87B59B /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8455259B7CBB12B08C487953 /* ReviewView.swift */; };
+		588AFE1C9B61B4DB83572C83 /* FormField.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9AC026E3C2B042A989DD921 /* FormField.swift */; };
+		62BBD3C93067B6CC67D1494E /* ShopStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A35EE384A252E867A4C37D5 /* ShopStore.swift */; };
+		875493C5E5928F4C012FF512 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A078F43795F38A47C225DFE /* MenuView.swift */; };
+		8AFD47B7386C0E563B7E01C7 /* BookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF4D29731254C47318820001 /* BookView.swift */; };
+		8EC72D6CBCEAEC3E942A6A64 /* ChatBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3848EC980A86E7AB7174FC2 /* ChatBubble.swift */; };
+		961DCC5EEE538BEA5D5829AB /* MenuItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8A0A3F86DD49FBBD23BCA5 /* MenuItemRow.swift */; };
+		B6D15A6773006746CF874F12 /* AskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59D6549BC716CF7CC4EFEF2 /* AskView.swift */; };
+		C15C9AD34E2E14BDC85CAD20 /* CheckoutSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4393798D65459A8020E06B72 /* CheckoutSheet.swift */; };
+		C9F1B56E74991C9F7061D223 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3AD44525E3C188FD9E2CB3 /* RootView.swift */; };
+		D3822387DC98D30F28DE1687 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858CE614E0D003808AF67217 /* Money.swift */; };
+		D64258A79B806A106387FF77 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2A58D8312CB21136AF230A6 /* Device.swift */; };
+		D6DF99008D846F5E4837E523 /* ChatStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BD052C9593A89089902708A /* ChatStore.swift */; };
+		E7024D828ED9BE4D76F22AD1 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DC9765E6D99DB8FC9F884A /* Models.swift */; };
+		FE8987EB2A6C8EA1CE80E85C /* OrderStatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08558A70371543EC6D48744 /* OrderStatusCard.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		06DBD16B7F84C130F01ECC91 /* PlainError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainError.swift; sourceTree = "<group>"; };
+		3A078F43795F38A47C225DFE /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
+		3BD052C9593A89089902708A /* ChatStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStore.swift; sourceTree = "<group>"; };
+		4393798D65459A8020E06B72 /* CheckoutSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutSheet.swift; sourceTree = "<group>"; };
+		4D15E3F0E9763FF61FFCC699 /* OctopusShopApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OctopusShopApp.swift; sourceTree = "<group>"; };
+		6634239DAAE54123A69C7EC2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8455259B7CBB12B08C487953 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
+		858CE614E0D003808AF67217 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
+		8E2468A827A108D71855D6D8 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		93A8E84B7BFF2F2AE122BFBF /* ShopPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopPickerView.swift; sourceTree = "<group>"; };
+		9A35EE384A252E867A4C37D5 /* ShopStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopStore.swift; sourceTree = "<group>"; };
+		A9AC026E3C2B042A989DD921 /* FormField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormField.swift; sourceTree = "<group>"; };
+		AA3AD44525E3C188FD9E2CB3 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		BB77F3D87AAF2E3BF7CAEF22 /* ConvexService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvexService.swift; sourceTree = "<group>"; };
+		BF71B94A6056C7695C17C436 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		C08558A70371543EC6D48744 /* OrderStatusCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderStatusCard.swift; sourceTree = "<group>"; };
+		C2A58D8312CB21136AF230A6 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
+		E2591ECE4FD712177D31FB72 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		E4DC9765E6D99DB8FC9F884A /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		E4E8400BE663D1CDDCC02223 /* OctopusShop.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = OctopusShop.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8D9CD875B17C6636D8420E0 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		EF4D29731254C47318820001 /* BookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookView.swift; sourceTree = "<group>"; };
+		F3848EC980A86E7AB7174FC2 /* ChatBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubble.swift; sourceTree = "<group>"; };
+		F59D6549BC716CF7CC4EFEF2 /* AskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskView.swift; sourceTree = "<group>"; };
+		FE8A0A3F86DD49FBBD23BCA5 /* MenuItemRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuItemRow.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C2CD6D23F725D9E76AF0A5A0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2809D12717D75DA32834A8D5 /* ConvexMobile in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0A9577ADC01DB7DA1E800A79 /* OctopusShop */ = {
+			isa = PBXGroup;
+			children = (
+				6634239DAAE54123A69C7EC2 /* Assets.xcassets */,
+				BB77F3D87AAF2E3BF7CAEF22 /* ConvexService.swift */,
+				C2A58D8312CB21136AF230A6 /* Device.swift */,
+				E2591ECE4FD712177D31FB72 /* Info.plist */,
+				E4DC9765E6D99DB8FC9F884A /* Models.swift */,
+				858CE614E0D003808AF67217 /* Money.swift */,
+				4D15E3F0E9763FF61FFCC699 /* OctopusShopApp.swift */,
+				06DBD16B7F84C130F01ECC91 /* PlainError.swift */,
+				E8D9CD875B17C6636D8420E0 /* Theme.swift */,
+				3AACCA334854CD966C3858CB /* Stores */,
+				192B809E20EAE292F3F8C770 /* Views */,
+			);
+			path = OctopusShop;
+			sourceTree = "<group>";
+		};
+		192B809E20EAE292F3F8C770 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F59D6549BC716CF7CC4EFEF2 /* AskView.swift */,
+				EF4D29731254C47318820001 /* BookView.swift */,
+				F3848EC980A86E7AB7174FC2 /* ChatBubble.swift */,
+				4393798D65459A8020E06B72 /* CheckoutSheet.swift */,
+				A9AC026E3C2B042A989DD921 /* FormField.swift */,
+				8E2468A827A108D71855D6D8 /* MainTabView.swift */,
+				FE8A0A3F86DD49FBBD23BCA5 /* MenuItemRow.swift */,
+				3A078F43795F38A47C225DFE /* MenuView.swift */,
+				C08558A70371543EC6D48744 /* OrderStatusCard.swift */,
+				8455259B7CBB12B08C487953 /* ReviewView.swift */,
+				AA3AD44525E3C188FD9E2CB3 /* RootView.swift */,
+				93A8E84B7BFF2F2AE122BFBF /* ShopPickerView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		3AACCA334854CD966C3858CB /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+				3BD052C9593A89089902708A /* ChatStore.swift */,
+				9A35EE384A252E867A4C37D5 /* ShopStore.swift */,
+			);
+			path = Stores;
+			sourceTree = "<group>";
+		};
+		C4FD9435A5F137711834A4FA = {
+			isa = PBXGroup;
+			children = (
+				0A9577ADC01DB7DA1E800A79 /* OctopusShop */,
+				E2A25E27D08D0E9F7BA0691D /* shop-ios */,
+				D3F72C1671D22A19EA51874C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D3F72C1671D22A19EA51874C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E4E8400BE663D1CDDCC02223 /* OctopusShop.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E2A25E27D08D0E9F7BA0691D /* shop-ios */ = {
+			isa = PBXGroup;
+			children = (
+				BF71B94A6056C7695C17C436 /* Config.xcconfig */,
+			);
+			name = "shop-ios";
+			path = .;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6EFB19BFAD51A342A133D15A /* OctopusShop */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 296754DB19C808D02E2ADA8E /* Build configuration list for PBXNativeTarget "OctopusShop" */;
+			buildPhases = (
+				0E968274D9F32B5E347FF0E7 /* Sources */,
+				538C0650B8DE302C9C506175 /* Resources */,
+				C2CD6D23F725D9E76AF0A5A0 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OctopusShop;
+			packageProductDependencies = (
+				B524653C17F4CB8AA9AE731B /* ConvexMobile */,
+			);
+			productName = OctopusShop;
+			productReference = E4E8400BE663D1CDDCC02223 /* OctopusShop.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A7DE9CE8EB9A344C673CBE8A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 02A0D190C99950DF51227875 /* Build configuration list for PBXProject "OctopusShop" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = C4FD9435A5F137711834A4FA;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B4F85AA09B33E33A516F7542 /* XCRemoteSwiftPackageReference "convex-swift" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = D3F72C1671D22A19EA51874C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6EFB19BFAD51A342A133D15A /* OctopusShop */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		538C0650B8DE302C9C506175 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				43B5188465F8A1D48EDA7861 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0E968274D9F32B5E347FF0E7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B6D15A6773006746CF874F12 /* AskView.swift in Sources */,
+				8AFD47B7386C0E563B7E01C7 /* BookView.swift in Sources */,
+				8EC72D6CBCEAEC3E942A6A64 /* ChatBubble.swift in Sources */,
+				D6DF99008D846F5E4837E523 /* ChatStore.swift in Sources */,
+				C15C9AD34E2E14BDC85CAD20 /* CheckoutSheet.swift in Sources */,
+				3BA7FA0E5C0E48863EB83FF8 /* ConvexService.swift in Sources */,
+				D64258A79B806A106387FF77 /* Device.swift in Sources */,
+				588AFE1C9B61B4DB83572C83 /* FormField.swift in Sources */,
+				3146377B013DC0D53964ADF4 /* MainTabView.swift in Sources */,
+				961DCC5EEE538BEA5D5829AB /* MenuItemRow.swift in Sources */,
+				875493C5E5928F4C012FF512 /* MenuView.swift in Sources */,
+				E7024D828ED9BE4D76F22AD1 /* Models.swift in Sources */,
+				D3822387DC98D30F28DE1687 /* Money.swift in Sources */,
+				1E5CC1487127E0107142A1DE /* OctopusShopApp.swift in Sources */,
+				FE8987EB2A6C8EA1CE80E85C /* OrderStatusCard.swift in Sources */,
+				08367335BD84AC48BA14E1E9 /* PlainError.swift in Sources */,
+				528542D80D33E817BE87B59B /* ReviewView.swift in Sources */,
+				C9F1B56E74991C9F7061D223 /* RootView.swift in Sources */,
+				1F94185BF46DD359D8445720 /* ShopPickerView.swift in Sources */,
+				62BBD3C93067B6CC67D1494E /* ShopStore.swift in Sources */,
+				0900BABDD59BB7BEEB95A2E1 /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2A4D8A8CE6215595FDEB4E56 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
+				INFOPLIST_FILE = OctopusShop/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.octopus.customer;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		45C01607C4CF4DE67ED226C2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF71B94A6056C7695C17C436 /* Config.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		D1C88E3780ABCEFDBA2DC2E1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF71B94A6056C7695C17C436 /* Config.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		F03750D536603EF99E9E5FDC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
+				INFOPLIST_FILE = OctopusShop/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.octopus.customer;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		02A0D190C99950DF51227875 /* Build configuration list for PBXProject "OctopusShop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1C88E3780ABCEFDBA2DC2E1 /* Debug */,
+				45C01607C4CF4DE67ED226C2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		296754DB19C808D02E2ADA8E /* Build configuration list for PBXNativeTarget "OctopusShop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F03750D536603EF99E9E5FDC /* Debug */,
+				2A4D8A8CE6215595FDEB4E56 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B4F85AA09B33E33A516F7542 /* XCRemoteSwiftPackageReference "convex-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/get-convex/convex-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.8.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B524653C17F4CB8AA9AE731B /* ConvexMobile */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B4F85AA09B33E33A516F7542 /* XCRemoteSwiftPackageReference "convex-swift" */;
+			productName = ConvexMobile;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A7DE9CE8EB9A344C673CBE8A /* Project object */;
+}

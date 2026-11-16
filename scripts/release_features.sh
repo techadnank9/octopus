@@ -58,7 +58,7 @@ run_phone() { # id kind name target
   st=failed; url=""
   if [ "$2" = "device" ]; then
     # Owner app: a cloud iPhone with the Octopus app installed and launched.
-    url=$(cd ios && revyl device start --app-id "$REVYL_APP" --json </dev/null 2>/dev/null | viewer_of viewer_url)
+    url=$(cd ios && revyl device start --app-id "$REVYL_APP" --app-link "$4" --json </dev/null 2>/dev/null | viewer_of viewer_url)
     [ -n "$url" ] && st=open
   elif [ "$2" = "store" ]; then
     # Customer app: a cloud iPhone with the shop's page opened in Safari.

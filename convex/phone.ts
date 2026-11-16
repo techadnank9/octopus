@@ -7,14 +7,15 @@ export const TESTS = ["create-shop-and-menu", "order-arrives-live", "accept-then
 export const request = internalMutation({
   args: { kind: v.union(v.literal("device"), v.literal("store"), v.literal("test")), name: v.optional(v.string()), shopId: v.optional(v.id("shops")) },
   handler: async (ctx, { kind, name, shopId }) => {
-    if (kind === "store" && !shopId) throw new Error("Which shop?");
+    if (kind !== "test" && !shopId) throw new Error("Which shop?");
     if (kind === "test" && !TESTS.includes(name as (typeof TESTS)[number])) throw new Error("Unknown test");
     const waiting = (await ctx.db.query("phoneRuns").order("desc").take(10)).filter((r) => r.status === "queued" || r.status === "running");
     if (waiting.length >= 3) throw new Error("Three runs are already in progress. Wait for one to finish.");
     await ctx.db.insert("phoneRuns", {
       kind,
       name: kind === "test" ? name! : kind === "store" ? "Customer app on iPhone" : "Owner app on iPhone",
-      target: kind === "store" ? `${process.env.CONVEX_SITE_URL}/shop?id=${shopId}` : undefined,
+      // Deep links: the owner app and the customer app each open straight into this shop.
+      target: kind === "store" ? `octopusshop://shop/${shopId}` : kind === "device" ? `octopus://shop/${shopId}` : undefined,
       status: "queued",
     });
     return { queued: true };

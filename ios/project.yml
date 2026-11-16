@@ -26,6 +26,10 @@ targets:
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: "1"
         CONVEX_URL: $(CONVEX_URL)
+        CFBundleURLTypes:
+          - CFBundleURLName: com.octopus.shop
+            CFBundleURLSchemes:
+              - octopus
         NSCameraUsageDescription: Octopus uses the camera to read your menu.
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
