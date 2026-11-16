@@ -161,6 +161,7 @@ footer a { display:inline-block; padding:12px 2px; margin:-12px 0; }
     <div id="status"></div>
     <label class="search">Search the menu<input id="menuSearch" type="search" placeholder="Search the menu"></label>
     <button type="button" class="favourites-filter" id="favouritesFilter" aria-pressed="false" aria-controls="menu">Favourites</button>
+    <button type="button" class="ghost" id="allItems" hidden>Show full menu</button>
     <p class="menu-count" id="menuCount" hidden></p>
     <div id="menu"></div>
   </section>
@@ -235,8 +236,11 @@ async function call(path, body) {
 function drawMenu() {
   const query = $('menuSearch').value.trim().toLowerCase();
   const matches = items.filter((i) => i.name.toLowerCase().includes(query) && (!favouritesOnly || favourites.has(i.name)));
-  $('menuCount').hidden = items.length <= 12;
-  $('menuCount').textContent = items.length + ' items';
+  const savedCount = items.filter((i) => favourites.has(i.name)).length;
+  $('favouritesFilter').textContent = 'Favourites (' + savedCount + ')';
+  $('allItems').hidden = !favouritesOnly;
+  $('menuCount').hidden = !favouritesOnly && items.length <= 12;
+  $('menuCount').textContent = favouritesOnly ? matches.length + ' of ' + savedCount + ' favourites' : items.length + ' items';
   $('menu').innerHTML = matches.length ? matches.map((i) => {
     const n = cart[i.name] || 0;
     const stepper = !i.available ? '<span class="price">Sold out</span>'
@@ -289,6 +293,13 @@ $('favouritesFilter').onclick = () => {
   favouritesOnly = !favouritesOnly;
   $('favouritesFilter').setAttribute('aria-pressed', String(favouritesOnly));
   drawMenu();
+};
+$('allItems').onclick = () => {
+  favouritesOnly = false;
+  $('menuSearch').value = '';
+  $('favouritesFilter').setAttribute('aria-pressed', 'false');
+  drawMenu();
+  $('favouritesFilter').focus();
 };
 $('menu').addEventListener('click', (e) => {
   const heart = e.target.closest('button[data-favourite]');
