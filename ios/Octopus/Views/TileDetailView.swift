@@ -1,40 +1,32 @@
 import SwiftUI
 
-/// The sheet behind a dashboard tile: that function's detail and actions.
+/// The page behind a dashboard tile: that function's detail and actions.
 struct TileDetailView: View {
     let kind: TileKind
     let dashboard: Dashboard?
     @ObservedObject var store: SuiteStore
 
-    @Environment(\.dismiss) private var dismiss
     @State private var announcement = ""
     @State private var rate = ""
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(kind.line)
-                        .font(Theme.body)
-                        .opacity(0.7)
-                    content
-                }
-                .foregroundStyle(Theme.ink)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(kind.line)
+                    .font(Theme.body)
+                    .opacity(0.7)
+                content
             }
-            .scrollDismissesKeyboard(.interactively)
-            .screenBackground()
-            .navigationTitle(kind.title)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                }
-            }
-            .alert(store.message ?? "", isPresented: showsMessage) {
-                Button("OK") {}
-            }
+            .foregroundStyle(Theme.ink)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
+        }
+        .scrollDismissesKeyboard(.interactively)
+        .screenBackground()
+        .navigationTitle(kind.title)
+        .navigationBarTitleDisplayMode(.large)
+        .alert(store.message ?? "", isPresented: showsMessage) {
+            Button("OK") {}
         }
     }
 

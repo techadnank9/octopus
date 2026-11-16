@@ -22,10 +22,12 @@ struct Item: Decodable, Equatable, Identifiable {
     let available: Bool
     /// Units left. Nil when the owner is not counting this item.
     @OptionalConvexFloat var stock: Double?
+    /// The menu section this item belongs to, for example "Rice and grains".
+    let category: String?
 
     enum CodingKeys: String, CodingKey {
         case id = "_id"
-        case name, priceCents, description, available, stock
+        case name, priceCents, description, available, stock, category
     }
 }
 

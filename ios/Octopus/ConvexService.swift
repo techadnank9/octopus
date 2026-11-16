@@ -42,10 +42,17 @@ struct ConvexService {
         client.subscribe(to: "items:list", with: ["shopId": shopId], yielding: [Item].self)
     }
 
-    func saveItem(shopId: String, id: String?, name: String, priceCents: Double) async throws {
+    /// Returns the id of the saved item.
+    @discardableResult
+    func saveItem(shopId: String, id: String?, name: String, priceCents: Double) async throws -> String {
         var args: [String: ConvexEncodable?] = ["shopId": shopId, "name": name, "priceCents": priceCents]
         if let id { args["id"] = id }
-        let _: String = try await client.mutation("items:save", with: args)
+        return try await client.mutation("items:save", with: args)
+    }
+
+    /// Pass an empty string to clear the category.
+    func setCategory(id: String, category: String) async throws {
+        try await client.mutation("items:setCategory", with: ["id": id, "category": category])
     }
 
     func removeItem(id: String) async throws {

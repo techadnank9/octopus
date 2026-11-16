@@ -1,5 +1,14 @@
 import UIKit
 
+/// One section of the menu. A nil category holds the uncategorised items.
+struct ItemGroup: Identifiable {
+    let category: String?
+    var items: [Item]
+
+    var id: String { category ?? "" }
+    var title: String { "\(category ?? "Uncategorised"), \(items.count)" }
+}
+
 @MainActor
 final class MenuStore: ObservableObject {
     @Published private(set) var items: [Item] = []
@@ -42,10 +51,39 @@ final class MenuStore: ObservableObject {
         }
     }
 
-    func save(id: String?, name: String, priceCents: Double) async {
+    /// Items grouped by category in the order first seen, with uncategorised items last.
+    var groups: [ItemGroup] {
+        var named: [ItemGroup] = []
+        var loose: [Item] = []
+        for item in items {
+            guard let category = item.category, !category.isEmpty else {
+                loose.append(item)
+                continue
+            }
+            if let index = named.firstIndex(where: { $0.category == category }) {
+                named[index].items.append(item)
+            } else {
+                named.append(ItemGroup(category: category, items: [item]))
+            }
+        }
+        if !loose.isEmpty { named.append(ItemGroup(category: nil, items: loose)) }
+        return named
+    }
+
+    /// The shop's existing categories, in the order first seen.
+    var categories: [String] {
+        groups.compactMap(\.category)
+    }
+
+    /// Pass a category only when it changed. An empty string clears it.
+    func save(id: String?, name: String, priceCents: Double, category: String?) async {
         let shopId = shopId
         await run {
-            try await ConvexService.shared.saveItem(shopId: shopId, id: id, name: name, priceCents: priceCents)
+            let savedId = try await ConvexService.shared.saveItem(
+                shopId: shopId, id: id, name: name, priceCents: priceCents)
+            if let category {
+                try await ConvexService.shared.setCategory(id: id ?? savedId, category: category)
+            }
         }
     }
 

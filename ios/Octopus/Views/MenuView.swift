@@ -36,18 +36,23 @@ struct MenuView: View {
                 .listRowSeparator(.hidden)
 
                 Section("Your menu") {
-                    ForEach(store.items) { item in
-                        ItemRow(item: item, store: store) { draft = ItemDraft(item: item) }
-                    }
-                    .onDelete { offsets in
-                        let removed = offsets.map { store.items[$0] }
-                        Task { for item in removed { await store.remove(item) } }
-                    }
                     Button { draft = ItemDraft() } label: {
                         Label("Add item", systemImage: "plus")
                             .font(Theme.headline)
                             .foregroundStyle(Theme.purple)
                             .frame(minHeight: 44)
+                    }
+                }
+
+                ForEach(store.groups) { group in
+                    Section(group.title) {
+                        ForEach(group.items) { item in
+                            ItemRow(item: item, store: store) { draft = ItemDraft(item: item) }
+                        }
+                        .onDelete { offsets in
+                            let removed = offsets.map { group.items[$0] }
+                            Task { for item in removed { await store.remove(item) } }
+                        }
                     }
                 }
             }
@@ -56,8 +61,12 @@ struct MenuView: View {
             .screenBackground()
             .navigationTitle("Menu")
             .sheet(item: $draft) { draft in
-                ItemEditorView(draft: draft) { name, priceCents in
-                    Task { await store.save(id: draft.itemId, name: name, priceCents: priceCents) }
+                ItemEditorView(draft: draft, suggestions: store.categories) { name, priceCents, category in
+                    Task {
+                        await store.save(
+                            id: draft.itemId, name: name, priceCents: priceCents,
+                            category: category == draft.category ? nil : category)
+                    }
                 }
             }
             .fullScreenCover(isPresented: $showCamera) {

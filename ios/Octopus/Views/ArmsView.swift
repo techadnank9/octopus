@@ -6,7 +6,6 @@ struct ArmsView: View {
 
     @StateObject private var dashboard: DashboardStore
     @StateObject private var store: SuiteStore
-    @State private var selected: TileKind?
 
     private static let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible())]
     private static let heroShare = 0.4
@@ -19,23 +18,26 @@ struct ArmsView: View {
     }
 
     var body: some View {
-        GeometryReader { screen in
-            let heroHeight = screen.size.height * Self.heroShare
-            ZStack(alignment: .top) {
-                hero(height: heroHeight)
-                ScrollView {
-                    tiles
-                        .frame(minHeight: screen.size.height - heroHeight, alignment: .top)
-                        .background(
-                            Theme.background,
-                            in: UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28))
-                        .padding(.top, heroHeight)
+        NavigationStack {
+            GeometryReader { screen in
+                let heroHeight = screen.size.height * Self.heroShare
+                ZStack(alignment: .top) {
+                    hero(height: heroHeight)
+                    ScrollView {
+                        tiles
+                            .frame(minHeight: screen.size.height - heroHeight, alignment: .top)
+                            .background(
+                                Theme.background,
+                                in: UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28))
+                            .padding(.top, heroHeight)
+                    }
                 }
             }
-        }
-        .background(Theme.ink.ignoresSafeArea())
-        .sheet(item: $selected) { kind in
-            TileDetailView(kind: kind, dashboard: dashboard.dashboard, store: store)
+            .background(Theme.ink.ignoresSafeArea())
+            .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(for: TileKind.self) { kind in
+                TileDetailView(kind: kind, dashboard: dashboard.dashboard, store: store)
+            }
         }
     }
 
@@ -62,7 +64,7 @@ struct ArmsView: View {
             LazyVGrid(columns: Self.columns, spacing: 12) {
                 ForEach(TileKind.allCases) { kind in
                     let stat = kind.stat(dashboard: dashboard.dashboard, store: store)
-                    Button { selected = kind } label: {
+                    NavigationLink(value: kind) {
                         ArmTile(kind: kind, value: stat.value, caption: stat.caption)
                     }
                     .buttonStyle(.plain)
