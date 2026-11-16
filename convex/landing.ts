@@ -4,7 +4,7 @@ export const LANDING = String.raw`<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Octopus: your shop, run by text</title>
+<title>Octopus: your shop's own app, from your website</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
@@ -321,8 +321,8 @@ form#build input,.pick select { min-height:52px; font-size:1.02rem; }
 <header class="hero">
   <div>
     <p class="brand"><i></i>Octopus</p>
-    <h1>Tell us about your shop. Your octopus runs it.</h1>
-    <p class="lede">Enter your website or your business name. In about a minute you get a menu, a text line customers can order on, pay links, and an assistant you run by message.</p>
+    <h1>Your shop's own app, from your website, in a minute.</h1>
+    <p class="lede">Enter your website. Your customers get a shopping app with your products, photos and prices. You get an octopus that runs it: it answers them, takes orders and payment, and builds new features when you text it.</p>
     <form id="build">
       <label>Your business<input id="query" type="text" placeholder="Enter website or name" autocomplete="off" autocapitalize="off"></label>
       <button class="go" id="go">Build my shop</button>
@@ -330,7 +330,7 @@ form#build input,.pick select { min-height:52px; font-size:1.02rem; }
       <p class="resume" id="resume" hidden>Already set up? <a id="resumeLink">Open your dashboard</a></p>
       <div class="pick" id="pick" hidden><label for="shops">Or open an existing shop</label><div class="pickrow"><select id="shops"></select><button type="button" id="openShop">Open</button></div></div>
       <ol class="steps" id="steps" hidden>
-        <li>Finding and reading your site</li><li>Building your menu</li><li>Opening your text line</li><li>Waking your octopus</li>
+        <li>Reading your website</li><li>Building your catalog</li><li>Creating your customer app</li><li>Waking your octopus</li>
       </ol>
     </form>
   </div>
@@ -339,9 +339,9 @@ form#build input,.pick select { min-height:52px; font-size:1.02rem; }
 
 <main>
   <section class="gets" id="gets">
-    <div><h3>Customers text, it answers</h3><p>Questions, orders and pay links, in seconds, at any hour. Only from your real menu.</p></div>
-    <div><h3>You text, it does the work</h3><p>"Banana bread is sold out." "Accept Priya's order." "What did we make today?"</p></div>
-    <div><h3>It remembers</h3><p>What you told it this morning, and what each regular likes. "Same as last time?"</p></div>
+    <div><h3>An app for your customers</h3><p>Your catalog by category, with photos, cart, pay link and live order status. Nothing to build or maintain.</p></div>
+    <div><h3>An octopus to run it</h3><p>It answers customers at any hour, takes orders and payment, sends invoices, and remembers every regular.</p></div>
+    <div><h3>New features by text</h3><p>"Add a favourites list to my app." It is built, reviewed and live in minutes, and you get a message when it is done.</p></div>
   </section>
 
   <section id="studio">
