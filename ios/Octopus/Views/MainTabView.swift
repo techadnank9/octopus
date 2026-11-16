@@ -11,14 +11,14 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
+            ArmsView(shop: shop)
+                .tabItem { Label("Home", systemImage: "house.fill") }
             OrdersView(store: orders, shopId: shop.id)
                 .tabItem { Label("Orders", systemImage: "tray.full.fill") }
             MenuView(shopId: shop.id)
                 .tabItem { Label("Menu", systemImage: "camera.fill") }
             NumberView(shop: shop)
                 .tabItem { Label("Number", systemImage: "qrcode") }
-            ArmsView(shop: shop)
-                .tabItem { Label("Arms", systemImage: "sparkles") }
             ChatView(shopId: shop.id)
                 .tabItem { Label("Octopus", systemImage: "bubble.left.and.text.bubble.right") }
         }

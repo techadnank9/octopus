@@ -25,7 +25,7 @@ test:
             - type: instructions
               step_description: Tap the primary button below the fields that sets up the shop (labelled "Set up my shop" or "Continue").
         - type: validation
-          step_description: The tab bar with Orders, Menu, Number, Arms and Octopus tabs is visible.
+          step_description: The tab bar with Home, Orders, Menu, Number and Octopus tabs is visible.
         - type: instructions
           step_description: Open the Menu tab.
         - type: if
@@ -48,6 +48,6 @@ test:
         - type: validation
           step_description: An order card with a customer name, at least one line item, a total and the status "New" is visible on the Orders screen, without any refresh.
         - type: instructions
-          step_description: Open the Arms tab.
+          step_description: Open the Home tab.
         - type: validation
-          step_description: The Arms screen shows the octopus at the top and a grid of numbered business tiles below it, and the "Sales and orders" tile shows a number of at least 1.
+          step_description: The Home screen shows the octopus at the top and a grid of numbered business tiles below it, and the "Sales and orders" tile shows a number of at least 1.

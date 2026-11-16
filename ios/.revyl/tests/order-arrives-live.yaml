@@ -25,7 +25,7 @@ test:
             - type: instructions
               step_description: Tap the primary button below the fields that sets up the shop (labelled "Set up my shop" or "Continue").
         - type: validation
-          step_description: The tab bar with Orders, Menu, Number, Arms and Octopus tabs is visible.
+          step_description: The tab bar with Home, Orders, Menu, Number and Octopus tabs is visible.
         - type: instructions
           step_description: Open the Menu tab.
         - type: if
