@@ -10,7 +10,7 @@ const channelOf = (device: string) => `demo:ios-${device.replace(/[^a-z0-9]/gi, 
 type Shops = { id: Id<"shops">; name: string; items: number; textLine: boolean }[];
 type Store = {
   shop: { name: string; currency: string; hours: string | null };
-  items: { name: string; priceCents: number; description: string | null; imageUrl: string | null; available: boolean; stock: number | null }[];
+  items: { name: string; priceCents: number; description: string | null; imageUrl: string | null; category: string | null; available: boolean; stock: number | null }[];
   order: { lines: string[]; totalCents: number; status: string; paid: boolean; paymentLink: string | null; requestedTime: string | null } | null;
 };
 

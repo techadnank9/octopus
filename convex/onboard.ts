@@ -143,6 +143,7 @@ export const fromWeb = internalAction({
     const shopId = await ctx.runMutation(internal.onboard.createShop, { name, hours: draft.hours ?? undefined, currency, claimCode, items });
     if (draft.about) await remember(brain.shopNotes(shopId), `About the shop: ${draft.about}`);
     if (site) await ctx.scheduler.runAfter(0, internal.onboard.addImages, { shopId, website: site });
+    await ctx.scheduler.runAfter(0, internal.onboard.categorize, { shopId });
     // Learn the brand in the background so the dashboard opens straight away.
     await ctx.scheduler.runAfter(0, internal.onboard.learnBrand, { shopId, source: site ?? told ?? name });
     if (draft.unpriced?.length) {
@@ -212,7 +213,7 @@ export const store = internalQuery({
     const order = id ? await ctx.db.get(id) : null;
     return {
       shop: { name: shop.name, currency: shop.currency ?? "usd", hours: shop.hours ?? null },
-      items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, description: i.description ?? null, imageUrl: i.imageUrl ?? null, available: i.available, stock: i.stock ?? null })),
+      items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, description: i.description ?? null, imageUrl: i.imageUrl ?? null, category: i.category ?? null, available: i.available, stock: i.stock ?? null })),
       order:
         order && order.shopId === shopId
           ? {
@@ -343,5 +344,51 @@ export const addImages = internalAction({
   handler: async (ctx, { shopId, website }): Promise<{ matched: number }> => {
     const photos = [...(await productImages(website)).entries()].map(([name, imageUrl]) => ({ name, imageUrl }));
     return { matched: await ctx.runMutation(internal.onboard.setImages, { shopId, photos }) };
+  },
+});
+
+export const itemNames = internalQuery({
+  args: { shopId: v.id("shops") },
+  handler: async (ctx, { shopId }) =>
+    (await ctx.db.query("items").withIndex("by_shop", (q) => q.eq("shopId", shopId)).collect()).map((i) => ({ id: i._id, name: i.name })),
+});
+
+export const setCategories = internalMutation({
+  args: { rows: v.array(v.object({ id: v.id("items"), category: v.string() })) },
+  handler: async (ctx, { rows }) => {
+    for (const row of rows) await ctx.db.patch(row.id, { category: row.category });
+  },
+});
+
+/** Sorts the catalog onto a few shelves so customers can browse instead of scrolling one long list. */
+export const categorize = internalAction({
+  args: { shopId: v.id("shops") },
+  handler: async (ctx, { shopId }): Promise<{ categories: string[] }> => {
+    const items = await ctx.runQuery(internal.onboard.itemNames, { shopId });
+    if (items.length < 6) return { categories: [] };
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "content-type": "application/json" },
+      body: JSON.stringify({
+        model: process.env.CHAT_MODEL ?? "gpt-4.1-mini",
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content:
+              'Group a shop\'s items into 3 to 7 customer-friendly categories, the way a good shopping app would (short names in sentence case, such as "Rice and grains", "Dals and pulses", "Snacks"). Every item gets exactly one category. Reply with JSON only: {"items": [{"n": number, "category": string}]} where n is the item number given.',
+          },
+          { role: "user", content: items.map((item, n) => `${n}. ${item.name}`).join("\n") },
+        ],
+      }),
+    });
+    if (!res.ok) throw new Error(`Could not sort the catalog (${res.status})`);
+    const body = (await res.json()) as { choices: { message: { content: string } }[] };
+    const sorted = (JSON.parse(body.choices[0].message.content) as { items: { n: number; category: string }[] }).items;
+    const rows = sorted
+      .filter((row) => items[row.n] && typeof row.category === "string" && row.category.trim())
+      .map((row) => ({ id: items[row.n].id, category: row.category.trim().slice(0, 40) }));
+    await ctx.runMutation(internal.onboard.setCategories, { rows });
+    return { categories: [...new Set(rows.map((r) => r.category))] };
   },
 });

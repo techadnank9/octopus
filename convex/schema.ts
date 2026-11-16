@@ -31,6 +31,8 @@ export default defineSchema({
     priceCents: v.number(),
     description: v.optional(v.string()),
     available: v.boolean(),
+    /** Shelf the item sits on in the customer app, such as "Rice and grains". */
+    category: v.optional(v.string()),
     /** Product photo taken from the shop's own website. */
     imageUrl: v.optional(v.string()),
     /** Units left. Absent means the shop does not count this item. */
