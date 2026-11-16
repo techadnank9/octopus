@@ -8,6 +8,7 @@ struct TileDetailView: View {
 
     @State private var announcement = ""
     @State private var rate = ""
+    @State private var reorderList: String?
 
     var body: some View {
         ScrollView {
@@ -41,8 +42,10 @@ struct TileDetailView: View {
                 + "Anything it cannot answer is passed to you.")
         case .updates:
             note("When you tap Accept or Ready on an order, the customer gets a text straight away.")
-        case .sales, .receipts:
-            sales
+        case .sales:
+            sales(invoicing: false)
+        case .receipts:
+            sales(invoicing: true)
         case .payments:
             row("Collected", Money.string(cents: dashboard?.today.paidCents ?? 0))
             row("Still unpaid", Money.string(cents: dashboard?.today.unpaidCents ?? 0))
@@ -57,10 +60,14 @@ struct TileDetailView: View {
         case .bookkeeping:
             sellers
             action("Send me today's total", "dailyTotal")
+            week
         case .inventory:
             reorder
+            stockPoints
             note("Change stock in the Menu tab.")
         case .reviews:
+            ratings
+            action("Reply to all unanswered (\(Int(store.suite?.unanswered ?? 0)))", "replyAll")
             reviews
             action("Ask recent customers for a review", "askReviews")
         case .taxes:
@@ -70,12 +77,18 @@ struct TileDetailView: View {
 
     // MARK: Sections
 
-    @ViewBuilder private var sales: some View {
+    @ViewBuilder private func sales(invoicing: Bool) -> some View {
         let sales = store.suite?.sales ?? []
         if sales.isEmpty { note("No sales yet today.") }
         ForEach(sales) { sale in
             VStack(alignment: .leading, spacing: 4) {
                 titleLine(sale.customer, Money.string(cents: sale.totalCents))
+                if let invoice = sale.invoice {
+                    Text(invoice)
+                        .font(Theme.caption)
+                        .monospacedDigit()
+                        .foregroundStyle(Theme.purple)
+                }
                 Text(sale.items)
                     .font(Theme.body)
                 HStack {
@@ -86,6 +99,12 @@ struct TileDetailView: View {
                         .foregroundStyle(sale.paid ? Theme.purple : Theme.coral)
                 }
                 .font(Theme.caption)
+                if invoicing {
+                    Button("Send invoice") { run("sendInvoice", id: sale.id) }
+                        .buttonStyle(PrimaryButtonStyle())
+                        .disabled(store.isRunning)
+                        .padding(.top, 4)
+                }
             }
             .card()
         }
@@ -108,6 +127,7 @@ struct TileDetailView: View {
     @ViewBuilder private var bookings: some View {
         let bookings = store.suite?.bookings ?? []
         if bookings.isEmpty { note("No bookings yet.") }
+        action("Remind all upcoming bookings", "remindAll")
         ForEach(bookings) { booking in
             VStack(alignment: .leading, spacing: 8) {
                 titleLine(booking.customer, booking.isBooked ? "Booked" : "Cancelled")
@@ -129,6 +149,16 @@ struct TileDetailView: View {
 
     @ViewBuilder private var marketing: some View {
         let text = announcement.trimmingCharacters(in: .whitespacesAndNewlines)
+        let audiences = store.suite?.audiences
+        row("Everyone you can text", "\(Int(audiences?.all ?? store.suite?.audience.all ?? 0))")
+        row("Quiet regulars", "\(Int(audiences?.quiet ?? store.suite?.audience.quiet ?? 0))")
+        row("Ordered today", "\(Int(audiences?.today ?? 0))")
+        row("Have not paid", "\(Int(audiences?.unpaid ?? 0))")
+        Button("Draft a special for me") {
+            Task { if let drafted = await store.draft("draftSpecial") { announcement = drafted } }
+        }
+        .buttonStyle(PrimaryButtonStyle())
+        .disabled(store.isRunning)
         TextField("Today's special", text: $announcement, axis: .vertical)
             .font(Theme.body)
             .lineLimit(2...5)
@@ -159,6 +189,108 @@ struct TileDetailView: View {
         if lines.isEmpty { note("Nothing to reorder.") }
         ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
             row(line.name, "\(Int(line.left)) left")
+        }
+    }
+
+    @ViewBuilder private var week: some View {
+        let days = store.suite?.week ?? []
+        if !days.isEmpty {
+            Text("Last 7 days")
+                .font(Theme.headline)
+                .padding(.top, 8)
+            Grid(alignment: .trailing, horizontalSpacing: 8, verticalSpacing: 10) {
+                GridRow {
+                    Text("Date").gridColumnAlignment(.leading)
+                    Text("Orders")
+                    Text("Gross")
+                    Text("Tax")
+                    Text("Net")
+                }
+                .opacity(0.7)
+                ForEach(days) { day in
+                    Divider()
+                    GridRow {
+                        Text(Self.shortDate(day.date))
+                        Text("\(Int(day.orders))")
+                        Text(Money.string(cents: day.grossCents))
+                        Text(Money.string(cents: day.taxCents))
+                        Text(Money.string(cents: day.netCents))
+                            .fontWeight(.bold)
+                    }
+                }
+            }
+            .font(Theme.caption)
+            .monospacedDigit()
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+            .frame(maxWidth: .infinity)
+            .card()
+        }
+    }
+
+    /// "2026-11-15" becomes "Nov 15". Anything else is shown as it came.
+    private static func shortDate(_ text: String) -> String {
+        guard let date = try? Date(text, strategy: .iso8601.year().month().day()) else { return text }
+        return date.formatted(.dateTime.month(.abbreviated).day())
+    }
+
+    @ViewBuilder private var stockPoints: some View {
+        let points = store.suite?.stockPoints ?? []
+        if !points.isEmpty {
+            Text("Stock points")
+                .font(Theme.headline)
+                .padding(.top, 8)
+        }
+        ForEach(Array(points.enumerated()), id: \.offset) { _, point in
+            HStack {
+                Text(point.name)
+                    .font(Theme.body)
+                Spacer()
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("\(Int(point.left)) left")
+                        .font(Theme.headline)
+                        .foregroundStyle(point.left <= point.point ? Theme.coral : Theme.ink)
+                    Text("Reorder at \(Int(point.point))")
+                        .font(Theme.caption)
+                        .opacity(0.7)
+                }
+            }
+            .card()
+        }
+        Button("Draft reorder list") {
+            Task { if let drafted = await store.draft("draftReorder") { reorderList = drafted } }
+        }
+        .buttonStyle(PrimaryButtonStyle())
+        .disabled(store.isRunning)
+        if let reorderList {
+            Text(reorderList)
+                .font(Theme.body)
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .card()
+        }
+    }
+
+    @ViewBuilder private var ratings: some View {
+        let ratings = store.suite?.ratings ?? []
+        let most = max(ratings.map(\.count).max() ?? 0, 1)
+        if !ratings.isEmpty {
+            VStack(spacing: 8) {
+                ForEach(Array(ratings.enumerated()), id: \.offset) { _, rating in
+                    HStack(spacing: 8) {
+                        Text("\(Int(rating.stars)) star\(rating.stars == 1 ? "" : "s")")
+                            .frame(width: 64, alignment: .leading)
+                        ProgressView(value: rating.count, total: most)
+                            .tint(Theme.purple)
+                        Text("\(Int(rating.count))")
+                            .fontWeight(.bold)
+                            .monospacedDigit()
+                            .frame(minWidth: 28, alignment: .trailing)
+                    }
+                    .font(Theme.caption)
+                }
+            }
+            .card()
         }
     }
 

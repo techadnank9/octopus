@@ -53,4 +53,17 @@ final class SuiteStore: ObservableObject {
         }
         isRunning = false
     }
+
+    /// Runs an action whose answer is shown on the page instead of in an alert. Nil when it failed.
+    func draft(_ action: String) async -> String? {
+        isRunning = true
+        defer { isRunning = false }
+        do {
+            return try await ConvexService.shared.runDashboard(
+                shopId: shopId, action: action, id: nil, text: nil, rate: nil)
+        } catch {
+            message = error.plainMessage
+            return nil
+        }
+    }
 }

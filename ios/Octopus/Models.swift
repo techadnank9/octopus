@@ -116,6 +116,43 @@ struct Suite: Decodable, Equatable {
     let reviews: [Review]
     let reorder: [ReorderLine]
     let audience: Audience
+    /// The last seven days, newest first.
+    let week: [DayTotals]?
+    let audiences: Audiences?
+    /// Five stars down to one.
+    let ratings: [RatingCount]?
+    let stockPoints: [StockPoint]?
+    /// Reviews that have no reply yet.
+    @OptionalConvexFloat var unanswered: Double?
+}
+
+struct DayTotals: Decodable, Equatable, Identifiable {
+    let date: String
+    @ConvexFloat var orders: Double
+    @ConvexFloat var grossCents: Double
+    @ConvexFloat var taxCents: Double
+    @ConvexFloat var netCents: Double
+
+    var id: String { date }
+}
+
+struct Audiences: Decodable, Equatable {
+    @ConvexFloat var all: Double
+    @ConvexFloat var quiet: Double
+    @ConvexFloat var today: Double
+    @ConvexFloat var unpaid: Double
+}
+
+struct RatingCount: Decodable, Equatable {
+    @ConvexFloat var stars: Double
+    @ConvexFloat var count: Double
+}
+
+struct StockPoint: Decodable, Equatable {
+    let name: String
+    @ConvexFloat var left: Double
+    /// Reorder when stock falls to this many.
+    @ConvexFloat var point: Double
 }
 
 struct Sale: Decodable, Equatable, Identifiable {
@@ -125,6 +162,8 @@ struct Sale: Decodable, Equatable, Identifiable {
     let items: String
     @ConvexFloat var totalCents: Double
     let paid: Bool
+    /// The invoice number, for example "INV-0001".
+    let invoice: String?
 }
 
 struct TaxSummary: Decodable, Equatable {
