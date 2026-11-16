@@ -2,10 +2,10 @@
 
 _meta:
     remote_id: 18250d9b-073a-4bfa-929d-7ec44766da3b
-    remote_version: 4
-    local_version: 4
-    last_synced_at: "2026-11-15T15:55:48-08:00"
-    checksum: cd9f534310853e1ee9a48607a6cafa06fa0b6814a668c33acb9e72e9ed8fbfbe
+    remote_version: 5
+    local_version: 5
+    last_synced_at: "2026-11-15T16:36:57-08:00"
+    checksum: ba2195fd51104173dc951794ea5810f84e461fb08971a416ec9166972fed84fb
 test:
     metadata:
         name: arms-counters

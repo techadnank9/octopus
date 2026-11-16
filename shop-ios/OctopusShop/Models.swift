@@ -24,6 +24,8 @@ struct MenuItem: Decodable, Equatable, Identifiable {
     let name: String
     @ConvexFloat var priceCents: Double
     let description: String?
+    /// Product photo from the shop's own website. Nil when there is none.
+    let imageUrl: String?
     let available: Bool
     /// Units left. Nil when the shop is not counting this item.
     @OptionalConvexFloat var stock: Double?

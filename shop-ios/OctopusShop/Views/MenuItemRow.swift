@@ -9,6 +9,10 @@ struct MenuItemRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top) {
+                if let imageUrl = item.imageUrl, let url = URL(string: imageUrl) {
+                    thumbnail(url)
+                        .padding(.trailing, 4)
+                }
                 VStack(alignment: .leading, spacing: 4) {
                     Text(item.name)
                         .font(Theme.headline)
@@ -47,6 +51,24 @@ struct MenuItemRow: View {
         .foregroundStyle(Theme.ink)
         .card()
         .opacity(item.isSoldOut ? 0.5 : 1)
+    }
+
+    private func thumbnail(_ url: URL) -> some View {
+        let shape = RoundedRectangle(cornerRadius: 14, style: .continuous)
+        return AsyncImage(url: url) { phase in
+            if let image = phase.image {
+                image
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Theme.ink.opacity(0.06)
+            }
+        }
+        .frame(width: 72, height: 72)
+        .background(Color.white)
+        .clipShape(shape)
+        .overlay(shape.strokeBorder(Theme.ink.opacity(0.12), lineWidth: 1))
+        .accessibilityHidden(true)
     }
 
     private var stepper: some View {

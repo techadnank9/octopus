@@ -2,10 +2,10 @@
 
 _meta:
     remote_id: dfbcf190-b87b-448e-9146-64ad1ed74334
-    remote_version: 4
-    local_version: 4
-    last_synced_at: "2026-11-15T15:55:46-08:00"
-    checksum: 9d9b46b7aa940d6ea0a1b79300a87fd2b89c31a433f211a2cfacb0c6a6dfb826
+    remote_version: 5
+    local_version: 5
+    last_synced_at: "2026-11-15T16:36:57-08:00"
+    checksum: 57180cd66dbfb4c838f2849970b891e14f42541e9b8e5e37351d5d2bf9b9e450
 test:
     metadata:
         name: create-shop-and-menu

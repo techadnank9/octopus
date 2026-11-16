@@ -2,10 +2,10 @@
 
 _meta:
     remote_id: eec809a0-75d9-4cdd-be76-c49be5713bb8
-    remote_version: 4
-    local_version: 4
-    last_synced_at: "2026-11-15T15:55:47-08:00"
-    checksum: 429da474185fe498d0ac17a15768be5bae60dda906b74bac492ef8f8c8172d45
+    remote_version: 5
+    local_version: 5
+    last_synced_at: "2026-11-15T16:36:59-08:00"
+    checksum: 20bb5ce67b9d2fbfdd1be25bf9e5a4d32c839b96126f86219d410e7241571679
 test:
     metadata:
         name: order-arrives-live
