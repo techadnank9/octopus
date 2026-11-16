@@ -301,8 +301,25 @@ export const learnBrand = internalAction({
  */
 async function productImages(website: string): Promise<Map<string, string>> {
   const target = /^https?:\/\//i.test(website) ? website : `https://${website}`;
-  const home = await scrape(target);
   const photos = new Map<string, string>();
+  // Shops built on Shopify publish their whole catalog as a feed: every product, its variants and its photo.
+  try {
+    for (let page = 1; page <= 6; page++) {
+      const feed = await fetch(`${new URL(target).origin}/products.json?limit=250&page=${page}`);
+      if (!feed.ok) break;
+      const body = (await feed.json()) as { products?: { title: string; variants?: { title: string }[]; images?: { src: string }[] }[] };
+      if (!body.products?.length) break;
+      for (const product of body.products) {
+        const photo = product.images?.[0]?.src;
+        if (!photo) continue;
+        photos.set(product.title.trim().toLowerCase(), photo);
+        for (const variant of product.variants ?? []) photos.set(`${product.title} ${variant.title}`.trim().toLowerCase(), photo);
+      }
+    }
+  } catch {
+    // Not a Shopify shop: fall through to reading the pages.
+  }
+  const home = await scrape(target);
   if (!home) return photos;
   // The home page shows only some products, so read the listing pages it links to as well.
   const host = new URL(target).host;
@@ -315,7 +332,8 @@ async function productImages(website: string): Promise<Map<string, string>> {
   }
   for (const m of markdown.matchAll(/#{2,4}\s*\[([^\]]+)\]\((https?:\/\/[^)\s"]+)/g)) {
     const photo = byPage.get(m[2]);
-    if (photo) photos.set(m[1].trim().toLowerCase(), photo);
+    const key = m[1].trim().toLowerCase();
+    if (photo && !photos.has(key)) photos.set(key, photo);
   }
   return photos;
 }
@@ -329,7 +347,11 @@ export const setImages = internalMutation({
       // Exact name first; then a size variant of the same product ("Urid Dal 2 KG" uses the "Urid Dal 500 Gm" photo).
       const name = item.name.trim().toLowerCase();
       const stem = name.replace(/\s*\d+(\.\d+)?\s*(kg|g|gm|gms|ml|l|ltr|pcs|pack)\b.*$/i, "").trim();
-      const photo = photos.find((p) => p.name === name) ?? (stem.length > 3 ? photos.find((p) => p.name.startsWith(stem)) : undefined);
+      const squash = (text: string) => text.replace(/[^a-z0-9]/g, "");
+      const photo =
+        photos.find((p) => p.name === name) ??
+        photos.find((p) => squash(p.name) === squash(name)) ??
+        (stem.length > 3 ? photos.find((p) => p.name.startsWith(stem)) ?? photos.find((p) => squash(stem).startsWith(squash(p.name)) && p.name.length > 5) : undefined);
       if (!photo) continue;
       await ctx.db.patch(item._id, { imageUrl: photo.imageUrl });
       matched += 1;

@@ -7,6 +7,9 @@ set -u
 REPO=techadnank9/octopus
 REVYL_APP=f5c287d9-a1fb-48df-b3f2-c12c09e74ae6
 SHOP_APP=a03a0ca7-fe63-4d30-98a7-f0baac8e83cd
+# Exact builds to open, so an older build finishing late on Revyl can never take their place.
+OWNER_BUILD=dea819eb-95de-4e25-aaea-a82caabf5be2
+SHOP_BUILD=71d3ae06-bd47-4bc7-9fc7-f37f34436c17
 PATH="$HOME/.revyl/bin:$PATH"
 cd "$(dirname "$0")/.."
 
@@ -59,11 +62,11 @@ run_phone() { # id kind name target
   st=failed; url=""
   if [ "$2" = "device" ]; then
     # Owner app: a cloud iPhone with the Octopus app installed and launched.
-    url=$(cd ios && revyl device start --app-id "$REVYL_APP" --app-link "$4" --json </dev/null 2>/dev/null | viewer_of viewer_url)
+    url=$(cd ios && revyl device start --app-id "$REVYL_APP" --build-version-id "$OWNER_BUILD" --app-link "$4" --json </dev/null 2>/dev/null | viewer_of viewer_url)
     [ -n "$url" ] && st=open
   elif [ "$2" = "store" ]; then
     # Customer app: the native app opened straight into this shop. Until a native build exists, the shop's page in Safari.
-    out=$(cd shop-ios && revyl device start --app-id "$SHOP_APP" --app-link "$4" --json </dev/null 2>/dev/null)
+    out=$(cd shop-ios && revyl device start --app-id "$SHOP_APP" --build-version-id "$SHOP_BUILD" --app-link "$4" --json </dev/null 2>/dev/null)
     url=$(printf '%s' "$out" | viewer_of viewer_url)
     if [ -n "$url" ]; then
       st=open
