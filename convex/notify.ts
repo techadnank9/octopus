@@ -14,6 +14,7 @@ export const saveMessage = internalMutation({
     role: v.union(v.literal("customer"), v.literal("agent")),
     text: v.string(),
     link: v.optional(v.string()),
+    fromOwner: v.optional(v.boolean()),
   },
   handler: (ctx, message) => ctx.db.insert("messages", message),
 });

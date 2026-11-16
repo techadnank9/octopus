@@ -71,6 +71,8 @@ export default defineSchema({
     role: v.union(v.literal("customer"), v.literal("agent")),
     text: v.string(),
     link: v.optional(v.string()),
+    /** True when the owner wrote this themselves from the inbox, not the octopus. */
+    fromOwner: v.optional(v.boolean()),
   }).index("by_thread", ["shopId", "channelId"]),
 
   bookings: defineTable({

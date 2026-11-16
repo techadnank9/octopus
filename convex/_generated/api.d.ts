@@ -15,6 +15,7 @@ import type * as dashboard from "../dashboard.js";
 import type * as events from "../events.js";
 import type * as features from "../features.js";
 import type * as http from "../http.js";
+import type * as inbox from "../inbox.js";
 import type * as items from "../items.js";
 import type * as landing from "../landing.js";
 import type * as memory from "../memory.js";
@@ -47,6 +48,7 @@ declare const fullApi: ApiFromModules<{
   events: typeof events;
   features: typeof features;
   http: typeof http;
+  inbox: typeof inbox;
   items: typeof items;
   landing: typeof landing;
   memory: typeof memory;
