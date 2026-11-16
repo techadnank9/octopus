@@ -360,11 +360,13 @@ async function refresh() {
     if (run && run.status === 'open' && run.url) {
       link.href = run.url; link.target = '_blank'; link.rel = 'noopener'; link.dataset.ready = '1';
       if (wantPhone[pair[1]]) { wantPhone[pair[1]] = false; $('simNote').textContent = 'Your cloud iPhone is ready. Tap the button to open it.'; window.open(run.url, '_blank'); }
-    } else if (run && (run.status === 'queued' || run.status === 'running')) {
-      link.dataset.ready = ''; $('simNote').textContent = 'Starting a cloud iPhone on Revyl. About a minute.';
+    } else {
+      link.dataset.ready = ''; link.href = '#'; link.removeAttribute('target');
+    }
+    if (run && (run.status === 'queued' || run.status === 'running')) { $('simNote').textContent = 'Starting a cloud iPhone on Revyl. About a minute.';
     }
   });
-  const PS = { queued: 'Waiting for a phone', running: 'Starting on a cloud iPhone', passed: 'Passed', failed: 'Failed', open: 'Live' };
+  const PS = { queued: 'Waiting for a phone', running: 'Starting on a cloud iPhone', passed: 'Passed', failed: 'Failed', open: 'Live', ended: 'Ended' };
   $('phoneRuns').innerHTML = s.phoneRuns.map((r) => '<div class="line3"><span>' + esc(r.name) + '<small>' + PS[r.status] + '</small></span><span></span>' + (r.url ? '<a class="tog" style="text-decoration:none;border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;font-weight:700;font-size:.82rem;color:var(--ink)" target="_blank" rel="noopener" href="' + esc(r.url) + '">' + (r.kind === 'test' ? 'Watch report' : 'Open phone') + '</a>' : '<span></span>') + '</div>').join('');
   $('payLines').innerHTML = [['Collected today', d.today.paidCents], ['Still unpaid', d.today.unpaidCents], ['Average order', d.today.averageCents]].map((r) => '<div class="row"><span>' + r[0] + '</span><b>' + money(r[1]) + '</b></div>').join('');
   $('invoices').innerHTML = u.sales.length ? u.sales.map((o, k) => '<div class="line3"><span>' + esc(o.customer) + '<small>' + esc(o.items) + '</small></span><b>' + money(o.totalCents) + '</b><button data-inv="' + k + '">Invoice</button></div>').join('') : '<p class="empty">Receipts and invoices appear with your first sale.</p>';

@@ -94,7 +94,7 @@ export default defineSchema({
     name: v.string(),
     /** For a customer-app run: the page the cloud iPhone opens in Safari. */
     target: v.optional(v.string()),
-    status: v.union(v.literal("queued"), v.literal("running"), v.literal("passed"), v.literal("failed"), v.literal("open")),
+    status: v.union(v.literal("queued"), v.literal("running"), v.literal("passed"), v.literal("failed"), v.literal("open"), v.literal("ended")),
     url: v.optional(v.string()),
   }),
 

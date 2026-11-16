@@ -82,6 +82,8 @@ next_phone() {
 
 echo "watching for finished features and phone runs (ctrl-c to stop)"
 while :; do
+  live=$(cd ios && revyl device list --json </dev/null 2>/dev/null | node -e 'let t = ""; process.stdin.on("data", (d) => (t += d)).on("end", () => console.log(JSON.stringify([...t.matchAll(/"session_id":\s*"([^"]+)"/g)].map((m) => m[1]))));')
+  npx convex run phone:reconcile "{\"live\":${live:-[]}}" >/dev/null 2>&1
   job=$(next_phone)
   if [ -n "$job" ]; then
     (run_phone "$(echo "$job" | cut -d"|" -f1)" "$(echo "$job" | cut -d"|" -f2)" "$(echo "$job" | cut -d"|" -f3)" "$(echo "$job" | cut -d"|" -f4)") &

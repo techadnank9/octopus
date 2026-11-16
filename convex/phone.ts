@@ -42,3 +42,13 @@ export const finish = internalMutation({
   args: { id: v.id("phoneRuns"), status: v.union(v.literal("passed"), v.literal("failed"), v.literal("open")), url: v.optional(v.string()) },
   handler: (ctx, { id, status, url }) => ctx.db.patch(id, { status, url }),
 });
+
+/** Live phones end after a while. Runs whose session is no longer alive are marked ended so the dashboard starts a fresh one. */
+export const reconcile = internalMutation({
+  args: { live: v.array(v.string()) },
+  handler: async (ctx, { live }) => {
+    for (const run of await ctx.db.query("phoneRuns").order("desc").take(30)) {
+      if (run.status === "open" && !live.some((id) => run.url?.includes(id))) await ctx.db.patch(run._id, { status: "ended" });
+    }
+  },
+});
