@@ -125,10 +125,12 @@ export const createShop = internalMutation({
 export const fromWeb = internalAction({
   args: { query: v.optional(v.string()), website: v.optional(v.string()), description: v.optional(v.string()) },
   handler: async (ctx, { query, website, description }): Promise<{ shopId: Id<"shops">; claimCode: string; source: string | null }> => {
-    const typed = query?.trim().slice(0, 200);
+    const typed = query?.trim().slice(0, 1200);
     const looksLikeSite = !!typed && /^\S+\.[a-z]{2,}(\/\S*)?$/i.test(typed);
-    const site = website?.trim() || (looksLikeSite ? typed : typed ? await findWebsite(typed) : undefined);
-    const told = description?.trim().slice(0, 4000) || (typed && !looksLikeSite ? `The business is called "${typed}".` : undefined);
+    // A sentence or more is the owner describing the business; a few words is a name to look up.
+    const describes = !!typed && !looksLikeSite && typed.split(/\s+/).length > 6;
+    const site = website?.trim() || (looksLikeSite ? typed : typed && !describes ? await findWebsite(typed) : undefined);
+    const told = description?.trim().slice(0, 4000) || (describes ? typed : typed && !looksLikeSite ? `The business is called "${typed}".` : undefined);
     if (!site && !told) throw new Error("Enter your website or your business name");
     if (!process.env.OPENAI_API_KEY) throw new Error("Setup is not available yet");
     const source = [site ? `Website ${site}:\n${await readWebsite(site)}` : "", told ? `Owner's description:\n${told}` : ""].join("\n\n");

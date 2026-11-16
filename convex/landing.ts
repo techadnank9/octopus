@@ -322,9 +322,9 @@ form#build input,.pick select { min-height:52px; font-size:1.02rem; }
   <div>
     <p class="brand"><i></i>Octopus</p>
     <h1>Your shop's own app, from your website, in a minute.</h1>
-    <p class="lede">Enter your website. Your customers get a shopping app with your products, photos and prices. You get an octopus that runs it: it answers them, takes orders and payment, and builds new features when you text it.</p>
+    <p class="lede">Enter your website, or describe your business in a sentence. Your customers get a shopping app with your products, photos and prices. You get an octopus that runs it: it answers them, takes orders and payment, and builds new features when you text it.</p>
     <form id="build">
-      <label>Your business<input id="query" type="text" placeholder="Enter website or name" autocomplete="off" autocapitalize="off"></label>
+      <label>Your business<input id="query" type="text" placeholder="Enter your website, or describe what you sell" autocomplete="off" autocapitalize="off"></label>
       <button class="go" id="go">Build my shop</button>
       <p class="err" id="err" role="alert"></p>
       <p class="resume" id="resume" hidden>Already set up? <a id="resumeLink">Open your dashboard</a></p>
