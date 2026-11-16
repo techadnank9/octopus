@@ -47,3 +47,12 @@ export const setAvailable = mutation({
     return null;
   },
 });
+
+/** Moves an item to another shelf. An empty name clears it. */
+export const setCategory = mutation({
+  args: { id: v.id("items"), category: v.string() },
+  handler: async (ctx, { id, category }) => {
+    await ctx.db.patch(id, { category: category.trim().slice(0, 40) || undefined });
+    return null;
+  },
+});

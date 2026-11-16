@@ -110,6 +110,7 @@ body.dash #studio { padding-top:32px; }
 .alert i { width:8px; height:8px; border-radius:50%; background:var(--coral); flex:none; }
 #alerts { margin-bottom:20px; }
 .mrow { display:grid; grid-template-columns:minmax(0,1fr) 96px 150px 92px; gap:10px; align-items:center; padding:8px 0; border-bottom:1px solid #F0EBF8; font-size:.95rem; }
+.shelf { font:800 1rem var(--display); margin:16px 0 4px; color:var(--plum); }
 .mrow.off .nm { color:var(--muted); text-decoration:line-through; }
 .mrow input { border:1.5px solid var(--line); border-radius:10px; padding:7px 9px; background:#fff; color:var(--ink); width:100%; }
 .stock { display:flex; align-items:center; gap:6px; }
@@ -463,11 +464,14 @@ async function refresh() {
   }
   $('shopName').textContent = s.shop.name;
   $('source').textContent = localStorage.getItem('octopusSource') || '';
-  if (!menuBusy()) $('menu').innerHTML = s.items.length ? s.items.map((i) => {
+  let shelf = null;
+  const shelved = s.items.slice().sort((a, b) => (a.category || 'zzz').localeCompare(b.category || 'zzz'));
+  if (!menuBusy()) $('menu').innerHTML = s.items.length ? shelved.map((i) => {
     const n = esc(i.name);
+    const head = (i.category || 'Uncategorised') !== shelf ? '<h4 class="shelf">' + esc(shelf = i.category || 'Uncategorised') + '</h4>' : '';
     const stock = i.stock === null ? '<button data-n="' + n + '" data-a="count">Count stock</button>'
       : '<button data-n="' + n + '" data-a="dec" aria-label="One fewer ' + n + '">−</button><b class="' + (i.stock <= 3 ? 'low' : '') + '">' + i.stock + '</b><button data-n="' + n + '" data-a="inc" aria-label="One more ' + n + '">+</button><button data-n="' + n + '" data-a="uncount" aria-label="Stop counting ' + n + '">×</button>';
-    return '<div class="mrow' + (i.available ? '' : ' off') + '"><span class="nm">' + n + '</span><input data-n="' + n + '" data-a="price" inputmode="decimal" aria-label="Price of ' + n + '" value="' + (i.priceCents / 100).toFixed(2) + '"><div class="stock" data-s="' + (i.stock === null ? '' : i.stock) + '">' + stock + '</div><button class="tog' + (i.available ? ' is' : '') + '" data-n="' + n + '" data-a="toggle" data-on="' + (i.available ? 1 : 0) + '">' + (i.available ? 'On sale' : 'Off') + '</button></div>';
+    return head + '<div class="mrow' + (i.available ? '' : ' off') + '"><span class="nm">' + n + '</span><input data-n="' + n + '" data-a="price" inputmode="decimal" aria-label="Price of ' + n + '" value="' + (i.priceCents / 100).toFixed(2) + '"><div class="stock" data-s="' + (i.stock === null ? '' : i.stock) + '">' + stock + '</div><button class="tog' + (i.available ? ' is' : '') + '" data-n="' + n + '" data-a="toggle" data-on="' + (i.available ? 1 : 0) + '">' + (i.available ? 'On sale' : 'Off') + '</button></div>';
   }).join('') : '<p class="empty">No items yet. Add one below, or tell your octopus: "Add flat white for 4.50".</p>';
   const d = s.dashboard;
   $('stats').innerHTML = [[d.today.orders, 'orders today'], [money(d.today.paidCents), 'collected'], [money(d.today.unpaidCents), 'still unpaid'], [money(d.today.averageCents), 'average order']]

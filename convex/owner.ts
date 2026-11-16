@@ -20,7 +20,7 @@ const name = { type: "string", description: "Menu item name" };
 export const OWNER_TOOLS = [
   tool("get_menu", "The whole menu with prices and what is sold out, plus opening hours."),
   tool("add_item", "Add a menu item.", { name, price: { type: "number" } }, ["name", "price"]),
-  tool("update_item", "Change an item's price, name, or whether it is available.", { name, price: { type: "number" }, available: { type: "boolean" }, newName: { type: "string" } }, ["name"]),
+  tool("update_item", "Change an item's price, name, category, or whether it is available.", { name, price: { type: "number" }, available: { type: "boolean" }, newName: { type: "string" }, category: { type: "string" } }, ["name"]),
   tool("remove_item", "Delete a menu item.", { name }, ["name"]),
   tool("set_stock", "Set how many units of an item are left. It goes down with each order and switches off at zero. Use stock null to stop counting.", { name, stock: { type: ["number", "null"] } }, ["name", "stock"]),
   tool("set_hours", "Set the shop's opening hours.", { hours: { type: "string" } }, ["hours"]),
@@ -59,6 +59,7 @@ export function runOwnerTool(ctx: ActionCtx, shopId: Id<"shops">, toolName: stri
         price: typeof args.price === "number" ? args.price : undefined,
         available: typeof args.available === "boolean" ? args.available : undefined,
         newName: typeof args.newName === "string" ? args.newName : undefined,
+        category: typeof args.category === "string" ? args.category : undefined,
       });
     case "set_stock":
       return ctx.runMutation(internal.ownerTools.setStock, { shopId, name: String(args.name), stock: typeof args.stock === "number" ? args.stock : null });

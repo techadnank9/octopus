@@ -26,7 +26,7 @@ export const menu = internalQuery({
   handler: async (ctx, { shopId }) => {
     const shop = await ctx.db.get(shopId);
     const items = await ctx.db.query("items").withIndex("by_shop", (q) => q.eq("shopId", shopId)).collect();
-    return { shopName: shop!.name, hours: shop!.hours ?? null, currency: shop!.currency ?? "usd", items: items.map((i) => ({ name: i.name, price: money(i.priceCents), available: i.available, stock: i.stock ?? null })) };
+    return { shopName: shop!.name, hours: shop!.hours ?? null, currency: shop!.currency ?? "usd", items: items.map((i) => ({ name: i.name, category: i.category ?? null, price: money(i.priceCents), available: i.available, stock: i.stock ?? null })) };
   },
 });
 
@@ -41,14 +41,15 @@ export const addItem = internalMutation({
 });
 
 export const updateItem = internalMutation({
-  args: { shopId: v.id("shops"), name: v.string(), price: v.optional(v.number()), available: v.optional(v.boolean()), newName: v.optional(v.string()) },
-  handler: async (ctx, { shopId, name, price, available, newName }) => {
+  args: { shopId: v.id("shops"), name: v.string(), price: v.optional(v.number()), available: v.optional(v.boolean()), newName: v.optional(v.string()), category: v.optional(v.string()) },
+  handler: async (ctx, { shopId, name, price, available, newName, category }) => {
     const item = await findItem(ctx, shopId, name);
     if (price !== undefined && !(price >= 0)) throw new Error("Price must be zero or more");
     await ctx.db.patch(item._id, {
       ...(price !== undefined ? { priceCents: Math.round(price * 100) } : {}),
       ...(available !== undefined ? { available } : {}),
       ...(newName?.trim() ? { name: newName.trim() } : {}),
+      ...(category?.trim() ? { category: category.trim().slice(0, 40) } : {}),
     });
     const updated = (await ctx.db.get(item._id))!;
     return { name: updated.name, price: money(updated.priceCents), available: updated.available };

@@ -170,7 +170,7 @@ export const state = internalQuery({
     const suite: Awaited<ReturnType<typeof suiteOf>> = await suiteOf(ctx, shopId);
     return {
       shop: { name: shop.name, brand: shop.brand ?? null, currency: shop.currency ?? "usd", hours: shop.hours ?? null, channelLink: shop.channelLink ?? null, claimCode: shop.ownerId.startsWith("web:") ? shop.ownerId.slice(4) : null, ownerLink: process.env.OWNER_CHANNEL_LINK ?? null },
-      items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, available: i.available, stock: i.stock ?? null })),
+      items: items.map((i) => ({ name: i.name, category: i.category ?? null, priceCents: i.priceCents, available: i.available, stock: i.stock ?? null })),
       dashboard,
       suite,
       phoneRuns: await ctx.runQuery(internal.phone.recent, {}),
