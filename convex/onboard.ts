@@ -142,6 +142,7 @@ export const fromWeb = internalAction({
     const currency = /^[a-z]{3}$/i.test(draft.currency ?? "") ? draft.currency!.toLowerCase() : undefined;
     const shopId = await ctx.runMutation(internal.onboard.createShop, { name, hours: draft.hours ?? undefined, currency, claimCode, items });
     if (draft.about) await remember(brain.shopNotes(shopId), `About the shop: ${draft.about}`);
+    if (site) await ctx.scheduler.runAfter(0, internal.onboard.addImages, { shopId, website: site });
     // Learn the brand in the background so the dashboard opens straight away.
     await ctx.scheduler.runAfter(0, internal.onboard.learnBrand, { shopId, source: site ?? told ?? name });
     if (draft.unpriced?.length) {
@@ -211,7 +212,7 @@ export const store = internalQuery({
     const order = id ? await ctx.db.get(id) : null;
     return {
       shop: { name: shop.name, currency: shop.currency ?? "usd", hours: shop.hours ?? null },
-      items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, description: i.description ?? null, available: i.available, stock: i.stock ?? null })),
+      items: items.map((i) => ({ name: i.name, priceCents: i.priceCents, description: i.description ?? null, imageUrl: i.imageUrl ?? null, available: i.available, stock: i.stock ?? null })),
       order:
         order && order.shopId === shopId
           ? {
@@ -290,5 +291,57 @@ export const learnBrand = internalAction({
       ...[0, 1, 2, 3].map((i) => text.slice(i * 1800, (i + 1) * 1800)).filter(Boolean).map((chunk) => remember(space, chunk)),
     ]);
     return { facts: facts.length };
+  },
+});
+
+/**
+ * Product photos from the shop's own site. Shop pages list each product as an image link followed by a
+ * heading link to the same product page, so photos are matched to names through that shared page address.
+ */
+async function productImages(website: string): Promise<Map<string, string>> {
+  const target = /^https?:\/\//i.test(website) ? website : `https://${website}`;
+  const home = await scrape(target);
+  const photos = new Map<string, string>();
+  if (!home) return photos;
+  // The home page shows only some products, so read the listing pages it links to as well.
+  const host = new URL(target).host;
+  const more = [...new Set(home.links)].filter((link) => link.includes(host) && /collections|products|shop|menu|catalog/i.test(link) && !/\/products\/[^/]+$/.test(link)).slice(0, 4);
+  const pages = [home, ...(await Promise.all(more.map((link) => scrape(link)))).filter((p): p is Scrape => p !== null)];
+  const markdown = pages.map((p) => p.markdown).join("\n");
+  const byPage = new Map<string, string>();
+  for (const m of markdown.matchAll(/\[!\[[^\]]*\]\((https?:\/\/[^)\s]+?)(?:%20\d+w)?\)\]\((https?:\/\/[^)\s"]+)/g)) {
+    if (!byPage.has(m[2])) byPage.set(m[2], m[1]);
+  }
+  for (const m of markdown.matchAll(/#{2,4}\s*\[([^\]]+)\]\((https?:\/\/[^)\s"]+)/g)) {
+    const photo = byPage.get(m[2]);
+    if (photo) photos.set(m[1].trim().toLowerCase(), photo);
+  }
+  return photos;
+}
+
+export const setImages = internalMutation({
+  args: { shopId: v.id("shops"), photos: v.array(v.object({ name: v.string(), imageUrl: v.string() })) },
+  handler: async (ctx, { shopId, photos }) => {
+    const items = await ctx.db.query("items").withIndex("by_shop", (q) => q.eq("shopId", shopId)).collect();
+    let matched = 0;
+    for (const item of items) {
+      // Exact name first; then a size variant of the same product ("Urid Dal 2 KG" uses the "Urid Dal 500 Gm" photo).
+      const name = item.name.trim().toLowerCase();
+      const stem = name.replace(/\s*\d+(\.\d+)?\s*(kg|g|gm|gms|ml|l|ltr|pcs|pack)\b.*$/i, "").trim();
+      const photo = photos.find((p) => p.name === name) ?? (stem.length > 3 ? photos.find((p) => p.name.startsWith(stem)) : undefined);
+      if (!photo) continue;
+      await ctx.db.patch(item._id, { imageUrl: photo.imageUrl });
+      matched += 1;
+    }
+    return matched;
+  },
+});
+
+/** Adds product photos from the shop's website to the items already in its catalog. */
+export const addImages = internalAction({
+  args: { shopId: v.id("shops"), website: v.string() },
+  handler: async (ctx, { shopId, website }): Promise<{ matched: number }> => {
+    const photos = [...(await productImages(website)).entries()].map(([name, imageUrl]) => ({ name, imageUrl }));
+    return { matched: await ctx.runMutation(internal.onboard.setImages, { shopId, photos }) };
   },
 });

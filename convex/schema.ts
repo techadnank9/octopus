@@ -31,6 +31,8 @@ export default defineSchema({
     priceCents: v.number(),
     description: v.optional(v.string()),
     available: v.boolean(),
+    /** Product photo taken from the shop's own website. */
+    imageUrl: v.optional(v.string()),
     /** Units left. Absent means the shop does not count this item. */
     stock: v.optional(v.number()),
     /** Reorder when stock falls to this many. Three when absent. */

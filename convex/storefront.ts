@@ -27,6 +27,7 @@ header p { color:#CFC6E6; margin-top:8px; font-size:.95rem; }
 .tabs button { flex:1 0 auto; white-space:nowrap; border:1.5px solid var(--line); background:#fff; border-radius:999px; padding:10px; font-weight:700; cursor:pointer; }
 .tabs button.on { background:var(--ink); border-color:var(--ink); color:var(--paper); }
 .item { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid #EEE8F7; }
+.item .pic { width:64px; height:64px; border-radius:14px; object-fit:cover; background:#fff; border:1px solid var(--line); flex:none; }
 .item .name { font-weight:700; }
 .item-info { flex:1; min-width:0; overflow-wrap:anywhere; }
 .item-heading { display:flex; align-items:center; gap:8px; }
@@ -241,7 +242,7 @@ function drawMenu() {
     const stepper = !i.available ? '<span class="price">Sold out</span>'
       : '<div class="step">' + (n ? '<button data-n="' + esc(i.name) + '" data-d="-1" aria-label="Remove one ' + esc(i.name) + '">−</button><span>' + n + '</span>' : '') + '<button class="add" data-n="' + esc(i.name) + '" data-d="1" aria-label="Add ' + esc(i.name) + '">+</button></div>';
     const heart = '<button type="button" class="favourite" data-favourite="' + esc(i.name) + '" aria-label="Favourite ' + esc(i.name) + '" aria-pressed="' + favourites.has(i.name) + '"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>';
-    return '<div class="item' + (i.available ? '' : ' off') + '"><div class="item-info"><div class="item-heading"><div class="name">' + esc(i.name) + '</div>' + heart + '</div>' + (i.description ? '<div class="desc">' + esc(i.description) + '</div>' : '') + '<div class="price">' + money(i.priceCents) + (i.available && i.stock !== null && i.stock <= 3 ? ' · only ' + i.stock + ' left' : '') + '</div></div>' + (i.available ? stepper : '<div class="step">' + stepper + '</div>') + '</div>';
+    return '<div class="item' + (i.available ? '' : ' off') + '">' + (i.imageUrl ? '<img class="pic" loading="lazy" alt="" src="' + esc(i.imageUrl) + '">' : '') + '<div class="item-info"><div class="item-heading"><div class="name">' + esc(i.name) + '</div>' + heart + '</div>' + (i.description ? '<div class="desc">' + esc(i.description) + '</div>' : '') + '<div class="price">' + money(i.priceCents) + (i.available && i.stock !== null && i.stock <= 3 ? ' · only ' + i.stock + ' left' : '') + '</div></div>' + (i.available ? stepper : '<div class="step">' + stepper + '</div>') + '</div>';
   }).join('') : '<p class="empty" role="status">' + (query ? 'Nothing matches' : favouritesOnly ? 'No favourites yet. Tap a heart on the menu to save an item.' : 'The menu is being set up. Ask the octopus what is available.') + '</p>';
   const lines = items.filter((i) => cart[i.name]);
   const count = lines.reduce((t, i) => t + cart[i.name], 0);
