@@ -5,12 +5,18 @@ export const TESTS = ["create-shop-and-menu", "order-arrives-live", "accept-then
 
 /** The dashboard asked to run the phone app on a Revyl cloud iPhone: a live session, or one of the saved tests. */
 export const request = internalMutation({
-  args: { kind: v.union(v.literal("device"), v.literal("test")), name: v.optional(v.string()) },
-  handler: async (ctx, { kind, name }) => {
+  args: { kind: v.union(v.literal("device"), v.literal("store"), v.literal("test")), name: v.optional(v.string()), shopId: v.optional(v.id("shops")) },
+  handler: async (ctx, { kind, name, shopId }) => {
+    if (kind === "store" && !shopId) throw new Error("Which shop?");
     if (kind === "test" && !TESTS.includes(name as (typeof TESTS)[number])) throw new Error("Unknown test");
     const waiting = (await ctx.db.query("phoneRuns").order("desc").take(10)).filter((r) => r.status === "queued" || r.status === "running");
     if (waiting.length >= 3) throw new Error("Three runs are already in progress. Wait for one to finish.");
-    await ctx.db.insert("phoneRuns", { kind, name: kind === "test" ? name! : "Live iPhone", status: "queued" });
+    await ctx.db.insert("phoneRuns", {
+      kind,
+      name: kind === "test" ? name! : kind === "store" ? "Customer app on iPhone" : "Owner app on iPhone",
+      target: kind === "store" ? `${process.env.CONVEX_SITE_URL}/shop?id=${shopId}` : undefined,
+      status: "queued",
+    });
     return { queued: true };
   },
 });
@@ -28,7 +34,7 @@ export const claim = internalMutation({
     const next = (await ctx.db.query("phoneRuns").order("asc").collect()).find((r) => r.status === "queued");
     if (!next) return null;
     await ctx.db.patch(next._id, { status: "running" });
-    return { id: next._id, kind: next.kind, name: next.name };
+    return { id: next._id, kind: next.kind, name: next.name, target: next.target ?? "" };
   },
 });
 

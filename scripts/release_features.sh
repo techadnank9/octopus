@@ -52,16 +52,24 @@ release() { # feature id
   echo "released feature $id via PR #$pr"
 }
 
-run_phone() { # id kind name
+viewer_of() { node -e 'let t = ""; process.stdin.on("data", (d) => (t += d)).on("end", () => { const m = t.match(new RegExp("\"" + process.argv[1] + "\":\\s*\"([^\"]+)\"")); console.log(m ? m[1] : ""); });' "$1"; }
+
+run_phone() { # id kind name target
+  st=failed; url=""
   if [ "$2" = "device" ]; then
-    url=$(cd ios && revyl device start --app-id "$REVYL_APP" --json </dev/null 2>/dev/null | node -e '
-      let t = ""; process.stdin.on("data", (d) => (t += d)).on("end", () => { const m = t.match(/"viewer_url":\s*"([^"]+)"/); console.log(m ? m[1] : ""); });')
-    if [ -n "$url" ]; then st=open; else st=failed; fi
+    # Owner app: a cloud iPhone with the Octopus app installed and launched.
+    url=$(cd ios && revyl device start --app-id "$REVYL_APP" --json </dev/null 2>/dev/null | viewer_of viewer_url)
+    [ -n "$url" ] && st=open
+  elif [ "$2" = "store" ]; then
+    # Customer app: a cloud iPhone with the shop's page opened in Safari.
+    out=$(cd ios && revyl device start --platform ios --json </dev/null 2>/dev/null)
+    sid=$(printf '%s' "$out" | viewer_of session_id)
+    url=$(printf '%s' "$out" | viewer_of viewer_url)
+    if [ -n "$sid" ] && (cd ios && revyl device navigate --url "$4" --session-id "$sid" </dev/null >/dev/null 2>&1); then st=open; fi
   else
     out=$(cd ios && revyl test run "$3" --json </dev/null 2>&1)
-    url=$(printf '%s' "$out" | node -e '
-      let t = ""; process.stdin.on("data", (d) => (t += d)).on("end", () => { const m = t.match(/"report_link":\s*"([^"]+)"/); console.log(m ? m[1] : ""); });')
-    if printf '%s' "$out" | grep -q '"success": true'; then st=passed; else st=failed; fi
+    url=$(printf '%s' "$out" | viewer_of report_link)
+    if printf '%s' "$out" | grep -q '"success": true'; then st=passed; fi
   fi
   npx convex run phone:finish "{\"id\":\"$1\",\"status\":\"$st\"${url:+,\"url\":\"$url\"}}" >/dev/null 2>&1
   echo "phone run $3: $st $url"
@@ -69,14 +77,14 @@ run_phone() { # id kind name
 
 next_phone() {
   npx convex run phone:claim 2>/dev/null | node -e '
-    let t = ""; process.stdin.on("data", (d) => (t += d)).on("end", () => { try { const r = JSON.parse(t); if (r) console.log(r.id + "|" + r.kind + "|" + r.name); } catch {} });'
+    let t = ""; process.stdin.on("data", (d) => (t += d)).on("end", () => { try { const r = JSON.parse(t); if (r) console.log([r.id, r.kind, r.name, r.target].join("|")); } catch {} });'
 }
 
 echo "watching for finished features and phone runs (ctrl-c to stop)"
 while :; do
   job=$(next_phone)
   if [ -n "$job" ]; then
-    (run_phone "$(echo "$job" | cut -d"|" -f1)" "$(echo "$job" | cut -d"|" -f2)" "$(echo "$job" | cut -d"|" -f3)") &
+    (run_phone "$(echo "$job" | cut -d"|" -f1)" "$(echo "$job" | cut -d"|" -f2)" "$(echo "$job" | cut -d"|" -f3)" "$(echo "$job" | cut -d"|" -f4)") &
   fi
   for id in $(npx convex run features:awaitingRelease 2>/dev/null | node -e '
       let t = ""; process.stdin.on("data", (d) => (t += d)).on("end", () => { try { JSON.parse(t).forEach((f) => console.log(f.id)); } catch {} });'); do

@@ -88,8 +88,10 @@ export default defineSchema({
   }).index("by_shop", ["shopId"]),
 
   phoneRuns: defineTable({
-    kind: v.union(v.literal("device"), v.literal("test")),
+    kind: v.union(v.literal("device"), v.literal("store"), v.literal("test")),
     name: v.string(),
+    /** For a customer-app run: the page the cloud iPhone opens in Safari. */
+    target: v.optional(v.string()),
     status: v.union(v.literal("queued"), v.literal("running"), v.literal("passed"), v.literal("failed"), v.literal("open")),
     url: v.optional(v.string()),
   }),

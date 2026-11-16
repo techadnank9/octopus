@@ -200,8 +200,8 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
         <h2 id="shopName"></h2>
         <p id="source" class="src"></p>
         <div class="stats" id="stats"></div>
-        <div class="links"><a id="storeLink" target="_blank" rel="noopener">Open customer app</a><a id="iphoneLink" class="alt" href="#">Open owner app on iPhone</a><span>App code <b id="claim"></b></span></div>
-        <p class="src" id="iphoneNote" style="margin:10px 0 0"></p>
+        <div class="links"><a id="simStore" href="#">Open customer app on iPhone</a><a id="simOwner" class="alt" href="#">Open owner app on iPhone</a><span>App code <b id="claim"></b></span></div>
+        <p class="src" style="margin:10px 0 0"><span id="simNote"></span> <a id="storeLink" target="_blank" rel="noopener" style="color:#CFC6E6">Or open the customer app in this browser</a></p>
       </div>
       <div class="dstage"><div id="octoDash" aria-label="3D octopus. Drag to turn it."></div></div>
     </div>
@@ -224,7 +224,7 @@ footer { background:var(--ink); color:var(--paper); text-align:center; padding:4
       <article class="tile"><header><span class="num">12</span><div><h3>Taxes and compliance</h3><p>Keeps tidy records of sales and the tax inside them.</p></div><b class="live" id="l12"></b></header><div class="tbody"><form class="send" id="taxForm"><input id="taxRate" inputmode="decimal" placeholder="Tax rate %" aria-label="Tax rate in percent"><button>Save rate</button></form><div id="taxLines" style="margin-top:10px"></div></div></article>
     </div>
     <div class="panel phonebar"><h3>The iPhone app, on a cloud iPhone</h3><p class="hint">Runs the owner app on a Revyl simulator. A live phone opens in Revyl; tests come back with a video report.</p>
-      <div class="acts"><button class="main" data-phone="device">Open a live iPhone</button><button data-phone="test" data-name="create-shop-and-menu">Test: set up shop and menu</button><button data-phone="test" data-name="order-arrives-live">Test: order arrives live</button><button data-phone="test" data-name="accept-then-ready">Test: accept then ready</button><button data-phone="test" data-name="arms-counters">Test: dashboard counters</button></div>
+      <div class="acts"><button class="main" data-phone="device">Start a fresh owner iPhone</button><button data-phone="test" data-name="create-shop-and-menu">Test: set up shop and menu</button><button data-phone="test" data-name="order-arrives-live">Test: order arrives live</button><button data-phone="test" data-name="accept-then-ready">Test: accept then ready</button><button data-phone="test" data-name="arms-counters">Test: dashboard counters</button></div>
       <div id="phoneRuns" style="margin-top:12px"></div>
       <p class="hint" style="margin-top:10px"><a href="https://app.revyl.ai" target="_blank" rel="noopener" style="color:var(--violet);font-weight:700">Open Revyl</a></p></div>
     <div class="share"><img class="qr" id="storeQr" alt="QR code for your customer app"><p>Customers scan this to open your shop's own app: menu, cart, pay and live order status.</p></div>
@@ -343,16 +343,17 @@ async function refresh() {
   live('l12', money(u.tax.taxCents), 'tax in sales');
   const FS = { building: 'Capy is building it', built: 'Built and reviewed, releasing', live: 'Live in your customer app', failed: 'Not shipped' };
   $('features').innerHTML = u.features.map((f) => '<div class="alert" style="background:#EFE9FB;border-color:#D9D0EC;color:#3A1D6E"><i style="background:' + (f.status === 'live' ? '#1E9E55' : f.status === 'failed' ? '#B3261A' : '#5B2EE5') + '"></i><span><b>' + FS[f.status] + ':</b> ' + esc(f.request) + '</span></div>').join('');
-  const phone = s.phoneRuns.find((r) => r.kind === 'device');
-  if (phone && phone.status === 'open' && phone.url) {
-    $('iphoneLink').href = phone.url; $('iphoneLink').target = '_blank'; $('iphoneLink').rel = 'noopener'; $('iphoneLink').dataset.ready = '1';
-    $('iphoneNote').textContent = wantPhone ? 'Your cloud iPhone is ready. Tap the button again to open it.' : '';
-    if (wantPhone) { wantPhone = false; window.open(phone.url, '_blank'); }
-  } else if (phone && (phone.status === 'queued' || phone.status === 'running')) {
-    $('iphoneNote').textContent = 'Starting a cloud iPhone on Revyl. About a minute.';
-  }
-  const PS = { queued: 'Waiting for a phone', running: 'Running on a cloud iPhone', passed: 'Passed', failed: 'Failed', open: 'Live' };
-  $('phoneRuns').innerHTML = s.phoneRuns.map((r) => '<div class="line3"><span>' + esc(r.name) + '<small>' + PS[r.status] + '</small></span><span></span>' + (r.url ? '<a class="tog" style="text-decoration:none;border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;font-weight:700;font-size:.82rem;color:var(--ink)" target="_blank" rel="noopener" href="' + esc(r.url) + '">' + (r.kind === 'device' ? 'Open phone' : 'Watch report') + '</a>' : '<span></span>') + '</div>').join('');
+  [['simOwner', 'device'], ['simStore', 'store']].forEach((pair) => {
+    const link = $(pair[0]), run = s.phoneRuns.find((r) => r.kind === pair[1]);
+    if (run && run.status === 'open' && run.url) {
+      link.href = run.url; link.target = '_blank'; link.rel = 'noopener'; link.dataset.ready = '1';
+      if (wantPhone[pair[1]]) { wantPhone[pair[1]] = false; $('simNote').textContent = 'Your cloud iPhone is ready. Tap the button to open it.'; window.open(run.url, '_blank'); }
+    } else if (run && (run.status === 'queued' || run.status === 'running')) {
+      link.dataset.ready = ''; $('simNote').textContent = 'Starting a cloud iPhone on Revyl. About a minute.';
+    }
+  });
+  const PS = { queued: 'Waiting for a phone', running: 'Starting on a cloud iPhone', passed: 'Passed', failed: 'Failed', open: 'Live' };
+  $('phoneRuns').innerHTML = s.phoneRuns.map((r) => '<div class="line3"><span>' + esc(r.name) + '<small>' + PS[r.status] + '</small></span><span></span>' + (r.url ? '<a class="tog" style="text-decoration:none;border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;font-weight:700;font-size:.82rem;color:var(--ink)" target="_blank" rel="noopener" href="' + esc(r.url) + '">' + (r.kind === 'test' ? 'Watch report' : 'Open phone') + '</a>' : '<span></span>') + '</div>').join('');
   $('payLines').innerHTML = [['Collected today', d.today.paidCents], ['Still unpaid', d.today.unpaidCents], ['Average order', d.today.averageCents]].map((r) => '<div class="row"><span>' + r[0] + '</span><b>' + money(r[1]) + '</b></div>').join('');
   $('invoices').innerHTML = u.sales.length ? u.sales.map((o, k) => '<div class="line3"><span>' + esc(o.customer) + '<small>' + esc(o.items) + '</small></span><b>' + money(o.totalCents) + '</b><button data-inv="' + k + '">Invoice</button></div>').join('') : '<p class="empty">Receipts and invoices appear with your first sale.</p>';
   $('bookings').innerHTML = u.bookings.length ? u.bookings.map((b) => '<div class="line3"><span>' + esc(b.customer) + '<small>' + esc(b.service) + ', ' + esc(b.when) + (b.status === 'cancelled' ? ' (cancelled)' : b.reminded ? ' (reminded)' : '') + '</small></span>' + (b.status === 'booked' ? '<button data-do="remind" data-id="' + b.id + '">Remind</button><button data-do="cancelBooking" data-id="' + b.id + '">Cancel</button>' : '<span></span><span></span>') + '</div>').join('') : '<p class="empty">No bookings yet. Customers can text "book me for 5 PM tomorrow".</p>';
@@ -374,13 +375,16 @@ async function refresh() {
   }).join('') : '<p class="empty">No orders yet. Text your line, or try the customer chat.</p>';
 }
 
-let sales = [], taxInfo = { rate: 0 }, wantPhone = false;
-$('iphoneLink').addEventListener('click', (e) => {
-  if ($('iphoneLink').dataset.ready === '1') return;
-  e.preventDefault();
-  wantPhone = true;
-  $('iphoneNote').textContent = 'Starting a cloud iPhone on Revyl. About a minute.';
-  post('/public/phone', { kind: 'device' }).then(refresh).catch((err) => { $('iphoneNote').textContent = err.message; });
+let sales = [], taxInfo = { rate: 0 };
+const wantPhone = {};
+[['simOwner', 'device'], ['simStore', 'store']].forEach((pair) => {
+  $(pair[0]).addEventListener('click', (e) => {
+    if ($(pair[0]).dataset.ready === '1') return;
+    e.preventDefault();
+    wantPhone[pair[1]] = true;
+    $('simNote').textContent = 'Starting a cloud iPhone on Revyl. About a minute.';
+    post('/public/phone', { kind: pair[1], shopId: shopId }).then(refresh).catch((err) => { $('simNote').textContent = err.message; });
+  });
 });
 const toast = (text) => { $('toast').textContent = text; setTimeout(() => { if ($('toast').textContent === text) $('toast').textContent = ''; }, 5000); };
 const DONE = { announce: 'Announcement sent to ', winback: 'Win-back text sent to ', chaseUnpaid: 'Payment reminder sent to ', askReviews: 'Review request sent to ' };
